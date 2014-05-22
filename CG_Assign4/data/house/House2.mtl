@@ -1,0 +1,41 @@
+# Exported from Wings 3D 1.0.1
+newmtl Door
+Ns 100.0
+d 1.0
+illum 2
+Kd 0.34902 0.25098 0.2
+Ka 1.0 1.0 1.0
+Ks 1.0 1.0 1.0
+Ke 0.0 0.0 0.0
+map_Kd Door_tex.png
+
+newmtl InnWalls
+Ns 100.0
+d 1.0
+illum 2
+Kd 0.823529 0.792157 0.741176
+Ka 1.0 1.0 1.0
+Ks 1.0 1.0 1.0
+Ke 0.0 0.0 0.0
+map_Kd InnWall2.jpg
+
+newmtl Shingles
+Ns 100.0
+d 1.0
+illum 2
+Kd 0.282353 0.309804 0.435294
+Ka 1.0 1.0 1.0
+Ks 1.0 1.0 1.0
+Ke 0.0 0.0 0.0
+map_Kd Tiles.png
+
+newmtl Window
+Ns 100.0
+d 1.0
+illum 2
+Kd 0.615686 0.65098 0.701961
+Ka 1.0 1.0 1.0
+Ks 1.0 1.0 1.0
+Ke 0.0 0.0 0.0
+map_Kd Window.png
+

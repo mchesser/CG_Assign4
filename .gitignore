@@ -19,3 +19,9 @@
 *.exe
 *.out
 *.app
+/CG_Assign4/CG_Assign4.vcxproj.filters
+/CG_Assign4/CG_Assign4.opensdf
+/CG_Assign4/CG_Assign4.sdf
+/CG_Assign4/CG_Assign4.sln
+/CG_Assign4/CG_Assign4.v12.suo
+/CG_Assign4/CG_Assign4.vcxproj
