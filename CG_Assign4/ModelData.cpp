@@ -79,6 +79,11 @@ RawModelData loadModelData(const std::string& filename) {
         shape.material.dissolve = baseShapes[i].material.dissolve;
 
         shape.textureName = subdir + baseShapes[i].material.diffuse_texname;
+        // The filename from tiny_obj_loader does not trim trailing whitespace. This causes issues
+        // when using SOIL to load textures on Linux. So we need to manually trim whitespace 
+        // It is unfortunate that C++ does not have a nice way for trimming strings, so we need
+        // to use this complicated expression.
+        shape.textureName.erase(shape.textureName.find_last_not_of(" \n\r\t") + 1);
 
         data.shapes.push_back(shape);
     }
