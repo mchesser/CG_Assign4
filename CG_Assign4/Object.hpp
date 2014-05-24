@@ -25,6 +25,13 @@ public:
     void rotateAroundPoint(glm::vec3 rotation, glm::vec3 point);
 
     /// <summary>
+    /// Rotate the object so it faces a point.
+    /// </summary>
+    ///
+    /// <param name="point">The target point to face.</param>
+    void lookAt(glm::vec3 point);
+
+    /// <summary>
     /// Moves the object with respect to the direction the object is facing.
     /// </summary>
     ///
@@ -40,7 +47,7 @@ protected:
     /// <summary>
     ///	Create a new object.
     /// Note: Normally it is better to use the default parameters for constructing the object,
-    /// then using rotate to rotate the object.
+    /// then use rotate or lookAt to set the correct position of the object.
     /// </summary>
     ///
     /// <param name="position">The position of the object in the world.</param>

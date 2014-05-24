@@ -28,22 +28,26 @@ void Object::rotateAroundPoint(glm::vec3 rotation, glm::vec3 point) {
     position = point + rotationMat * (position - point);
 }
 
+void Object::lookAt(glm::vec3 point) {
+    const glm::vec3 pointDir = glm::normalize(point - position);
+    const float angle = glm::acos(glm::dot(direction, pointDir));
+    const glm::mat3 rotationMat = glm::mat3(rotate3D(glm::vec3(0, 0, angle), pointDir, direction,
+        glm::cross(direction, pointDir)));
+
+    // Apply the rotation to the object's properties
+    up = rotationMat * up;
+    direction = rotationMat * direction;
+}
+
 void Object::move(glm::vec3 amount) {
     const glm::vec3 xAxis = glm::cross(direction, up);
     position += amount.x * xAxis + amount.y * up + amount.z * direction;
 }
 
 glm::mat4 Object::transformationMatrix() const {
-    // Construct a rotation matrix by creating a transformation matrix that transforms the object's
-    // axis to the world axis.
-    glm::mat4 rotation = glm::mat4(1.0f);
-    rotation[0] = glm::vec4(glm::cross(direction, up), 0);
-    rotation[1] = glm::vec4(up, 0);
-    rotation[2] = glm::vec4(direction, 0);
-
     return (
         glm::translate(glm::mat4(1.0f), position) *
-        rotation *
+        rotateBasis(glm::cross(direction, up), up, direction) *
         glm::scale(glm::mat4(1.0f), scale)
         );
 }

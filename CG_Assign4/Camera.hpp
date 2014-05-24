@@ -10,7 +10,15 @@ public:
     /// </summary>
     ///
     /// <param name="position">The position of the camera in the world.</param>
-    Camera(glm::vec3 position);
+    /// <param name="target">The position of the camera's target.</param>
+    Camera(glm::vec3 position, glm::vec3 target);
+
+    /// <summary> 
+    /// Move the camera's target by a specified amount.
+    /// </summary>
+    ///
+    /// <param name="amount">The amount to move the target by.</param>
+    void moveTarget(glm::vec3 amount);
 
     /// <summary>
     /// Construct a view transformation from the camera.
