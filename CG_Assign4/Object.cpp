@@ -31,6 +31,14 @@ void Object::rotateAroundPoint(glm::vec3 rotation, glm::vec3 point) {
 void Object::lookAt(glm::vec3 point) {
     const glm::vec3 pointDir = glm::normalize(point - position);
     const float angle = glm::acos(glm::dot(direction, pointDir));
+    if (angle == 0.0) {
+        // If the angle is zero then the target direction is orthogonal to the current direction,
+        // this means either we are already facing the correct direction, or we need to face the
+        // opposite direction.
+        direction = pointDir;
+        return;
+    }
+
     const glm::mat3 rotationMat = glm::mat3(rotate3D(glm::vec3(0, 0, angle), pointDir, direction,
         glm::cross(direction, pointDir)));
 
