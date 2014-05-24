@@ -1,11 +1,11 @@
-#version 150
+#version 120
 
-in  vec3 v_coord;
-in  vec3 v_normal;
-in  vec2 v_texcoord;
+attribute vec3 v_coord;
+attribute vec3 v_normal;
+attribute vec2 v_texcoord;
 
-out vec4 color;
-out vec2 texcoord;
+varying vec4 color;
+varying vec2 texcoord;
 
 uniform mat4 mv;
 uniform mat4 proj;
@@ -23,7 +23,7 @@ uniform Material material;
 uniform vec3 lightPosition;
 
 void main()
-{
+{    
     vec4 pos = mv * vec4(v_coord, 1.0);
     gl_Position = proj * pos;
 

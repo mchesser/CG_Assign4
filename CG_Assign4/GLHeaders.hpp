@@ -5,10 +5,10 @@
 #include <windows.h>
 #endif
 
-#ifdef __APPLE__
-#include <OpenGL/OpenGL.h>
-#include <GLUT/glut.h>
+#ifndef __APPLE__
+  #include <GL/glew.h>
+  #include <GL/glut.h>
 #else
-#include <GL/glew.h>
-#include <GL/glut.h>
+  #include <OpenGL/gl3.h>
+  #include <GLUT/glut.h>
 #endif

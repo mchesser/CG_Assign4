@@ -102,6 +102,8 @@ void onDisplay() {
     glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glEnable(GL_TEXTURE_2D);
+     
     renderer->drawModel(building, glm::vec3(0, -1, 0), glm::vec3(2));
     renderer->drawModel(building, glm::vec3(32, -1, 0), glm::vec3(2));
     renderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
@@ -162,7 +164,9 @@ int main(int argc, char* argv[]) {
     glutInitWindowSize(800, 600);
     glutCreateWindow("Assignment 4");
 
+#ifndef __APPLE__
     glewInit();
+#endif
 
     // Enable GL properties
     glEnable(GL_DEPTH_TEST);

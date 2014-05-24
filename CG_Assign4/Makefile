@@ -3,7 +3,7 @@
 CC = g++
 CFLAGS = -c -O -Wall -DGLM_FORCE_RADIANS
 # Windows = WIN32, MacOSX = __APPLE__, Linux = Linux
-OSFLAG = WIN32
+OSFLAG = __APPLE__
 
 SRC_FILES = Main.cpp Renderer.cpp Camera.cpp ModelData.cpp Object.cpp
 OBJECTS = $(SRC_FILES:.cpp=.o)
