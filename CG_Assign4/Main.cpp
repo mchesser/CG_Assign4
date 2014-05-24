@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "ModelData.hpp"
 #include "Renderer.hpp"
+#include "City.hpp"
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -18,7 +19,8 @@
 #define ORIGIN  (glm::vec3(0))
 
 static ModelData* terrainModel;
-static ModelData* building;
+static ModelData* buildingModel;
+static City* city;
 
 static Renderer* renderer;
 static Camera* cam1;
@@ -81,19 +83,109 @@ RawModelData genTerrainModel(const std::string& terrainTexture) {
     return data;
 }
 
+// FIXME: This should be replaced by a better function for generating buildings
+//  - Need to generate normals correctly
+//  - Need to generate textures for day and night
+//  - Need to generate bump map / heightmap
+RawModelData genCube(const std::string& texture) {
+    RawModelData data;
+    RawModelData::Shape shape;
+
+    shape.vertices.reserve(8);
+    shape.vertices.push_back(glm::vec3(-1, 1, 1));
+    shape.vertices.push_back(glm::vec3(-1, 1, -1));
+    shape.vertices.push_back(glm::vec3(1, 1, -1));
+    shape.vertices.push_back(glm::vec3(1, 1, 1));
+    shape.vertices.push_back(glm::vec3(-1, -1, 1));
+    shape.vertices.push_back(glm::vec3(-1, -1, -1));
+    shape.vertices.push_back(glm::vec3(1, -1, -1));
+    shape.vertices.push_back(glm::vec3(1, -1, 1));
+
+    shape.normals.reserve(8);
+    for (size_t i = 0; i < 4; ++i) {
+        shape.normals.push_back(glm::vec3(0, 1, 0));
+    }
+
+    shape.texCoords.reserve(8);
+    shape.texCoords.push_back(glm::vec2(0, 1));
+    shape.texCoords.push_back(glm::vec2(0, 0));
+    shape.texCoords.push_back(glm::vec2(1, 0));
+    shape.texCoords.push_back(glm::vec2(1, 1));
+    shape.texCoords.push_back(glm::vec2(0, 1));
+    shape.texCoords.push_back(glm::vec2(0, 0));
+    shape.texCoords.push_back(glm::vec2(1, 0));
+    shape.texCoords.push_back(glm::vec2(1, 1));
+
+    // Top
+    shape.indices.push_back(0);
+    shape.indices.push_back(1);
+    shape.indices.push_back(2);
+    shape.indices.push_back(0);
+    shape.indices.push_back(2);
+    shape.indices.push_back(3);
+    // Bottom
+    shape.indices.push_back(4);
+    shape.indices.push_back(5);
+    shape.indices.push_back(6);
+    shape.indices.push_back(4);
+    shape.indices.push_back(6);
+    shape.indices.push_back(7);
+    // Left
+    shape.indices.push_back(0);
+    shape.indices.push_back(4);
+    shape.indices.push_back(5);
+    shape.indices.push_back(0);
+    shape.indices.push_back(5);
+    shape.indices.push_back(1);
+    // Right
+    shape.indices.push_back(2);
+    shape.indices.push_back(6);
+    shape.indices.push_back(7);
+    shape.indices.push_back(2);
+    shape.indices.push_back(7);
+    shape.indices.push_back(3);
+    // Front
+    shape.indices.push_back(1);
+    shape.indices.push_back(5);
+    shape.indices.push_back(6);
+    shape.indices.push_back(1);
+    shape.indices.push_back(6);
+    shape.indices.push_back(2);
+    // Back
+    shape.indices.push_back(0);
+    shape.indices.push_back(4);
+    shape.indices.push_back(7);
+    shape.indices.push_back(0);
+    shape.indices.push_back(7);
+    shape.indices.push_back(3);
+
+    shape.material.ambient = glm::vec3(0.3f);
+    shape.material.diffuse = glm::vec3(1.0f);
+    shape.material.specular = glm::vec3(0.0f);
+    shape.material.shininess = 0.0f;
+    shape.material.dissolve = 0.0f;
+
+    shape.textureName = texture;
+
+    data.shapes.push_back(shape);
+    return data;
+}
+
 // Initialise the program resources
 void initResources() {
     GLuint program = initProgram(shaderFromFile("shaders/vshader.glsl", GL_VERTEX_SHADER),
         shaderFromFile("shaders/fshader.glsl", GL_FRAGMENT_SHADER));
     glUseProgram(program);
 
-    cam1 = new Camera(glm::vec3(0.0f, 40.0f, 0.0f), ORIGIN);
+    cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), ORIGIN);
     glm::mat4 proj = glm::perspective(DEG2RAD(60.0f), screenWidth / screenHeight, 0.1f, 200.0f);
 
     renderer = new Renderer(program, proj, cam1);
 
-    building = new ModelData(loadModelData("data/house/House2.obj"), renderer);
-    terrainModel = new ModelData(genTerrainModel("data/grassTex.tga"), renderer);
+    buildingModel = new ModelData(genCube("data/default.tga"), renderer);
+    terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
+
+    city = new City(buildingModel);
 }
 
 // Display callback
@@ -101,10 +193,7 @@ void onDisplay() {
     glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_TEXTURE_2D);
-     
-    renderer->drawModel(building, glm::vec3(0, -1, 0), glm::vec3(2));
-    renderer->drawModel(building, glm::vec3(32, -1, 0), glm::vec3(2));
+    city->draw(renderer);
     renderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
 
     // Swap buffers
@@ -159,7 +248,7 @@ void onReshape(int width, int height) {
 // Program entry point
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
     glutCreateWindow("Assignment 4");
 
@@ -170,6 +259,7 @@ int main(int argc, char* argv[]) {
     // Enable GL properties
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
     glCullFace(GL_TRUE);
 
     // Set up callbacks

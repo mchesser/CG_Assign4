@@ -6,6 +6,21 @@
 
 class Object {
 public:
+    /// <summary>
+    ///	Create a new object.
+    /// Note: Normally it is better to use the default parameters for constructing the object,
+    /// then use rotate or lookAt to set the correct position of the object.
+    /// </summary>
+    ///
+    /// <param name="position">The position of the object in the world.</param>
+    /// <param name="direction">The direction the object is facing.</param>
+    /// <param name="up">The up direction of the object.</param>
+    /// <param name="scale">The scale of the object.</param>
+    Object(glm::vec3 position,
+        glm::vec3 direction = glm::vec3(0, 0, 1),
+        glm::vec3 up = glm::vec3(0, 1, 0),
+        glm::vec3 scale = glm::vec3(1.0f));
+
     virtual ~Object() {}
 
     /// <summary>
@@ -44,21 +59,6 @@ public:
     glm::mat4 transformationMatrix() const;
 
 protected:
-    /// <summary>
-    ///	Create a new object.
-    /// Note: Normally it is better to use the default parameters for constructing the object,
-    /// then use rotate or lookAt to set the correct position of the object.
-    /// </summary>
-    ///
-    /// <param name="position">The position of the object in the world.</param>
-    /// <param name="direction">The direction the object is facing.</param>
-    /// <param name="up">The up direction of the object.</param>
-    /// <param name="scale">The scale of the object.</param>
-    Object(glm::vec3 position,
-        glm::vec3 direction = glm::vec3(0, 0, 1),
-        glm::vec3 up = glm::vec3(0, 1, 0),
-        glm::vec3 scale = glm::vec3(1.0f));
-
     /// <summary>
     /// The position of the object in the world.
     /// </summary>
