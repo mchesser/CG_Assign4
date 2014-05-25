@@ -5,7 +5,7 @@ CFLAGS = -c -O -Wall -DGLM_FORCE_RADIANS
 # Windows = WIN32, MacOSX = __APPLE__, Linux = Linux
 OSFLAG = __APPLE__
 
-SRC_FILES = Main.cpp Renderer.cpp Camera.cpp ModelData.cpp Object.cpp Array2d.cpp City.cpp
+SRC_FILES = Main.cpp Renderer.cpp Camera.cpp ModelData.cpp Object.cpp City.cpp
 OBJECTS = $(SRC_FILES:.cpp=.o)
 SOIL_LIB = SOIL/SOIL.a
 TINY_OBJ_LIB = tiny_obj_loader/tiny_obj_loader.a
