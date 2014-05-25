@@ -31,6 +31,14 @@ static float screenHeight = 600;
 
 static long prevTime = 0;
 
+
+struct KeyState {
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+} keyState;
+
 // A simple structure for storing relevant information required for mouse control
 static struct MouseHandler {
     MouseHandler() : x(0), y(0), prevX(0), prevY(0), isDown(false) {}
@@ -116,6 +124,12 @@ void initResources() {
     terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
 
     city = new City(buildingModel);
+
+
+    keyState.up = false;
+    keyState.down = false;
+    keyState.left = false;
+    keyState.right = false;
 }
 
 // Display callback
@@ -136,6 +150,11 @@ void onIdle() {
     float dt = static_cast<float>(time - prevTime) / 1000.0f;
     prevTime = time;
 
+    if (keyState.up) cam1->move(glm::vec3(0, 0, 0.2f));
+    if (keyState.down) cam1->move(glm::vec3(0, 0, -0.2f));
+    if (keyState.left) cam1->move(glm::vec3(-0.2f, 0, 0));
+    if (keyState.right) cam1->move(glm::vec3(0.2f, 0, 0));
+
     glutPostRedisplay();
 }
 
@@ -143,11 +162,21 @@ void onIdle() {
 void keyboard(unsigned char key, int x, int y) {
     switch (key) {
     case 033: exit(EXIT_SUCCESS); break;
-    case 'w': cam1->move(glm::vec3(0, 0, 0.2f)); break;
-    case 's': cam1->move(glm::vec3(0, 0, -0.2f)); break;
-    case 'a': cam1->move(glm::vec3(-0.2f, 0, 0)); break;
-    case 'd': cam1->move(glm::vec3(0.2f, 0, 0)); break;
+    case 'w': keyState.up = true; break;
+    case 's': keyState.down = true; break;
+    case 'a': keyState.left = true; break;
+    case 'd': keyState.right = true; break;
     }
+}
+
+void keyboardUp(unsigned char key, int x, int y) {
+    switch (key) {
+    case 'w': keyState.up = false; break;
+    case 's': keyState.down = false; break;
+    case 'a': keyState.left = false; break;
+    case 'd': keyState.right = false; break;
+    }
+
 }
 
 // Mouse click callback
@@ -166,7 +195,7 @@ void onMotion(int x, int y) {
     glutPostRedisplay();
 }
 
-// Window shape callback
+// Window shape callbackwww
 void onReshape(int width, int height) {
     screenWidth = static_cast<float>(width);
     screenHeight = static_cast<float>(height);
@@ -197,6 +226,7 @@ int main(int argc, char* argv[]) {
     glutIdleFunc(onIdle);
     glutReshapeFunc(onReshape);
     glutKeyboardFunc(keyboard);
+    glutKeyboardUpFunc(keyboardUp);
     glutMouseFunc(onMouse);
     glutMotionFunc(onMotion);
 
