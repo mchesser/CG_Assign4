@@ -9,7 +9,7 @@ Object::Object(glm::vec3 position, glm::vec3 direction, glm::vec3 up, glm::vec3 
 }
 
 void Object::rotate(glm::vec3 rotation) {
-    const glm::vec3 xAxis = glm::cross(direction, up);
+    const glm::vec3 xAxis = glm::normalize(glm::cross(direction, up));
     const glm::mat3 rotationMat = glm::mat3(rotate3D(rotation, xAxis, up, direction));
 
     // Apply the rotation to the object's properties
@@ -19,7 +19,7 @@ void Object::rotate(glm::vec3 rotation) {
 
 void Object::rotateAroundPoint(glm::vec3 rotation, glm::vec3 point) {
     const glm::vec3 pointDir = glm::normalize(position - point);
-    const glm::vec3 xAxis = glm::cross(pointDir, up);
+    const glm::vec3 xAxis = glm::normalize(glm::cross(pointDir, up));
     const glm::mat3 rotationMat = glm::mat3(rotate3D(rotation, xAxis, up, pointDir));
 
     // Apply the rotation to the object's properties
@@ -50,7 +50,7 @@ void Object::lookAt(glm::vec3 point) {
 }
 
 void Object::move(glm::vec3 amount) {
-    const glm::vec3 xAxis = glm::cross(direction, up);
+    const glm::vec3 xAxis = glm::normalize(glm::cross(direction, up));
     position += amount.x * xAxis + amount.y * up + amount.z * direction;
 }
 

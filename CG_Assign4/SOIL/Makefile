@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -c -O -D __APPLE__ 
+CFLAGS = -c -O -D$(OSFLAG)
 
 SRC_FILES = image_DXT.c image_helper.c stb_image_aug.c SOIL.c
 OBJECTS = $(SRC_FILES:.c=.o)

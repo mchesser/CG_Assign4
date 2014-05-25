@@ -2,8 +2,20 @@
 
 CC = g++
 CFLAGS = -c -O -Wall -DGLM_FORCE_RADIANS
-# Windows = WIN32, MacOSX = __APPLE__, Linux = Linux
-OSFLAG = __APPLE__
+
+# Determine the OS which is running (see: http://stackoverflow.com/questions/714100/os-detecting-makefile)
+ifeq ($(OS),Windows_NT)
+    OSFLAG = WIN32
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        OSFLAG = LINUX
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        OSFLAG = __APPLE__
+    endif
+endif
+export OSFLAG
 
 SRC_FILES = Main.cpp Renderer.cpp Camera.cpp ModelData.cpp Object.cpp City.cpp
 OBJECTS = $(SRC_FILES:.cpp=.o)
@@ -11,17 +23,17 @@ SOIL_LIB = SOIL/SOIL.a
 TINY_OBJ_LIB = tiny_obj_loader/tiny_obj_loader.a
 
 ifeq ($(OSFLAG), WIN32)
-CFLAGS += -DWIN32
-LIBS = -lopengl32 -lglut32 -lglew32 -lglu32
+	CFLAGS += -DWIN32
+	LIBS = -lopengl32 -lglut32 -lglew32 -lglu32
 endif
 
 ifeq ($(OSFLAG), __APPLE__)
-CFLAGS += -DMACOSX -I.
-LIBS = -framework Glut -framework OpenGL -framework CoreFoundation
+	CFLAGS += -DMACOSX -I.
+	LIBS = -framework Glut -framework OpenGL -framework CoreFoundation
 endif
 
-ifeq ($(OSFLAG), Linux)
-LIBS = -lGL -lglut -lGLEW -lGLU
+ifeq ($(OSFLAG), LINUX)
+	LIBS = -lGL -lglut -lGLEW -lGLU
 endif
 
 
