@@ -41,7 +41,7 @@ void Object::lookAt(glm::vec3 point) {
     }
     const float angle = glm::acos(dot_product);
 
-    const glm::mat3 rotationMat = glm::mat3(rotate3D(glm::vec3(0, 0, angle), pointDir, direction,
+    const glm::mat3 rotationMat = glm::mat3(glm::rotate(glm::mat4(1), angle, 
         glm::cross(direction, pointDir)));
 
     // Apply the rotation to the object's properties
