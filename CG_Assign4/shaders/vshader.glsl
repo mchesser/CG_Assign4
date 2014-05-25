@@ -30,7 +30,7 @@ void main()
     vec4 ambient, diffuse, specular;
     ambient = vec4(material.ambient, 1.0);
 
-    vec3 L = normalize(lightPosition - vec3(pos));
+    vec3 L = -normalize(lightPosition - vec3(pos));
     vec3 N = normalize(normalMatrix * v_normal);
     vec3 H = normalize(L - normalize(vec3(pos)));
     
@@ -43,10 +43,10 @@ void main()
     }
     else {
         float Ks = pow(max(dot(N, H), 0.0), material.shine);
-        specular = 4 * Ks * vec4(material.specular, 1.0);
+        specular = Ks * vec4(material.specular, 1.0);
     }
 
-    color = ambient + diffuse + specular;
+    color = ambient + diffuse;
     color.a = 1.0;
 
     texcoord = v_texcoord;

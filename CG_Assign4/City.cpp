@@ -51,7 +51,7 @@ void City::draw(const Renderer* renderer) const {
             const BuildingData building = building_types[data.at(x, y)];
             
             const glm::vec3 position = glm::vec3(static_cast<float>(x) * (BULDING_SCALE + BULDING_OFFSET),
-                building.scale.y / 2.0f,
+                building.scale.y,
                 static_cast<float>(y) * (BULDING_SCALE + BULDING_OFFSET)) + offset;
 
             const glm::mat4 transform = Object(position, STREET_DIR, SKY_DIR,

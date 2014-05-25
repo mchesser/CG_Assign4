@@ -16,6 +16,14 @@ struct Material {
     float dissolve;
 };
 
+const Material DEFAULT_MATERIAL = {
+    glm::vec3(0.3f),
+    glm::vec3(1.0f),
+    glm::vec3(0.1f),
+    0.0f,
+    0.0f
+};
+
 struct RawModelData {
     struct Shape {
         std::vector<glm::vec3> vertices;

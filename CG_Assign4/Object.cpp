@@ -31,7 +31,7 @@ void Object::rotateAroundPoint(glm::vec3 rotation, glm::vec3 point) {
 void Object::lookAt(glm::vec3 point) {
     const glm::vec3 pointDir = glm::normalize(point - position);
     const float dot_product = glm::dot(direction, pointDir);
-    if (dot_product >= 1.0f) {
+    if (abs(dot_product) >= 1.0f) {
         // If the dot product is greater than or equal to 1, it means the target direction is close 
         // to the current direction. Since floating point errors can affect the values it is
         // possible to get values above 1 causing errors when computing the angle, so we just

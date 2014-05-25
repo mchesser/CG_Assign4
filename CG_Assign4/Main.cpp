@@ -2,6 +2,7 @@
 #include "GLShaderLoader.hpp"
 #include "Camera.hpp"
 #include "ModelData.hpp"
+#include "Shapes.hpp"
 #include "Renderer.hpp"
 #include "City.hpp"
 
@@ -45,43 +46,13 @@ static struct MouseHandler {
 // Generates a square terrain with the specified texture loaded from a file
 RawModelData genTerrainModel(const std::string& terrainTexture) {
     RawModelData data;
-    RawModelData::Shape shape;
-
-    shape.vertices.reserve(4);
-    shape.vertices.push_back(glm::vec3(-1, -1, 1));
-    shape.vertices.push_back(glm::vec3(-1, -1, -1));
-    shape.vertices.push_back(glm::vec3(1, -1, -1));
-    shape.vertices.push_back(glm::vec3(1, -1, 1));
-
-    shape.normals.reserve(4);
-    for (size_t i = 0; i < 4; ++i) {
-        shape.normals.push_back(glm::vec3(0, 1, 0));
-    }
-
-    shape.texCoords.reserve(4);
-    shape.texCoords.push_back(glm::vec2(0, 1));
-    shape.texCoords.push_back(glm::vec2(0, 0));
-    shape.texCoords.push_back(glm::vec2(1, 0));
-    shape.texCoords.push_back(glm::vec2(1, 1));
-
-    shape.indices.push_back(0);
-    shape.indices.push_back(1);
-    shape.indices.push_back(2);
-    shape.indices.push_back(0);
-    shape.indices.push_back(2);
-    shape.indices.push_back(3);
-
-    shape.material.ambient = glm::vec3(0.3f);
-    shape.material.diffuse = glm::vec3(1.0f);
-    shape.material.specular = glm::vec3(0.0f);
-    shape.material.shininess = 0.0f;
-    shape.material.dissolve = 0.0f;
-
+    RawModelData::Shape shape = shapes::quad(glm::vec3(-1, 0, 1), glm::vec3(-1, 0, -1),
+        glm::vec3(1, 0, -1), glm::vec3(1, 0, 1));
     shape.textureName = terrainTexture;
-
     data.shapes.push_back(shape);
     return data;
 }
+
 
 // FIXME: This should be replaced by a better function for generating buildings
 //  - Need to generate normals correctly
@@ -90,84 +61,43 @@ RawModelData genTerrainModel(const std::string& terrainTexture) {
 RawModelData genCube(const std::string& texture) {
     RawModelData data;
     RawModelData::Shape shape;
-
-    shape.vertices.reserve(8);
-    shape.vertices.push_back(glm::vec3(-1, 1, 1));
-    shape.vertices.push_back(glm::vec3(-1, 1, -1));
-    shape.vertices.push_back(glm::vec3(1, 1, -1));
-    shape.vertices.push_back(glm::vec3(1, 1, 1));
-    shape.vertices.push_back(glm::vec3(-1, -1, 1));
-    shape.vertices.push_back(glm::vec3(-1, -1, -1));
-    shape.vertices.push_back(glm::vec3(1, -1, -1));
-    shape.vertices.push_back(glm::vec3(1, -1, 1));
-
-    shape.normals.reserve(8);
-    for (size_t i = 0; i < 4; ++i) {
-        shape.normals.push_back(glm::vec3(0, 1, 0));
-    }
-
-    shape.texCoords.reserve(8);
-    shape.texCoords.push_back(glm::vec2(0, 1));
-    shape.texCoords.push_back(glm::vec2(0, 0));
-    shape.texCoords.push_back(glm::vec2(1, 0));
-    shape.texCoords.push_back(glm::vec2(1, 1));
-    shape.texCoords.push_back(glm::vec2(0, 1));
-    shape.texCoords.push_back(glm::vec2(0, 0));
-    shape.texCoords.push_back(glm::vec2(1, 0));
-    shape.texCoords.push_back(glm::vec2(1, 1));
-
     // Top
-    shape.indices.push_back(0);
-    shape.indices.push_back(1);
-    shape.indices.push_back(2);
-    shape.indices.push_back(0);
-    shape.indices.push_back(2);
-    shape.indices.push_back(3);
-    // Bottom
-    shape.indices.push_back(4);
-    shape.indices.push_back(5);
-    shape.indices.push_back(6);
-    shape.indices.push_back(4);
-    shape.indices.push_back(6);
-    shape.indices.push_back(7);
-    // Left
-    shape.indices.push_back(0);
-    shape.indices.push_back(4);
-    shape.indices.push_back(5);
-    shape.indices.push_back(0);
-    shape.indices.push_back(5);
-    shape.indices.push_back(1);
-    // Right
-    shape.indices.push_back(2);
-    shape.indices.push_back(6);
-    shape.indices.push_back(7);
-    shape.indices.push_back(2);
-    shape.indices.push_back(7);
-    shape.indices.push_back(3);
-    // Front
-    shape.indices.push_back(1);
-    shape.indices.push_back(5);
-    shape.indices.push_back(6);
-    shape.indices.push_back(1);
-    shape.indices.push_back(6);
-    shape.indices.push_back(2);
-    // Back
-    shape.indices.push_back(0);
-    shape.indices.push_back(4);
-    shape.indices.push_back(7);
-    shape.indices.push_back(0);
-    shape.indices.push_back(7);
-    shape.indices.push_back(3);
-
-    shape.material.ambient = glm::vec3(0.3f);
-    shape.material.diffuse = glm::vec3(1.0f);
-    shape.material.specular = glm::vec3(0.0f);
-    shape.material.shininess = 0.0f;
-    shape.material.dissolve = 0.0f;
-
+    shape = shapes::quad(glm::vec3(-1, 1, 1), glm::vec3(-1, 1, -1),
+        glm::vec3(1, 1, -1), glm::vec3(1, 1, 1));
     shape.textureName = texture;
-
     data.shapes.push_back(shape);
+
+    // Bottom
+    shape = shapes::quad(glm::vec3(-1, -1, 1), glm::vec3(-1, -1, -1),
+        glm::vec3(1, -1, -1), glm::vec3(1, -1, 1));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Left
+    shape = shapes::quad(glm::vec3(-1, 1, 1), glm::vec3(-1, -1, 1),
+        glm::vec3(-1, -1, -1), glm::vec3(-1, 1, -1));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Right
+    shape = shapes::quad(glm::vec3(1, 1, -1), glm::vec3(1, -1, -1),
+        glm::vec3(1, -1, 1), glm::vec3(1, 1, 1));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Front
+    shape = shapes::quad(glm::vec3(-1, 1, -1), glm::vec3(-1, -1, -1),
+        glm::vec3(1, -1, -1), glm::vec3(1, 1, -1));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Back
+    shape = shapes::quad(glm::vec3(1, 1, 1), glm::vec3(1, -1, 1),
+        glm::vec3(-1, -1, 1), glm::vec3(-1, 1, 1));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+
     return data;
 }
 

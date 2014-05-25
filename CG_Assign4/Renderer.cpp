@@ -31,7 +31,7 @@ void Renderer::drawModel(const ModelData* model, glm::mat4 transformation) const
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix3fv(shader.uniform_normalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
-    glUniform3fv(shader.uniform_lightPosition, 1, glm::value_ptr(glm::vec3(view * glm::vec4(10, 100, 0, 0.0))));
+    glUniform3fv(shader.uniform_lightPosition, 1, glm::value_ptr(glm::vec3(view * glm::vec4(5000.0f, 10000.0f, 5000.0f, 0.0))));
 
     glActiveTexture(GL_TEXTURE0);
 

@@ -17,7 +17,7 @@ else
 endif
 export OSFLAG
 
-SRC_FILES = Main.cpp Renderer.cpp Camera.cpp ModelData.cpp Object.cpp City.cpp
+SRC_FILES = Main.cpp Renderer.cpp Camera.cpp ModelData.cpp Shapes.cpp Object.cpp City.cpp
 OBJECTS = $(SRC_FILES:.cpp=.o)
 SOIL_LIB = SOIL/SOIL.a
 TINY_OBJ_LIB = tiny_obj_loader/tiny_obj_loader.a
