@@ -11,7 +11,7 @@ class ModelData;
 class Renderer {
 public:
     /// <summary>
-    /// Create a new graphics manager.
+    /// Create a new renderer.
     /// </summary>
     ///
     /// <param name="program">The id of the gl shader program.</param>
@@ -20,13 +20,21 @@ public:
     Renderer(GLuint program, glm::mat4 proj, Camera* camera);
 
     /// <summary>
-    /// Draw a model from how it is view from a specific camera.
+    /// Draw a model after applying a specific transformation
     /// </summary>
     ///
     /// <param name="model">The model to draw.</param>
     /// <param name="transformation">The transformation to apply to the model</param>
     void drawModel(const ModelData* model, glm::mat4 transformation) const;
 
+    /// <summary>
+    /// Draw a model after applying different transformations.
+    /// </summary>
+    ///
+    /// <param name="model">The model to draw.</param>
+    /// <param name="position">The position of the model in the world.</param>
+    /// <param name="scale">The scale of the model.</param>
+    /// <param name="rotation">The rotation of the model.</param>
     void drawModel(const ModelData* model,
         glm::vec3 position = glm::vec3(0),
         glm::vec3 scale = glm::vec3(1),
@@ -49,6 +57,7 @@ public:
 
         GLint uniform_mv;
         GLint uniform_proj;
+        GLint uniform_depthBiasMVP;
         GLint uniform_normalMatrix;
 
         GLint uniform_materialAmbient;
@@ -60,8 +69,12 @@ public:
         GLint uniform_lightPosition;
 
         GLint uniform_texture;
+        GLint uniform_shadowMap;
     } shader;
 
-private:
+    GLuint shadowMapId;
     GLuint program;
+
+    glm::vec3 lightPos;
+private:
 };

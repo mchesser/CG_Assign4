@@ -4,6 +4,7 @@
 #include "ModelData.hpp"
 #include "Shapes.hpp"
 #include "Renderer.hpp"
+#include "ShadowRenderer.hpp"
 #include "City.hpp"
 
 #include "glm/vec3.hpp"
@@ -24,10 +25,18 @@ static ModelData* buildingModel;
 static City* city;
 
 static Renderer* renderer;
+static ShadowRenderer* shadowRenderer;
 static Camera* cam1;
 
 static float screenWidth = 800;
 static float screenHeight = 600;
+/// <summary>
+/// Returns the aspect ratio of the screen
+/// </summary>
+float getAspectRatio() {
+    return screenWidth / screenHeight;
+}
+
 
 static long prevTime = 0;
 
@@ -111,20 +120,25 @@ RawModelData genCube(const std::string& texture) {
 
 // Initialise the program resources
 void initResources() {
-    GLuint program = initProgram(shaderFromFile("shaders/vshader.glsl", GL_VERTEX_SHADER),
+    GLuint shadowProgram = initProgram(shaderFromFile("shaders/shadowmap.v.glsl", GL_VERTEX_SHADER),
+        shaderFromFile("shaders/shadowmap.f.glsl", GL_FRAGMENT_SHADER));
+    shadowRenderer = new ShadowRenderer(shadowProgram);
+    shadowRenderer->lightPos = glm::vec3(50.0f, 100.0f, 20.0f);
+
+    GLuint modelProgram = initProgram(shaderFromFile("shaders/vshader.glsl", GL_VERTEX_SHADER),
         shaderFromFile("shaders/fshader.glsl", GL_FRAGMENT_SHADER));
-    glUseProgram(program);
 
     cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), ORIGIN);
-    glm::mat4 proj = glm::perspective(DEG2RAD(60.0f), screenWidth / screenHeight, 0.1f, 200.0f);
+    glm::mat4 proj = glm::perspective(DEG2RAD(60.0f), getAspectRatio(), 0.1f, 200.0f);
 
-    renderer = new Renderer(program, proj, cam1);
+    renderer = new Renderer(modelProgram, proj, cam1);
+    renderer->shadowMapId = shadowRenderer->depthTexture;
+    renderer->lightPos = glm::vec3(50.0f, 100.0f, 20.0f);
 
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
 
     city = new City(buildingModel);
-
 
     keyState.up = false;
     keyState.down = false;
@@ -137,6 +151,18 @@ void onDisplay() {
     glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Shadow mapping
+    glUseProgram(shadowRenderer->program);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowRenderer->frameBuffer);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, 1024, 1024);
+    city->drawShadows(shadowRenderer);
+    shadowRenderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
+
+    // Model renderering
+    glUseProgram(renderer->program);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, screenWidth, screenHeight);
     city->draw(renderer);
     renderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
 
@@ -201,7 +227,7 @@ void onReshape(int width, int height) {
     screenHeight = static_cast<float>(height);
     glViewport(0, 0, width, height);
 
-    renderer->proj = glm::perspective(DEG2RAD(60.0f), screenWidth / screenHeight, 0.1f, 200.0f);
+    renderer->proj = glm::perspective(DEG2RAD(60.0f), getAspectRatio(), 0.1f, 200.0f);
 }
 
 // Program entry point
