@@ -17,7 +17,7 @@
 // FIXME: Very poor way of generating a random float
 #define randf() (static_cast<float>(rand()) / RAND_MAX)
 
-City::City(const ModelData* base_model) : data(5, 5, 0), center(glm::vec2(0, 0)) {
+City::City(const ModelData* base_model) : data(20, 20, 0), center(glm::vec2(0, 0)) {
     // Generate 10 buildings of different heights
     // FIXME: There might be other ways of varying the buildings
     building_types.reserve(10);

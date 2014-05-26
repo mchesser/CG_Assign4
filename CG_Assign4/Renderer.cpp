@@ -22,7 +22,7 @@ Renderer::Renderer(GLuint program, glm::mat4 proj, Camera* camera)
     shader.uniform_materialShine = glGetUniformLocation(program, "material.shine");
     shader.uniform_materialOpacity = glGetUniformLocation(program, "material.opacity");
     shader.uniform_lightPosition = glGetUniformLocation(program, "lightPosition");
-    shader.uniform_texture = glGetUniformLocation(program, "texture");
+    shader.uniform_texture = glGetUniformLocation(program, "modelTexture");
     shader.uniform_shadowMap = glGetUniformLocation(program, "shadowMap");
 }
 

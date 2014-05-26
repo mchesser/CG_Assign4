@@ -155,7 +155,7 @@ void onDisplay() {
     glUseProgram(shadowRenderer->program);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowRenderer->frameBuffer);
     glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, 1024, 1024);
+    glViewport(0, 0, 4* 1024, 4 * 1024);
     city->drawShadows(shadowRenderer);
     shadowRenderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
 
@@ -233,7 +233,7 @@ void onReshape(int width, int height) {
 // Program entry point
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
     glutInitWindowSize(800, 600);
     glutCreateWindow("Assignment 4");
 
