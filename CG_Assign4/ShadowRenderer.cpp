@@ -26,7 +26,7 @@ ShadowRenderer::ShadowRenderer(GLuint program) : program(program) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
     // Attach the texture object to the framebuffer
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
 
     // Don't draw to the colour buffer
     glDrawBuffer(GL_NONE);

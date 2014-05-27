@@ -1,4 +1,4 @@
-#version 120
+#version 130
 
 varying vec4 shadowCoord;
 varying vec3 normal;
@@ -42,10 +42,10 @@ void main(void)
 );
 	
 	for (int i=0;i<4;i++ ){
-		visibility -= 0.2*(1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy + poissonDisk[i]/3700.0, (shadowCoord.z-bias)/shadowCoord.w)));
+		//visibility -= 0.2*(1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy + poissonDisk[i]/3700.0, (shadowCoord.z-bias)/shadowCoord.w)));
 	}
 
-	//visibility = (texture(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z-bias)/shadowCoord.w)));
+	visibility = (texture(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z-bias)/shadowCoord.w)));
 
 	//if (texture(shadowMap, shadowCoord.xyz, bias) < shadowCoord.z - bias) {
 	//	visibility = 0.2;
