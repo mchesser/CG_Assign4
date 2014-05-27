@@ -1,9 +1,9 @@
-#version 130
+#version 150
 
-varying vec4 shadowCoord;
-varying vec3 normal;
-varying vec3 lightDir;
-varying vec2 texcoord;
+out vec4 shadowCoord;
+out vec3 normal;
+out vec3 lightDir;
+out vec2 texcoord;
 
 uniform sampler2D modelTexture;
 uniform sampler2DShadow shadowMap;
@@ -54,6 +54,6 @@ void main(void)
     vec4 color = 0.5 * ambient + visibility * diffuse;
     color.a = 1.0;
 
-    vec4 texcolor = texture2D(modelTexture, texcoord);
-    gl_FragColor = color * texcolor;
+    vec4 texcolor = texture(modelTexture, texcoord);
+    color = color * texcolor;
 }

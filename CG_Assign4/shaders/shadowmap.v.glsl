@@ -1,6 +1,6 @@
-#version 120
+#version 150
 
-attribute vec3 v_position;
+in vec3 v_position;
 uniform mat4 depthMVP;
 
 void main() {

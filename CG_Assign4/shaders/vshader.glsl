@@ -1,13 +1,13 @@
-#version 120
+#version 150
 
-attribute vec3 v_coord;
-attribute vec3 v_normal;
-attribute vec2 v_texcoord;
+in vec3 v_coord;
+in vec3 v_normal;
+in vec2 v_texcoord;
 
-varying vec4 shadowCoord;
-varying vec3 normal;
-varying vec3 lightDir;
-varying vec2 texcoord;
+out vec4 shadowCoord;
+out vec3 normal;
+out vec3 lightDir;
+out vec2 texcoord;
 
 uniform mat4 mv;
 uniform mat4 proj;

@@ -1,6 +1,6 @@
 #include "ModelData.hpp"
 #include "tiny_obj_loader/tiny_obj_loader.h"
-#include "SOIL/SOIL.h"
+#include "SOIL2/SOIL2.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include <iostream>
 

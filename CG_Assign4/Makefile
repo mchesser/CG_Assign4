@@ -19,7 +19,7 @@ export OSFLAG
 
 SRC_FILES = Main.cpp ShadowRenderer.cpp Renderer.cpp Camera.cpp ModelData.cpp Shapes.cpp Object.cpp City.cpp
 OBJECTS = $(SRC_FILES:.cpp=.o)
-SOIL_LIB = SOIL/SOIL.a
+SOIL_LIB = SOIL2/SOIL2.a
 TINY_OBJ_LIB = tiny_obj_loader/tiny_obj_loader.a
 
 ifeq ($(OSFLAG), WIN32)
@@ -45,7 +45,7 @@ $(BIN_FILE): $(OBJECTS) $(SOIL_LIB) $(TINY_OBJ_LIB)
 	$(CC) -o $@ $(OBJECTS) $(SOIL_LIB) $(TINY_OBJ_LIB) $(LIBS)
 
 $(SOIL_LIB):
-	$(MAKE) -C SOIL
+	$(MAKE) -C SOIL2
 
 $(TINY_OBJ_LIB):
 	$(MAKE) -C tiny_obj_loader
@@ -56,7 +56,7 @@ $(TINY_OBJ_LIB):
 clean:
 	rm -f $(BIN_FILE)
 	rm -rf *.o
-	$(MAKE) -C SOIL clean
+	$(MAKE) -C SOIL2 clean
 	$(MAKE) -C tiny_obj_loader
 
 .PHONY: \
