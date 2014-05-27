@@ -233,13 +233,17 @@ void onReshape(int width, int height) {
 // Program entry point
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
+
+#ifndef __APPLE__
+    glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+    glewInit();
+#else
     glutInitDisplayMode( GLUT_3_2_CORE_PROFILE | GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+#endif
+    
     glutInitWindowSize(800, 600);
     glutCreateWindow("Assignment 4");
 
-#ifndef __APPLE__
-    glewInit();
-#endif
 
     // Enable GL properties
     glEnable(GL_DEPTH_TEST);
