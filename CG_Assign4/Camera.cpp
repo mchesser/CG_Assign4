@@ -16,7 +16,3 @@ void Camera::moveTarget(glm::vec3 amount) {
 glm::mat4 Camera::view() const {
     return glm::lookAt(position, position + direction, up);
 }
-
-glm::vec3 Camera::getPosition() const {
-	return position;
-}

@@ -28,7 +28,7 @@ vec2 poissonDisk[4] = vec2[](
     vec2(0.34495938, 0.29387760)
 );
 
-float fogStart = 40.0;
+float fogStart = 35.0;
 float fogFade = 10.0;
 vec4 fogColor = vec4(0.7, 0.8, 1.0, 1.0);
 

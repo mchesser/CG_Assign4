@@ -61,3 +61,7 @@ glm::mat4 Object::transformationMatrix() const {
         glm::scale(glm::mat4(1.0f), scale)
         );
 }
+
+glm::vec3 Object::getPosition() const {
+    return position;
+}

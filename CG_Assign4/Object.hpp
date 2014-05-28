@@ -58,6 +58,11 @@ public:
     /// </summary>
     glm::mat4 transformationMatrix() const;
 
+    /// <summary>
+    /// Returns the position of the object.
+    /// </summary>
+    glm::vec3 getPosition() const;
+
 protected:
     /// <summary>
     /// The position of the object in the world.

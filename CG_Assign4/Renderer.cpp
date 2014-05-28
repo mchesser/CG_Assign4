@@ -62,7 +62,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* came
     }
 
     // Set up light
-    lightPos = glm::vec3(50.0f, 100.0f, 20.0f);
+    lightPos = glm::vec3(100.0f, 500.0f, 100.0f);
 }
 
 Renderer::~Renderer() {
@@ -92,9 +92,10 @@ void Renderer::drawModel(const ModelData* model, glm::vec3 position, glm::vec3 s
 
 void Renderer::renderScene() const {
     const glm::mat4 cameraView = activeCamera->view();
-    // FIXME: This should be based on the current camera view
-    const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0), glm::vec3(0, 1, 0));
-    const glm::mat4 lightProj = glm::ortho<float>(-50, 50, -50, 50, -100, 200);
+    // Always place the sun in the same position relative to the camera
+    const glm::vec3 lightPos_camera = activeCamera->getPosition() + lightPos;
+    const glm::mat4 lightView = glm::lookAt(lightPos_camera, activeCamera->getPosition(), glm::vec3(0, 1, 0));
+    const glm::mat4 lightProj = glm::ortho<float>(-70, 70, -70, 70, 400, 600);
 
     //
     // Render shadowmap
@@ -132,7 +133,8 @@ void Renderer::renderScene() const {
     glActiveTexture(GL_TEXTURE1);
 
     // Set the global light position from the camera view
-    glUniform3fv(shader.uniform_lightPosition, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lightPos, 1.0f))));
+    glUniform3fv(shader.uniform_lightPosition, 1, 
+        glm::value_ptr(glm::vec3(cameraView * glm::vec4(lightPos_camera, 1.0f))));
 
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(cameraProj));
