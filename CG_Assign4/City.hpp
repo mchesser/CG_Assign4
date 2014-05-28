@@ -1,7 +1,6 @@
 //! A basic class for creating, storing and rendering a basic city
 #pragma once
 #include "Renderer.hpp"
-#include "ShadowRenderer.hpp"
 #include "ModelData.hpp"
 #include "Array2d.hpp"
 #include "glm/vec2.hpp"
@@ -24,14 +23,7 @@ public:
     /// </summary>
     ///
     /// <param name="renderer>The renderer to draw to.</renderer>
-    void draw(const Renderer* renderer) const;
-
-    /// <summary>
-    /// Draws shadows for the city.
-    /// </summary>
-    ///
-    /// <param name="renderer>The renderer to draw to.</renderer>
-    void drawShadows(const ShadowRenderer* shadowRenderer) const;
+    void draw(Renderer* renderer) const;
 
 private:
     std::vector<BuildingData> building_types;

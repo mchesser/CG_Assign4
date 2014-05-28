@@ -4,7 +4,6 @@
 #include "ModelData.hpp"
 #include "Shapes.hpp"
 #include "Renderer.hpp"
-#include "ShadowRenderer.hpp"
 #include "City.hpp"
 
 #include "glm/vec3.hpp"
@@ -25,22 +24,14 @@ static ModelData* buildingModel;
 static City* city;
 
 static Renderer* renderer;
-static ShadowRenderer* shadowRenderer;
 static Camera* cam1;
 
-static float screenWidth = 800;
-static float screenHeight = 600;
-/// <summary>
-/// Returns the aspect ratio of the screen
-/// </summary>
-float getAspectRatio() {
-    return screenWidth / screenHeight;
-}
-
+static GLsizei screenWidth = 800;
+static GLsizei screenHeight = 600;
 
 static long prevTime = 0;
 
-
+// A simple structure for storing relevant information required for keyboard control
 struct KeyState {
     bool up;
     bool down;
@@ -59,7 +50,6 @@ static struct MouseHandler {
     inline void update(int nx, int ny) { prevX = x; prevY = y; x = nx; y = ny; }
 } mouseHandler;
 
-
 // Generates a square terrain with the specified texture loaded from a file
 RawModelData genTerrainModel(const std::string& terrainTexture) {
     RawModelData data;
@@ -69,7 +59,6 @@ RawModelData genTerrainModel(const std::string& terrainTexture) {
     data.shapes.push_back(shape);
     return data;
 }
-
 
 // FIXME: This should be replaced by a better function for generating buildings
 //  - Need to generate normals correctly
@@ -114,30 +103,21 @@ RawModelData genCube(const std::string& texture) {
     shape.textureName = texture;
     data.shapes.push_back(shape);
 
-
     return data;
 }
 
 // Initialise the program resources
 void initResources() {
-    GLuint shadowProgram = initProgram(shaderFromFile("shaders/shadowmap.v.glsl", GL_VERTEX_SHADER),
+    GLuint shadowMapProgram = initProgram(shaderFromFile("shaders/shadowmap.v.glsl", GL_VERTEX_SHADER),
         shaderFromFile("shaders/shadowmap.f.glsl", GL_FRAGMENT_SHADER));
-    shadowRenderer = new ShadowRenderer(shadowProgram);
-    shadowRenderer->lightPos = glm::vec3(50.0f, 100.0f, 20.0f);
-
     GLuint modelProgram = initProgram(shaderFromFile("shaders/vshader.glsl", GL_VERTEX_SHADER),
         shaderFromFile("shaders/fshader.glsl", GL_FRAGMENT_SHADER));
 
     cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), ORIGIN);
-    glm::mat4 proj = glm::perspective(DEG2RAD(60.0f), getAspectRatio(), 0.1f, 200.0f);
-
-    renderer = new Renderer(modelProgram, proj, cam1);
-    renderer->shadowMapId = shadowRenderer->depthTexture;
-    renderer->lightPos = glm::vec3(50.0f, 100.0f, 20.0f);
+    renderer = new Renderer(screenWidth, screenHeight, cam1, modelProgram, shadowMapProgram);
 
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
-
     city = new City(buildingModel);
 
     keyState.up = false;
@@ -148,23 +128,10 @@ void initResources() {
 
 // Display callback
 void onDisplay() {
-    glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Shadow mapping
-    glUseProgram(shadowRenderer->program);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowRenderer->frameBuffer);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, 4* 1024, 4 * 1024);
-    city->drawShadows(shadowRenderer);
-    shadowRenderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
-
-    // Model renderering
-    glUseProgram(renderer->program);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, screenWidth, screenHeight);
+    renderer->clear();
     city->draw(renderer);
     renderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
+    renderer->renderScene();
 
     // Swap buffers
     glutSwapBuffers();
@@ -222,12 +189,8 @@ void onMotion(int x, int y) {
 }
 
 // Window shape callbackwww
-void onReshape(int width, int height) {
-    screenWidth = static_cast<float>(width);
-    screenHeight = static_cast<float>(height);
-    glViewport(0, 0, width, height);
-
-    renderer->proj = glm::perspective(DEG2RAD(60.0f), getAspectRatio(), 0.1f, 200.0f);
+void onReshape(GLsizei width, GLsizei height) {
+    renderer->resize(width, height);
 }
 
 // Program entry point

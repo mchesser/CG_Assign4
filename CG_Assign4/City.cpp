@@ -39,31 +39,7 @@ City::City(const ModelData* base_model) : data(20, 20, 0), center(glm::vec2(0, 0
     }
 }
 
-void City::drawShadows(const ShadowRenderer* shadowRenderer) const {
-    const glm::vec3 offset = glm::vec3(
-        center.x - static_cast<float>(data.width()) * (BULDING_SCALE + BULDING_OFFSET) / 2.0f,
-        0,
-        center.y - static_cast<float>(data.height()) * (BULDING_SCALE + BULDING_OFFSET) / 2.0f);
-
-    // FIXME: Need to support roads and other features
-    for (int y = 0; y < data.height(); ++y) {
-        for (int x = 0; x < data.width(); ++x) {
-            const BuildingData building = building_types[data.at(x, y)];
-
-            const glm::vec3 position = glm::vec3(static_cast<float>(x)* (BULDING_SCALE + BULDING_OFFSET),
-                building.scale.y,
-                static_cast<float>(y)* (BULDING_SCALE + BULDING_OFFSET)) + offset;
-
-            const glm::mat4 transform = Object(position, STREET_DIR, SKY_DIR,
-                building.scale).transformationMatrix();
-
-            shadowRenderer->drawModel(building.model, transform);
-        }
-    }
-}
-
-
-void City::draw(const Renderer* renderer) const {
+void City::draw(Renderer* renderer) const {
     const glm::vec3 offset = glm::vec3(
         center.x - static_cast<float>(data.width()) * (BULDING_SCALE + BULDING_OFFSET) / 2.0f,
         0,

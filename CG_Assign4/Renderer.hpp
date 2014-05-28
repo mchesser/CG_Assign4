@@ -14,21 +14,37 @@ public:
     /// Create a new renderer.
     /// </summary>
     ///
-    /// <param name="program">The id of the gl shader program.</param>
-    /// <param name="proj">The perspective projection to apply.</param>
-    /// <param name="camera">The initial camera.</param>
-    Renderer(GLuint program, glm::mat4 proj, Camera* camera);
+    /// <param name="screenWidth">The width of the renderer's viewport.</param>
+    /// <param name="screenHeight">The height of the renderer's viewport.</param>
+    /// <param name="camera">The renderer's active camera.</param>
+    /// <param name="modelProgram">The id of the model shader program.</param>
+    /// <param name="shadowMapProgram">The id of the shadowMap shader program.</param>
+    Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* camera,
+        GLuint modelProgram, GLuint shadowMapProgram);
 
     /// <summary>
-    /// Draw a model after applying a specific transformation
+    /// Renderer destructor, frees the buffers and textures allocated by the renderer.
+    /// </summary>
+    ~Renderer();
+
+    /// <summary>
+    /// Resizes the renderer's viewport
+    /// <summary>
+    ///
+    /// <param name="width">The new width.</param>
+    /// <param name="height">The new height.</param>
+    void resize(GLsizei width, GLsizei height);
+
+    /// <summary>
+    /// Draw a model with a specific transformation
     /// </summary>
     ///
     /// <param name="model">The model to draw.</param>
     /// <param name="transformation">The transformation to apply to the model</param>
-    void drawModel(const ModelData* model, glm::mat4 transformation) const;
+    void drawModel(const ModelData* model, glm::mat4 transformation);
 
     /// <summary>
-    /// Draw a model after applying different transformations.
+    /// Draw a model with transformation properties.
     /// </summary>
     ///
     /// <param name="model">The model to draw.</param>
@@ -38,18 +54,18 @@ public:
     void drawModel(const ModelData* model,
         glm::vec3 position = glm::vec3(0),
         glm::vec3 scale = glm::vec3(1),
-        glm::vec3 rotation = glm::vec3(0)) const;
+        glm::vec3 rotation = glm::vec3(0));
 
     /// <summary>
-    /// The perspective projection.
+    /// Renders the scene to the screen.
     /// </summary>
-    glm::mat4 proj;
-
+    void renderScene() const;
+    
     /// <summary>
-    /// The camera to draw from.
+    /// Clears the current scene in the renderer.
     /// </summary>
-    Camera* activeCamera;
-
+    void clear();
+   
     struct ShaderInfo {
         GLint in_coord;
         GLint in_normal;
@@ -68,13 +84,36 @@ public:
 
         GLint uniform_lightPosition;
 
-        GLint uniform_texture;
+        GLint uniform_modelTexture;
         GLint uniform_shadowMap;
+        GLint uniform_depthMVP;
     } shader;
 
-    GLuint shadowMapId;
-    GLuint program;
+    GLsizei screenWidth;
+    GLsizei screenHeight;
+
+    /// <summary>
+    /// The camera to draw from.
+    /// </summary>
+    const Camera* activeCamera;
+private:
+    GLuint modelProgram;
+    GLuint shadowMapProgram;
+    
+    GLuint shadowMapFramebuffer;
+    GLuint shadowMapTexture;
 
     glm::vec3 lightPos;
-private:
+
+    struct RenderData {
+        const ModelData* model;
+        glm::mat4 transformation;
+    };
+
+    std::vector<RenderData> renderData;
+
+    /// <summary>
+    /// Computes the current aspect ratio of the renderer's screen.
+    /// </summary>
+    float aspectRatio() const;
 };

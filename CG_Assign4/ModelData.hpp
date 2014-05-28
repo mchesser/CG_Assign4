@@ -45,7 +45,6 @@ RawModelData loadModelData(const std::string& filename);
 
 class ModelData {
     friend class Renderer;
-    friend class ShadowRenderer;
 
 public:
     /// <summary>
