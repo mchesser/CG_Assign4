@@ -46,8 +46,8 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
         center.y - static_cast<float>(data.height()) * (BULDING_SCALE + BULDING_OFFSET) / 2.0f);
 
     // FIXME: Need to support roads and other features
-    for (int y = 0; y < data.height() + (int)cameraPosition.y/4 ; ++y) {
-        for (int x = 0; x < data.width() + (int)cameraPosition.y/4 ; ++x) {
+    for (int y = 0; y < data.height() ; ++y) {
+        for (int x = 0; x < data.width() ; ++x) {
             
             //FIXME: camera moves slightly faster then buildings are created
             const glm::vec3 position = glm::vec3(static_cast<float>( (x + (int)cameraPosition.x/4)) * (BULDING_SCALE + BULDING_OFFSET),
