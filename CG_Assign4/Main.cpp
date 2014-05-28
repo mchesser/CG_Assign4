@@ -158,11 +158,23 @@ void onDisplay() {
     glutSwapBuffers();
 }
 
+// FPS counter vars
+long past = 0;
+int frames = 0;
+
 // Idle callback
 void onIdle() {
     long time = glutGet(GLUT_ELAPSED_TIME);
-    float dt = static_cast<float>(time - prevTime) / 1000.0f;
+    double dt = static_cast<double>(time - prevTime) / 1000.0;
     prevTime = time;
+
+    // FPS counter
+    frames += 1;
+    if (static_cast<double>(time - past) / 1000.0 >= 1.0) {
+        std::cout << "FPS: " << frames << std::endl;
+        frames = 0;
+        past = time;
+    }
 
     if (keyState.up) cam1->move(glm::vec3(0, 0, 0.2f));
     if (keyState.down) cam1->move(glm::vec3(0, 0, -0.2f));
