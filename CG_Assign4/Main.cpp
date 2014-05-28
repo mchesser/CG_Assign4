@@ -139,7 +139,7 @@ void onDisplay() {
     glm::vec3 centerSquare = glm::vec3( 
         terrainSize * 2 * (int)((cameraPosition.x + terrainSize * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSize * 2)),
         0.0, 
-        terrainSize * 2 * (int)((cameraPosition.z + terrainSize * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSize * 2))
+        terrainSize * 2 * (int)((cameraPosition.z + terrainSize * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSize * 2))
         );
 
     // Draw center square and 8 surrounding squares
