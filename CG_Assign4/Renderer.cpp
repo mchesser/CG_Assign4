@@ -62,7 +62,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* came
     }
 
     // Set up light
-    lightPos = glm::vec3(100.0f, 500.0f, 100.0f);
+    lightPos = glm::vec3(200.0f, 500.0f, 100.0f);
 }
 
 Renderer::~Renderer() {
@@ -95,7 +95,7 @@ void Renderer::renderScene() const {
     // Always place the sun in the same position relative to the camera
     const glm::vec3 lightPos_camera = activeCamera->getPosition() + lightPos;
     const glm::mat4 lightView = glm::lookAt(lightPos_camera, activeCamera->getPosition(), glm::vec3(0, 1, 0));
-    const glm::mat4 lightProj = glm::ortho<float>(-70, 70, -70, 70, 400, 600);
+    const glm::mat4 lightProj = glm::ortho<float>(-50, 50, -50, 50, 500, 600);
 
     //
     // Render shadowmap
