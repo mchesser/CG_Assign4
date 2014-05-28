@@ -8,6 +8,7 @@ out vec4 shadowCoord;
 out vec3 normal;
 out vec3 lightDir;
 out vec2 texcoord;
+out float depth;
 
 uniform mat4 mv;
 uniform mat4 proj;
@@ -20,6 +21,7 @@ void main()
 {    
     vec4 pos = mv * vec4(v_coord, 1.0);
     gl_Position = proj * pos;
+	depth = pos.z;
 
 	shadowCoord = depthBiasMVP * vec4(v_coord, 1.0);
 	normal = normalize(normalMatrix * v_normal);

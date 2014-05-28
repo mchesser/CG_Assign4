@@ -27,9 +27,5 @@ public:
 
 private:
     std::vector<BuildingData> building_types;
-    Array2D<int> data;
-    glm::vec2 center;
-
-    float noise(int x, int y) const;
 };
 

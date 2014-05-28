@@ -130,7 +130,9 @@ void initResources() {
 void onDisplay() {
     renderer->clear();
     city->draw(renderer, cam1->getPosition());
-    renderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
+    glm::vec3 terrainPos = cam1->getPosition();
+    terrainPos.y = 0.0;
+    renderer->drawModel(terrainModel, terrainPos, glm::vec3(40, 1, 40));
     renderer->renderScene();
 
     // Swap buffers
