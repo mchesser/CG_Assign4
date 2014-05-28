@@ -23,11 +23,13 @@ public:
     /// </summary>
     ///
     /// <param name="renderer>The renderer to draw to.</renderer>
-    void draw(Renderer* renderer) const;
+    void draw(Renderer* renderer, glm::vec3 cameraPosition) const;
 
 private:
     std::vector<BuildingData> building_types;
     Array2D<int> data;
     glm::vec2 center;
+
+    float noise(int x, int y) const;
 };
 

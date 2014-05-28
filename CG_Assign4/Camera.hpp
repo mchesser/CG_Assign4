@@ -24,5 +24,8 @@ public:
     /// Construct a view transformation from the camera.
     /// </summary>
     glm::mat4 view() const;
+
+
+    glm::vec3 getPosition() const;
 };
 

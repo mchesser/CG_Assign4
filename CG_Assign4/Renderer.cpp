@@ -77,7 +77,8 @@ void Renderer::resize(GLsizei width, GLsizei height) {
 }
 
 void Renderer::drawModel(const ModelData* model, glm::mat4 transformation) {
-    renderData.push_back({ model, transformation });
+	RenderData data = { model, transformation };
+	renderData.push_back(data);
 }
 
 void Renderer::drawModel(const ModelData* model, glm::vec3 position, glm::vec3 scale,

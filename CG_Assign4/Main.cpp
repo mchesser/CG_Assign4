@@ -129,7 +129,7 @@ void initResources() {
 // Display callback
 void onDisplay() {
     renderer->clear();
-    city->draw(renderer);
+    city->draw(renderer, cam1->getPosition());
     renderer->drawModel(terrainModel, ORIGIN, glm::vec3(40, 1, 40));
     renderer->renderScene();
 
