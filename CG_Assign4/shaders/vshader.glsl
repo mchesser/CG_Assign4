@@ -21,10 +21,10 @@ void main()
 {    
     vec4 pos = mv * vec4(v_coord, 1.0);
     gl_Position = proj * pos;
-	depth = pos.z;
+    depth = pos.z;
 
-	shadowCoord = depthBiasMVP * vec4(v_coord, 1.0);
-	normal = normalize(normalMatrix * v_normal);
-	lightDir = -normalize(lightPosition - vec3(pos));
+    shadowCoord = depthBiasMVP * vec4(v_coord, 1.0);
+    normal = normalize(normalMatrix * v_normal);
+    lightDir = -normalize(lightPosition - vec3(pos));
     texcoord = v_texcoord;
 }
