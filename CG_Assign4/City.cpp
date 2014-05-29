@@ -25,6 +25,20 @@ float noise(int x, int y) {
     return ((1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) + 1.0) / 2.0;
 }
 
+bool City::checkCollision(glm::vec3 position) {  
+
+    // FIXME: Get building positions
+    if (position.x < 10.0 
+        && position.x > 5.0 
+        && position.z < 10.0 
+        && position.z > 5.0) {
+        printf("Test collision\n");
+        return true;
+    }  
+    return true;
+}
+
+
 City::City(const ModelData* base_model) {
     // Generate 10 buildings of different heights
     // FIXME: There might be other ways of varying the buildings
@@ -54,7 +68,6 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             const int index = (int)(noise(worldx, worldy) * (float)(building_types.size()));
             const BuildingData building = building_types[index];
 
-            //FIXME: camera moves slightly faster then buildings are created
             const glm::vec3 position = glm::vec3(static_cast<float>(worldx) * BUILDING_OFFSET,
                 building.scale.y,
                 static_cast<float>(worldy) * BUILDING_OFFSET) + offset;

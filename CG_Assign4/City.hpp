@@ -25,6 +25,11 @@ public:
     /// <param name="renderer>The renderer to draw to.</renderer>
     void draw(Renderer* renderer, glm::vec3 cameraPosition) const;
 
+    /// <summary>
+    /// Checks for collision at location x,y.
+    /// </summary>
+    bool checkCollision(glm::vec3 position);
+
 private:
     std::vector<BuildingData> building_types;
 };
