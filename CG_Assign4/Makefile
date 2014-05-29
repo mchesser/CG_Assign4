@@ -57,7 +57,7 @@ clean:
 	rm -f $(BIN_FILE)
 	rm -rf *.o
 	$(MAKE) -C SOIL2 clean
-	$(MAKE) -C tiny_obj_loader
+	$(MAKE) -C tiny_obj_loader clean
 
 .PHONY: \
 	all \

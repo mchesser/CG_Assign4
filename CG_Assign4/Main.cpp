@@ -249,7 +249,9 @@ int main(int argc, char* argv[]) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
-    glCullFace(GL_TRUE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+    glEnable(GL_CULL_FACE);
 
     // Set up callbacks
     glutDisplayFunc(onDisplay);
