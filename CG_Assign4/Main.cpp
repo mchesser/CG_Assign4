@@ -106,6 +106,26 @@ RawModelData genCube(const std::string& texture) {
     return data;
 }
 
+void drawProceduralTerrain(const int terrainSize) {
+    // Find camera position square center
+    glm::vec3 cameraPosition = glm::vec3(cam1->getPosition().x, 0.0, cam1->getPosition().z);
+    glm::vec3 centerSquare = glm::vec3( 
+        terrainSize * 2 * (int)((cameraPosition.x + terrainSize * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSize * 2)),
+        0.0, 
+        terrainSize * 2 * (int)((cameraPosition.z + terrainSize * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSize * 2))
+        );
+
+    // Draw center square and 8 surrounding squares
+    for (int i=-1; i<2; i++) {
+        for (int j=-1; j<2; j++) {
+            glm::vec3 square = centerSquare;
+            square.x = centerSquare.x + terrainSize * 2 * j;
+            square.z = centerSquare.z + terrainSize * 2 * i;
+            renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(terrainSize, 1, terrainSize));
+        }
+    }
+}
+
 // Initialise the program resources
 void initResources() {
     GLuint shadowMapProgram = initProgram(shaderFromFile("shaders/shadowmap.v.glsl", GL_VERTEX_SHADER),
@@ -131,26 +151,8 @@ void onDisplay() {
     renderer->clear();
     city->draw(renderer, cam1->getPosition());
 
-    // Ground drawing
     const int terrainSize = 20;
-
-    // Find camera position square center
-    glm::vec3 cameraPosition = glm::vec3(cam1->getPosition().x, 0.0, cam1->getPosition().z);
-    glm::vec3 centerSquare = glm::vec3( 
-        terrainSize * 2 * (int)((cameraPosition.x + terrainSize * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSize * 2)),
-        0.0, 
-        terrainSize * 2 * (int)((cameraPosition.z + terrainSize * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSize * 2))
-        );
-
-    // Draw center square and 8 surrounding squares
-    for (int i=-1; i<2; i++) {
-        for (int j=-1; j<2; j++) {
-            glm::vec3 square = centerSquare;
-            square.x = centerSquare.x + terrainSize * 2 * j;
-            square.z = centerSquare.z + terrainSize * 2 * i;
-            renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(terrainSize, 1, terrainSize));
-        }
-    }
+    drawProceduralTerrain(terrainSize);
     
     renderer->renderScene();
 
