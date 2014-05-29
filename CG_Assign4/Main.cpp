@@ -126,6 +126,12 @@ void drawProceduralTerrain(const int terrainSize) {
     }
 }
 
+bool checkCollisions(glm::vec3 position)
+{
+    //FIXME: check for ground collision also
+    return city->checkCollision(position);
+}
+
 // Initialise the program resources
 void initResources() {
     GLuint shadowMapProgram = initProgram(shaderFromFile("shaders/shadowmap.v.glsl", GL_VERTEX_SHADER),
@@ -178,10 +184,35 @@ void onIdle() {
         past = time;
     }
 
-    if (keyState.up) cam1->move(glm::vec3(0, 0, 0.2f));
-    if (keyState.down) cam1->move(glm::vec3(0, 0, -0.2f));
-    if (keyState.left) cam1->move(glm::vec3(-0.2f, 0, 0));
-    if (keyState.right) cam1->move(glm::vec3(0.2f, 0, 0));
+    // Key control
+    if (keyState.up) {
+        if (checkCollisions(cam1->getPosition())) {
+            cam1->move(glm::vec3(0, 0, 0.2f));
+        } else {
+            cam1->move(glm::vec3(0, 0, -0.1f));
+        }
+    }
+    if (keyState.down) {
+        if (checkCollisions(cam1->getPosition())) {
+            cam1->move(glm::vec3(0, 0, -0.2f));
+        } else {
+            cam1->move(glm::vec3(0, 0, 0.1f));
+        }
+    }
+    if (keyState.left) {
+        if (checkCollisions(cam1->getPosition())) {
+            cam1->move(glm::vec3(-0.2f, 0, 0));
+        } else {
+            cam1->move(glm::vec3(0.1f, 0, 0));
+        }
+    }
+    if (keyState.right) {
+        if (checkCollisions(cam1->getPosition())) {
+            cam1->move(glm::vec3(0.2f, 0, 0));
+        } else {
+            cam1->move(glm::vec3(-0.1f, 0, 0));
+        }
+    } 
 
     glutPostRedisplay();
 }
