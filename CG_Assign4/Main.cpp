@@ -74,8 +74,8 @@ RawModelData genCube(const std::string& texture) {
     data.shapes.push_back(shape);
 
     // Bottom
-    shape = shapes::quad(glm::vec3(-1, -1, 1), glm::vec3(-1, -1, -1),
-        glm::vec3(1, -1, -1), glm::vec3(1, -1, 1));
+    shape = shapes::quad(glm::vec3(1, -1, 1), glm::vec3(1, -1, -1),
+        glm::vec3(-1, -1, -1), glm::vec3(-1, -1, 1));
     shape.textureName = texture;
     data.shapes.push_back(shape);
 
