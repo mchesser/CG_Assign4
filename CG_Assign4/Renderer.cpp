@@ -6,9 +6,9 @@
 #define TAU (6.283185307179586f)
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
 
-Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* camera, GLuint modelProgram,
+Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* camera, const Sun* sun, GLuint modelProgram,
     GLuint shadowMapProgram) : screenWidth(screenWidth), screenHeight(screenHeight),
-    activeCamera(camera), modelProgram(modelProgram), shadowMapProgram(shadowMapProgram) {
+    activeCamera(camera), sun(sun), modelProgram(modelProgram), shadowMapProgram(shadowMapProgram) {
     
     // Configure shaders
     shader.in_coord = glGetAttribLocation(modelProgram, "v_coord");
@@ -25,7 +25,10 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* came
     shader.uniform_materialSpecular = glGetUniformLocation(modelProgram, "material.specular");
     shader.uniform_materialShine = glGetUniformLocation(modelProgram, "material.shine");
     shader.uniform_materialOpacity = glGetUniformLocation(modelProgram, "material.opacity");
-    shader.uniform_lightPosition = glGetUniformLocation(modelProgram, "lightPosition");
+    
+    shader.uniform_sunPos = glGetUniformLocation(modelProgram, "sunPos");
+    shader.uniform_sunAmbient = glGetUniformLocation(modelProgram, "sunAmbient");
+    shader.uniform_sunDiffuse = glGetUniformLocation(modelProgram, "sunDiffuse");
 
     shader.uniform_modelTexture = glGetUniformLocation(modelProgram, "modelTexture");
     shader.uniform_shadowMap = glGetUniformLocation(modelProgram, "shadowMap");
@@ -60,9 +63,6 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* came
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         exit(1);
     }
-
-    // Set up light
-    lightPos = glm::vec3(200.0f, 500.0f, 100.0f);
 }
 
 Renderer::~Renderer() {
@@ -92,10 +92,7 @@ void Renderer::drawModel(const ModelData* model, glm::vec3 position, glm::vec3 s
 
 void Renderer::renderScene() const {
     const glm::mat4 cameraView = activeCamera->view();
-    // Always place the sun in the same position relative to the camera
-    const glm::vec3 lightPos_camera = activeCamera->getPosition() + lightPos;
-    const glm::mat4 lightView = glm::lookAt(lightPos_camera, activeCamera->getPosition(), glm::vec3(0, 1, 0));
-    const glm::mat4 lightProj = glm::ortho<float>(-50, 50, -50, 50, 500, 600);
+    const glm::mat4 sunViewProj = sun->viewProjection(activeCamera->getPosition());
 
     //
     // Render shadowmap
@@ -105,7 +102,7 @@ void Renderer::renderScene() const {
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, 4 * 1024, 4 * 1024);
     for (size_t i = 0; i < renderData.size(); ++i) {
-        const glm::mat4 depthMVP = lightProj * lightView * renderData[i].transformation;
+        const glm::mat4 depthMVP = sunViewProj * renderData[i].transformation;
         glUniformMatrix4fv(shader.uniform_depthMVP, 1, GL_FALSE, glm::value_ptr(depthMVP));
 
         const ModelData* model = renderData[i].model;
@@ -128,13 +125,13 @@ void Renderer::renderScene() const {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, shadowMapTexture);
     glUniform1i(shader.uniform_shadowMap, /*GL_TEXTURE*/0);
-    
+
     // Change the active texture (used later)
     glActiveTexture(GL_TEXTURE1);
 
-    // Set the global light position from the camera view
-    glUniform3fv(shader.uniform_lightPosition, 1, 
-        glm::value_ptr(glm::vec3(cameraView * glm::vec4(lightPos_camera, 1.0f))));
+    glUniform3fv(shader.uniform_sunPos, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(sun->position(), 1.0f))));
+    glUniform3fv(shader.uniform_sunAmbient, 1, glm::value_ptr(sun->ambient()));
+    glUniform3fv(shader.uniform_sunDiffuse, 1, glm::value_ptr(sun->diffuse()));
 
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(cameraProj));
@@ -147,7 +144,7 @@ void Renderer::renderScene() const {
             0.0, 0.0, 0.5, 0.0,
             0.5, 0.5, 0.5, 1.0
          );
-        const glm::mat4 depthMVP = lightProj * lightView * renderData[i].transformation;
+        const glm::mat4 depthMVP = sunViewProj * renderData[i].transformation;
         const glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
         glUniformMatrix4fv(shader.uniform_depthBiasMVP, 1, GL_FALSE, glm::value_ptr(depthBiasMVP));
         

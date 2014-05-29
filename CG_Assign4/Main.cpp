@@ -5,6 +5,7 @@
 #include "Shapes.hpp"
 #include "Renderer.hpp"
 #include "City.hpp"
+#include "Sun.hpp"
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -25,6 +26,7 @@ static City* city;
 
 static Renderer* renderer;
 static Camera* cam1;
+static Sun* sun;
 
 static GLsizei screenWidth = 800;
 static GLsizei screenHeight = 600;
@@ -134,7 +136,8 @@ void initResources() {
         shaderFromFile("shaders/fshader.glsl", GL_FRAGMENT_SHADER));
 
     cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), ORIGIN);
-    renderer = new Renderer(screenWidth, screenHeight, cam1, modelProgram, shadowMapProgram);
+    sun = new Sun(-TAU / 12.0f, TAU / 12.0f);
+    renderer = new Renderer(screenWidth, screenHeight, cam1, sun, modelProgram, shadowMapProgram);
 
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
@@ -169,6 +172,8 @@ void onIdle() {
     long time = glutGet(GLUT_ELAPSED_TIME);
     double dt = static_cast<double>(time - prevTime) / 1000.0;
     prevTime = time;
+
+    sun->update(dt);
 
     // FPS counter
     frames += 1;

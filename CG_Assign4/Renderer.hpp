@@ -3,6 +3,7 @@
 
 #include "GLHeaders.hpp"
 #include "Camera.hpp"
+#include "Sun.hpp"
 #include "ModelData.hpp"
 #include "glm/mat4x4.hpp"
 
@@ -19,7 +20,7 @@ public:
     /// <param name="camera">The renderer's active camera.</param>
     /// <param name="modelProgram">The id of the model shader program.</param>
     /// <param name="shadowMapProgram">The id of the shadowMap shader program.</param>
-    Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* camera,
+    Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* camera, const Sun* sun,
         GLuint modelProgram, GLuint shadowMapProgram);
 
     /// <summary>
@@ -82,7 +83,9 @@ public:
         GLint uniform_materialShine;
         GLint uniform_materialOpacity;
 
-        GLint uniform_lightPosition;
+        GLint uniform_sunPos;
+        GLint uniform_sunAmbient;
+        GLint uniform_sunDiffuse;
 
         GLint uniform_modelTexture;
         GLint uniform_shadowMap;
@@ -96,6 +99,8 @@ public:
     /// The camera to draw from.
     /// </summary>
     const Camera* activeCamera;
+
+    const Sun* sun;
 private:
     GLuint modelProgram;
     GLuint shadowMapProgram;

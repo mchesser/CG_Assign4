@@ -2,7 +2,6 @@
 
 in vec4 shadowCoord;
 in vec3 normal;
-in vec3 lightDir;
 in vec2 texcoord;
 in float depth;
 
@@ -11,8 +10,11 @@ out vec4 out_color;
 uniform sampler2D modelTexture;
 uniform sampler2DShadow shadowMap;
 
-struct Material 
-{
+in vec3 sunDir;
+uniform vec3 sunAmbient;
+uniform vec3 sunDiffuse;
+
+struct Material {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -32,15 +34,14 @@ float fogStart = 35.0;
 float fogFade = 10.0;
 vec4 fogColor = vec4(0.7, 0.8, 1.0, 1.0);
 
-void main(void)
-{
+void main(void) {
     // Compute lighting
     vec4 ambient, diffuse;
     ambient = vec4(material.ambient, 1.0);
     
     vec4 Ld = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 Kd = vec4(material.diffuse, 1.0);
-    float cosTheta = clamp(dot(normal, lightDir), 0.0, 1.0);
+    float cosTheta = clamp(dot(normal, sunDir), 0.0, 1.0);
     diffuse = Ld * Kd * cosTheta;
 
     float bias = 0.001 * tan(acos(cosTheta));
@@ -49,10 +50,10 @@ void main(void)
     // Compute visibility
     float visibility = 1.0;
     for (int i = 0; i < 4; i++) {
-        visibility -= 0.2 * (1.0 - texture(shadowMap, vec3(shadowCoord.xy + poissonDisk[i]/2700.0, (shadowCoord.z-bias)/shadowCoord.w)));
+        visibility -= 0.2 * (1.0 - texture(shadowMap, vec3(shadowCoord.xy + poissonDisk[i]/3000.0, (shadowCoord.z-bias)/shadowCoord.w)));
     }
 
-    vec4 color = 0.5 * ambient + visibility * diffuse;
+    vec4 color = ambient * vec4(sunAmbient, 1.0) + visibility * diffuse * vec4(sunDiffuse, 1.0);
     color.a = 1.0;
 
     vec4 texcolor = texture(modelTexture, texcoord);
