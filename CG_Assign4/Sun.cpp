@@ -26,8 +26,6 @@ glm::vec3 linear_color_gradient(const glm::vec3 colors[], size_t numColors, floa
     return colors[left_color] + x_new * (colors[right_color] - colors[left_color]);
 }
 
-
-
 Sun::Sun(float verticalAngle, float horizontalAngle) 
     : verticalAngle(verticalAngle), horizontalAngle(horizontalAngle), 
       rotate_speed(DEFAULT_ROTATE_SPEED), paused(false) {
