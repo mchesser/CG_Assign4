@@ -32,7 +32,7 @@ bool City::checkCollision(glm::vec3 position) {
         && position.x > 5.0 
         && position.z < 10.0 
         && position.z > 5.0) {
-        printf("Test collision\n");
+        //printf("Test collision\n");
         return true;
     }  
     return true;
