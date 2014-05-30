@@ -230,6 +230,9 @@ void keyboard(unsigned char key, int x, int y) {
     case 's': keyState.down = true; break;
     case 'a': keyState.left = true; break;
     case 'd': keyState.right = true; break;
+    case 'i': sun->increaseSpeed(); break;
+    case 'o': sun->decreaseSpeed(); break;
+    case 'p': sun->togglePause(); break;
     }
 }
 

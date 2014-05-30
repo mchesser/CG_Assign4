@@ -19,18 +19,34 @@ public:
 
     /// <summary>
     /// Compute the view projection matrix, with respect to some position
-    /// <summary>
+    /// </summary>
     glm::mat4 viewProjection(glm::vec3 position)  const;
 
     /// <summary>
     /// The amount of diffuse light created by the sun.
-    /// <summary>
+    /// </summary>
     glm::vec3 diffuse() const;
 
     /// <summary>
     /// The amount of ambient light created by the sun.
-    /// <summary>
+    /// </summary>
     glm::vec3 ambient() const;
+
+    /// <summary>
+    /// Increase the speed of rotation of the sun
+    ///</summary>
+    void increaseSpeed();
+
+    /// <summary>
+    /// Decrease the speed of rotation of the sun
+    /// </summary>
+    void decreaseSpeed();
+
+    /// <summary>
+    /// Toggle pause on and off
+    /// </summary>
+    void togglePause();
+
 
 private:
     float verticalAngle;
@@ -38,5 +54,9 @@ private:
 
     float distance;
     glm::mat4 projection;
+
+    int rotate_speed;
+
+    bool paused;
 };
 
