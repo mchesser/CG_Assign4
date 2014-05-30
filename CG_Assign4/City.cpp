@@ -44,9 +44,6 @@ const static TileType TILE_KEY[KEY_HEIGHT][KEY_WIDTH] = {
     { B, B, V, B, B },
 };
 
-#include <iostream>
-
-
 TileType getTile(int x, int y) {
     x = x < 0 ? KEY_WIDTH-1 + (x % KEY_WIDTH) : x % KEY_WIDTH;
     y = y < 0 ? KEY_HEIGHT-1 + (y % KEY_HEIGHT): y % KEY_HEIGHT;
@@ -67,7 +64,6 @@ City::City(const ModelData* base_model) {
         building_types.push_back(building);
     }
 }
-
 
 void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
     const glm::vec3 offset = glm::vec3(
