@@ -2,6 +2,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "GLMUtil.hpp"
+#include <iostream>
 
 #define TAU (6.283185307179586f)
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
@@ -170,6 +171,19 @@ void Renderer::renderScene() const {
             glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, NULL);
         }
     }
+}
+
+bool Renderer::checkCollision(glm::vec3 position) {  
+    for (size_t i=0; i<renderData.size(); i++) {
+
+        // Position of object
+        const glm::mat4 cameraView = activeCamera->view();
+        const glm::mat4 mv = cameraView * renderData[i].transformation;
+
+        // mv * boundingBox
+
+    }
+    return true;
 }
 
 void Renderer::clear() {

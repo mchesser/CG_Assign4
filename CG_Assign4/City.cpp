@@ -48,19 +48,6 @@ TileType getTile(int x, int y) {
     return TILE_KEY[y % KEY_HEIGHT][x % KEY_WIDTH];
 }
 
-bool City::checkCollision(glm::vec3 position) {  
-
-    // FIXME: Get building positions
-    if (position.x < 10.0 
-        && position.x > 5.0 
-        && position.z < 10.0 
-        && position.z > 5.0) {
-        printf("Test collision\n");
-        return true;
-    }  
-    return true;
-}
-
 City::City(const ModelData* base_model) {
     // Generate 10 buildings of different heights
     // FIXME: There might be other ways of varying the buildings

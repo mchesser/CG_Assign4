@@ -66,6 +66,11 @@ public:
     /// Clears the current scene in the renderer.
     /// </summary>
     void clear();
+
+    /// <summary>
+    /// Checks for collision at position.
+    /// </summary>
+    bool checkCollision(glm::vec3 position);
    
     struct ShaderInfo {
         GLint in_coord;

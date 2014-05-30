@@ -19,11 +19,6 @@ public:
     City(const ModelData* base_model);
 
     /// <summary>
-    /// Checks for collision at location x, y.
-    /// </summary>
-    bool checkCollision(glm::vec3 position);
-
-    /// <summary>
     /// Draws the city.
     /// </summary>
     ///

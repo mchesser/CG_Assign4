@@ -102,14 +102,15 @@ RawModelData genCube(const std::string& texture) {
     // Back
     shape = shapes::quad(glm::vec3(1, 1, 1), glm::vec3(1, -1, 1),
         glm::vec3(-1, -1, 1), glm::vec3(-1, 1, 1));
-    shape.textureName = texture;
     data.shapes.push_back(shape);
+    shape.textureName = texture;
 
     return data;
 }
 
 void drawProceduralTerrain(const int terrainSize) {
-    // Find camera position square center
+
+    // Find camera position square
     glm::vec3 cameraPosition = glm::vec3(cam1->getPosition().x, 0.0, cam1->getPosition().z);
     glm::vec3 centerSquare = glm::vec3( 
         terrainSize * 2 * (int)((cameraPosition.x + terrainSize * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSize * 2)),
@@ -130,8 +131,7 @@ void drawProceduralTerrain(const int terrainSize) {
 
 bool checkCollisions(glm::vec3 position)
 {
-    //FIXME: check for ground collision also
-    return city->checkCollision(position);
+    return (renderer->checkCollision(position));
 }
 
 // Initialise the program resources
