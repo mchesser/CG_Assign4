@@ -92,7 +92,7 @@ RawModelData loadModelData(const std::string& filename) {
 }
 
 ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
-    BoundingBox boundingBox;
+     RawModelData::BoundingBox boundingBox;
     for (size_t i = 0; i < data.shapes.size(); ++i) {
         Shape shape;
         glGenVertexArrays(1, &shape.vao);

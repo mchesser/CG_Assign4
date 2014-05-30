@@ -7,8 +7,8 @@
 #define TAU (6.283185307179586f)
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
 
-Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* camera, const Sun* sun, GLuint modelProgram,
-    GLuint shadowMapProgram) : screenWidth(screenWidth), screenHeight(screenHeight),
+Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
+    GLuint modelProgram, GLuint shadowMapProgram) : screenWidth(screenWidth), screenHeight(screenHeight), renderDistance(renderDistance),
     activeCamera(camera), sun(sun), modelProgram(modelProgram), shadowMapProgram(shadowMapProgram) {
     
     // Configure shaders
@@ -34,6 +34,8 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* came
     shader.uniform_modelTexture = glGetUniformLocation(modelProgram, "modelTexture");
     shader.uniform_shadowMap = glGetUniformLocation(modelProgram, "shadowMap");
     shader.uniform_depthMVP = glGetUniformLocation(shadowMapProgram, "depthMVP");
+
+    shader.uniform_renderDistance = glGetUniformLocation(modelProgram, "renderDistance");
 
     // Configure shadow map buffers
     glGenFramebuffers(1, &shadowMapFramebuffer);
@@ -121,6 +123,8 @@ void Renderer::renderScene() const {
     glViewport(0, 0, screenWidth, screenHeight);
     glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUniform1f(shader.uniform_renderDistance, renderDistance);
 
     // Bind shadowmap
     glActiveTexture(GL_TEXTURE0);

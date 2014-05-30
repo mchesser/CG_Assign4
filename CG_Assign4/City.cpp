@@ -7,8 +7,6 @@
 #define BUILDING_GAP (1.2f)
 #define TILE_SIZE (BUILDING_SCALE * BUILDING_GAP)
 
-#define GRID_SIZE (50)
-
 // FIXME: if we want buildings to have a unique street facing facade this value needs to be
 // dynamic
 #define STREET_DIR (glm::vec3(0, 0, 1))
@@ -51,35 +49,37 @@ TileType getTile(int x, int y) {
     return TILE_KEY[y][x];
 }
 
-City::City(const ModelData* base_model) {
+City::City(const ModelData* base_model, float renderDistance) {
     // Generate 10 buildings of different heights
     // FIXME: There might be other ways of varying the buildings
-    building_types.reserve(10);
+    buildingTypes.reserve(10);
     for (size_t i = 0; i < 10; ++i) {
         BuildingData building = {
             glm::vec3(BUILDING_SCALE / 2.0f, 1.0f + 4.0f * randf(), BUILDING_SCALE / 2.0f),
             // FIXME: Probably should have more than one base model
             base_model,
         };
-        building_types.push_back(building);
+        buildingTypes.push_back(building);
     }
+
+    gridSize = static_cast<int>(ceilf(renderDistance * 2 / TILE_SIZE)) + 5;
 }
 
 void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
     const glm::vec3 offset = glm::vec3(
-        -static_cast<float>(GRID_SIZE) * TILE_SIZE / 2.0f,
+        -static_cast<float>(gridSize) * TILE_SIZE / 2.0f,
         0,
-        -static_cast<float>(GRID_SIZE) * TILE_SIZE / 2.0f);
+        -static_cast<float>(gridSize)* TILE_SIZE / 2.0f);
 
     // FIXME: Need to support roads and other features
-    for (int y = 0; y < GRID_SIZE; ++y) {
-        for (int x = 0; x < GRID_SIZE; ++x) {
+    for (int y = 0; y < gridSize; ++y) {
+        for (int x = 0; x < gridSize; ++x) {
             const int gridx = x + static_cast<int>(cameraPosition.x / TILE_SIZE);
             const int gridy = y + static_cast<int>(cameraPosition.z / TILE_SIZE);
 
             if (getTile(gridx, gridy) == B) {
-                const int index = (int)(noise(gridx, gridy) * (float)(building_types.size()));
-                const BuildingData building = building_types[index];
+                const int index = (int)(noise(gridx, gridy) * (float)(buildingTypes.size()));
+                const BuildingData building = buildingTypes[index];
 
                 const glm::vec3 position = glm::vec3(static_cast<float>(gridx)* TILE_SIZE,
                     building.scale.y,

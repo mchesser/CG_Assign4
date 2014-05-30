@@ -3,7 +3,7 @@
 in vec4 shadowCoord;
 in vec3 normal;
 in vec2 texcoord;
-in float depth;
+in vec3 position;
 
 out vec4 out_color;
 
@@ -30,7 +30,7 @@ vec2 poissonDisk[4] = vec2[](
     vec2(0.34495938, 0.29387760)
 );
 
-float fogStart = 35.0;
+uniform float renderDistance;
 float fogFade = 10.0;
 vec4 fogColor = vec4(0.7, 0.8, 1.0, 1.0);
 
@@ -58,6 +58,7 @@ void main(void) {
 
     vec4 texcolor = texture(modelTexture, texcoord);
 
-    float fogFactor = min(max(-depth - fogStart, 0) / fogFade, 1);
+	float fogStart = renderDistance - fogFade;
+    float fogFactor = min(max(length(position) - fogStart, 0) / (1.0 + fogFade), 1);
     out_color = (1 - fogFactor) * texcolor * color + fogFactor * fogColor;
 }

@@ -16,7 +16,7 @@ public:
     /// <summary>
     /// Creates a new city.
     /// </summary>
-    City(const ModelData* base_model);
+    City(const ModelData* base_model, float renderDistance);
 
     /// <summary>
     /// Draws the city.
@@ -26,6 +26,7 @@ public:
     void draw(Renderer* renderer, glm::vec3 cameraPosition) const;
 
 private:
-    std::vector<BuildingData> building_types;
+    std::vector<BuildingData> buildingTypes;
+    int gridSize;
 };
 
