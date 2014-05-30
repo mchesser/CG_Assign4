@@ -180,8 +180,8 @@ bool Renderer::checkCollision(glm::vec3 position) {
         const glm::mat4 cameraView = activeCamera->view();
         const glm::mat4 mv = cameraView * renderData[i].transformation;
 
-        // mv * boundingBox
-
+        // position within mv * boundingBox
+        
     }
     return true;
 }

@@ -33,9 +33,9 @@ RawModelData loadModelData(const std::string& filename) {
         exit(EXIT_FAILURE);
     }
 
-    // --------------------------------------------------
+    // --------------------------------------------------------------
     // Compute normals and rearrange the structure of the loaded data
-    // --------------------------------------------------
+    // --------------------------------------------------------------
 
     RawModelData data;
     for (size_t i = 0; i < baseShapes.size(); ++i) {
@@ -85,12 +85,14 @@ RawModelData loadModelData(const std::string& filename) {
         // to use this complicated expression.
         shape.textureName.erase(shape.textureName.find_last_not_of(" \n\r\t") + 1);
 
+
         data.shapes.push_back(shape);
     }
     return data;
 }
 
 ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
+    BoundingBox boundingBox;
     for (size_t i = 0; i < data.shapes.size(); ++i) {
         Shape shape;
         glGenVertexArrays(1, &shape.vao);
