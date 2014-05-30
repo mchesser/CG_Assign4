@@ -44,7 +44,7 @@ void main(void) {
     float cosTheta = clamp(dot(normal, sunDir), 0.0, 1.0);
     diffuse = Ld * Kd * cosTheta;
 
-    float bias = 0.001 * tan(acos(cosTheta));
+    float bias = 0.005 * tan(acos(cosTheta));
     bias = clamp(bias, 0, 0.01);
 
     // Compute visibility
