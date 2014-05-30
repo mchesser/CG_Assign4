@@ -44,8 +44,14 @@ const static TileType TILE_KEY[KEY_HEIGHT][KEY_WIDTH] = {
     { B, B, V, B, B },
 };
 
+#include <iostream>
+
+
 TileType getTile(int x, int y) {
-    return TILE_KEY[y % KEY_HEIGHT][x % KEY_WIDTH];
+    x = x < 0 ? KEY_WIDTH-1 + (x % KEY_WIDTH) : x % KEY_WIDTH;
+    y = y < 0 ? KEY_HEIGHT-1 + (y % KEY_HEIGHT): y % KEY_HEIGHT;
+
+    return TILE_KEY[y][x];
 }
 
 City::City(const ModelData* base_model) {
@@ -62,6 +68,7 @@ City::City(const ModelData* base_model) {
     }
 }
 
+
 void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
     const glm::vec3 offset = glm::vec3(
         -static_cast<float>(GRID_SIZE) * TILE_SIZE / 2.0f,
@@ -71,8 +78,8 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
     // FIXME: Need to support roads and other features
     for (int y = 0; y < GRID_SIZE; ++y) {
         for (int x = 0; x < GRID_SIZE; ++x) {
-            const int gridx = x + static_cast<int>(cameraPosition.x) / TILE_SIZE;
-            const int gridy = y + static_cast<int>(cameraPosition.z) / TILE_SIZE;
+            const int gridx = x + static_cast<int>(cameraPosition.x / TILE_SIZE);
+            const int gridy = y + static_cast<int>(cameraPosition.z / TILE_SIZE);
 
             if (getTile(gridx, gridy) == B) {
                 const int index = (int)(noise(gridx, gridy) * (float)(building_types.size()));

@@ -102,8 +102,8 @@ RawModelData genCube(const std::string& texture) {
     // Back
     shape = shapes::quad(glm::vec3(1, 1, 1), glm::vec3(1, -1, 1),
         glm::vec3(-1, -1, 1), glm::vec3(-1, 1, 1));
-    data.shapes.push_back(shape);
     shape.textureName = texture;
+    data.shapes.push_back(shape);
 
     return data;
 }
@@ -141,8 +141,8 @@ void initResources() {
     GLuint modelProgram = initProgram(shaderFromFile("shaders/vshader.glsl", GL_VERTEX_SHADER),
         shaderFromFile("shaders/fshader.glsl", GL_FRAGMENT_SHADER));
 
-    cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), ORIGIN);
-    sun = new Sun(-TAU / 12.0f, TAU / 12.0f);
+    cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, 1.0f));
+    sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
     renderer = new Renderer(screenWidth, screenHeight, cam1, sun, modelProgram, shadowMapProgram);
 
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
