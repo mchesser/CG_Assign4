@@ -3,7 +3,10 @@
 #include <vector>
 
 #define TAU (6.283185307179586f)
-#define ROTATE_SPEED (100) // seconds
+#define DEFAULT_ROTATE_SPEED (100) // seconds
+#define UPDATE_SPEED (5)
+#define MIN_SPEED (500)
+#define MAX_SPEED (5)
 
 glm::vec3 linear_color_gradient(const glm::vec3 colors[], size_t numColors, float x) {
     // Handle the the cases where there is only one color to sample
@@ -26,16 +29,19 @@ glm::vec3 linear_color_gradient(const glm::vec3 colors[], size_t numColors, floa
 
 
 Sun::Sun(float verticalAngle, float horizontalAngle) 
-    : verticalAngle(verticalAngle), horizontalAngle(horizontalAngle) {
+    : verticalAngle(verticalAngle), horizontalAngle(horizontalAngle), 
+      rotate_speed(DEFAULT_ROTATE_SPEED), paused(false) {
     
     distance = 700;
     projection = glm::ortho<float>(-50, 50, -50, 50, distance - 50, distance + 50);
 }
 
 void Sun::update(float elapsedSeconds) {
-    verticalAngle += elapsedSeconds * TAU / ROTATE_SPEED;
-    if (verticalAngle > TAU) {
-        verticalAngle -= TAU;
+    if (paused == false) {
+        verticalAngle += elapsedSeconds * TAU / rotate_speed;
+        if (verticalAngle > TAU) {
+            verticalAngle -= TAU;
+        }
     }
 }
 
@@ -52,6 +58,19 @@ glm::mat4 Sun::viewProjection(glm::vec3 position) const {
         glm::lookAt(position + this->position(), position, glm::vec3(0, 1, 0));
 }
 
+void Sun::increaseSpeed() {
+    if (rotate_speed - UPDATE_SPEED > MAX_SPEED)
+        rotate_speed -= UPDATE_SPEED;
+}
+
+void Sun::decreaseSpeed() {
+    if (rotate_speed + UPDATE_SPEED < MIN_SPEED)
+        rotate_speed += UPDATE_SPEED;
+}
+
+void Sun::togglePause() {
+    paused = !paused;
+}
 
 glm::vec3 Sun::diffuse() const { 
     static const glm::vec3 colors[3] = {
