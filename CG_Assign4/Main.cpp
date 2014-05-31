@@ -152,11 +152,11 @@ void initResources() {
 
     cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, 1.0f));
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
-    renderer = new Renderer(screenWidth, screenHeight, cam1, sun, modelProgram, shadowMapProgram);
+    renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram);
 
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
-    city = new City(buildingModel);
+    city = new City(buildingModel, 30.0f);
 
     keyState.up = false;
     keyState.down = false;

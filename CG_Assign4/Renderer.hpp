@@ -17,10 +17,12 @@ public:
     ///
     /// <param name="screenWidth">The width of the renderer's viewport.</param>
     /// <param name="screenHeight">The height of the renderer's viewport.</param>
+    /// <param name="renderDistance">The distance to draw.</param>
     /// <param name="camera">The renderer's active camera.</param>
+    /// <param name="sun">The sun used for lighting and shadows.</param>
     /// <param name="modelProgram">The id of the model shader program.</param>
     /// <param name="shadowMapProgram">The id of the shadowMap shader program.</param>
-    Renderer(GLsizei screenWidth, GLsizei screenHeight, const Camera* camera, const Sun* sun,
+    Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
         GLuint modelProgram, GLuint shadowMapProgram);
 
     /// <summary>
@@ -95,10 +97,13 @@ public:
         GLint uniform_modelTexture;
         GLint uniform_shadowMap;
         GLint uniform_depthMVP;
+
+        GLint uniform_renderDistance;
     } shader;
 
     GLsizei screenWidth;
     GLsizei screenHeight;
+    float renderDistance;
 
     /// <summary>
     /// The camera to draw from.
