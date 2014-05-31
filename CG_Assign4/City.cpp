@@ -1,5 +1,6 @@
 #include "City.hpp"
 #include <stdlib.h>
+#include <cmath>
 
 // FIXME: This should be dynamic
 #define BUILDING_SCALE (2.0f)
