@@ -84,15 +84,9 @@ Skybox::Skybox(const Renderer* renderer, std::string front_filename, std::string
     // Initialize wall indices
     //
 
-    unsigned int even_indices[] = {
+    unsigned int indices[] = {
         2, 1, 0, 0, 3, 2
     };
-
-    unsigned int odd_indices[] = {
-        0, 1, 2, 2, 3, 0
-    };
-
-
 
 
     //
@@ -121,10 +115,7 @@ Skybox::Skybox(const Renderer* renderer, std::string front_filename, std::string
 
         // Load indices into buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, walls[i].buffers[2]);
-        if (i % 2 == 0)
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(even_indices), even_indices, GL_STATIC_DRAW);
-        else
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(odd_indices), odd_indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         walls[i].num_elements = 6;
 
