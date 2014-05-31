@@ -24,12 +24,13 @@ const Material DEFAULT_MATERIAL = {
     0.0f
 };
 
-struct RawModelData {
-    struct BoundingBox {
-        glm::vec3 maxVertex;
-        glm::vec3 minVertex;
+struct BoundingBox {
+    glm::vec3 maxVertex;
+    glm::vec3 minVertex;
+};
 
-    };
+struct RawModelData {
+    BoundingBox boundingBox;
 
     struct Shape {
         std::vector<glm::vec3> vertices;
@@ -75,4 +76,7 @@ private:
         unsigned int numElements;
     };
     std::vector<Shape> shapes;
+
+    BoundingBox boundingBox;
+
 };

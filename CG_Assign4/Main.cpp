@@ -59,6 +59,13 @@ RawModelData genTerrainModel(const std::string& terrainTexture) {
         glm::vec3(1, 0, -1), glm::vec3(1, 0, 1));
     shape.textureName = terrainTexture;
     data.shapes.push_back(shape);
+
+    // BoundingBox of terrain
+    BoundingBox boundingBox;
+    boundingBox.minVertex = glm::vec3(-1, 0, -1);
+    boundingBox.maxVertex = glm::vec3(1, 0, 1);
+    data.boundingBox = boundingBox;
+
     return data;
 }
 
@@ -69,6 +76,7 @@ RawModelData genTerrainModel(const std::string& terrainTexture) {
 RawModelData genCube(const std::string& texture) {
     RawModelData data;
     RawModelData::Shape shape;
+
     // Top
     shape = shapes::quad(glm::vec3(-1, 1, 1), glm::vec3(-1, 1, -1),
         glm::vec3(1, 1, -1), glm::vec3(1, 1, 1));
@@ -105,6 +113,12 @@ RawModelData genCube(const std::string& texture) {
     shape.textureName = texture;
     data.shapes.push_back(shape);
 
+    // BoundingBox of whole cube
+    BoundingBox boundingBox;
+    boundingBox.minVertex = glm::vec3(-1, -1, -1);
+    boundingBox.maxVertex = glm::vec3(1, 1, 1);
+    data.boundingBox = boundingBox;
+
     return data;
 }
 
@@ -127,11 +141,6 @@ void drawProceduralTerrain(const int terrainSize) {
             renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(terrainSize, 1, terrainSize));
         }
     }
-}
-
-bool checkCollisions(glm::vec3 position)
-{
-    return (renderer->checkCollision(position));
 }
 
 // Initialise the program resources
@@ -189,30 +198,33 @@ void onIdle() {
         past = time;
     }
 
+
+    bool collision = renderer->checkCollision(cam1->getPosition());
+
     // Key control
     if (keyState.up) {
-        if (checkCollisions(cam1->getPosition())) {
+        if (!collision) {
             cam1->move(glm::vec3(0, 0, 0.2f));
         } else {
             cam1->move(glm::vec3(0, 0, -0.1f));
         }
     }
     if (keyState.down) {
-        if (checkCollisions(cam1->getPosition())) {
+        if (!collision) {
             cam1->move(glm::vec3(0, 0, -0.2f));
         } else {
             cam1->move(glm::vec3(0, 0, 0.1f));
         }
     }
     if (keyState.left) {
-        if (checkCollisions(cam1->getPosition())) {
+        if (!collision) {
             cam1->move(glm::vec3(-0.2f, 0, 0));
         } else {
             cam1->move(glm::vec3(0.1f, 0, 0));
         }
     }
     if (keyState.right) {
-        if (checkCollisions(cam1->getPosition())) {
+        if (!collision) {
             cam1->move(glm::vec3(0.2f, 0, 0));
         } else {
             cam1->move(glm::vec3(-0.1f, 0, 0));
