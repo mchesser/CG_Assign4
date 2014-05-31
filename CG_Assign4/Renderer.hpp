@@ -116,6 +116,7 @@ public:
         GLint uniform_sb_rotate;
         GLint uniform_sb_proj;
         GLint uniform_sb_day_texture;
+        GLint uniform_sb_sunset_texture;
         GLint uniform_sb_night_texture;
         GLint uniform_sb_sun_pos;
     } shader;

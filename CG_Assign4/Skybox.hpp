@@ -29,13 +29,15 @@ public:
         std::string right_filename,
         std::string top_filename,
         std::string bottom_filename,
-        std::vector<std::string> night_files);
+        std::vector<std::string> night_files,
+        std::vector<std::string> sunset_files);
 
 private:
     struct Wall {
         GLuint vao;
         GLuint buffers[3];
         GLuint day_textureId;
+        GLuint sunset_textureId;
         GLuint night_textureId;
         unsigned int num_elements;
     } walls[6];

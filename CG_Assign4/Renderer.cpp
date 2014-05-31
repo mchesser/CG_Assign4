@@ -45,6 +45,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_sb_proj = glGetUniformLocation(skyboxProgram, "proj");
     shader.uniform_sb_day_texture = glGetUniformLocation(skyboxProgram, "day_texture");
     shader.uniform_sb_night_texture = glGetUniformLocation(skyboxProgram, "night_texture");
+    shader.uniform_sb_sunset_texture = glGetUniformLocation(skyboxProgram, "sunset_texture");
     shader.uniform_sb_sun_pos = glGetUniformLocation(skyboxProgram, "sun_position");
 
     // Configure shadow map buffers
@@ -126,8 +127,10 @@ void Renderer::renderScene() const {
         // set appropriate projection for skybox
         glm::mat4 rotate = cameraView * glm::translate(glm::mat4(1), activeCamera->getPosition());
         glm::mat4 proj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 100.0f);
+        glm::vec3 sun_position = sun->position();
         glUniformMatrix4fv(shader.uniform_sb_rotate, 1, GL_FALSE, glm::value_ptr(rotate));
         glUniformMatrix4fv(shader.uniform_sb_proj, 1, GL_FALSE, glm::value_ptr(proj));
+        glUniform3fv(shader.uniform_sb_sun_pos, 1, glm::value_ptr(sun_position));
 
         // Draw the 6 walls of the skybox
         for (int i = 0; i < 6; i++) {
@@ -146,7 +149,14 @@ void Renderer::renderScene() const {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
             glBindTexture(GL_TEXTURE_2D, active_skybox->walls[i].night_textureId);
-            glUniform1i(shader.uniform_sb_night_texture, 0);
+            glUniform1i(shader.uniform_sb_night_texture, 1);
+
+            glActiveTexture(GL_TEXTURE2);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glBindTexture(GL_TEXTURE_2D, active_skybox->walls[i].sunset_textureId);
+            glUniform1i(shader.uniform_sb_sunset_texture, 2);
             
             glDrawElements(GL_TRIANGLES, active_skybox->walls[i].num_elements, GL_UNSIGNED_INT, NULL);
 

@@ -173,10 +173,19 @@ void initResources() {
     night_files.push_back("data/skybox/graycloud_up.jpg");
     night_files.push_back("data/skybox/graycloud_dn.jpg");
 
+    //sunset filenames
+    std::vector<std::string> sunset_files;
+    sunset_files.push_back("data/skybox/yellowcloud_ft.jpg");
+    sunset_files.push_back("data/skybox/yellowcloud_bk.jpg");
+    sunset_files.push_back("data/skybox/yellowcloud_lf.jpg");
+    sunset_files.push_back("data/skybox/yellowcloud_rt.jpg");
+    sunset_files.push_back("data/skybox/yellowcloud_up.jpg");
+    sunset_files.push_back("data/skybox/yellowcloud_dn.jpg");
+
     skybox = new Skybox(renderer, 
         "data/skybox/bluecloud_ft.jpg", "data/skybox/bluecloud_bk.jpg", "data/skybox/bluecloud_lf.jpg", 
         "data/skybox/bluecloud_rt.jpg", "data/skybox/bluecloud_up.jpg", "data/skybox/bluecloud_dn.jpg",
-        night_files);
+        night_files, sunset_files);
 
     renderer->attachSkybox(skybox);
 
