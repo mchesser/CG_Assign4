@@ -1,7 +1,7 @@
 # Makefile based on code from: http://www.puxan.com/web/blog/HowTo-Write-Generic-Makefiles
 
 CC = g++
-CFLAGS = -c -O -Wall -DGLM_FORCE_RADIANS
+CFLAGS = -c -g -Wall -DGLM_FORCE_RADIANS
 
 # Determine the OS which is running (see: http://stackoverflow.com/questions/714100/os-detecting-makefile)
 ifeq ($(OS),Windows_NT)

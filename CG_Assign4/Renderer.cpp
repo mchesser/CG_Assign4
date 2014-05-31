@@ -227,17 +227,29 @@ void Renderer::renderScene() const {
     }
 }
 
-bool Renderer::checkCollision(glm::vec3 position) {  
+bool Renderer::checkCollision(glm::vec3 position) { 
+
     for (size_t i=0; i<renderData.size(); i++) {
 
         // Position of object
-        const glm::mat4 cameraView = activeCamera->view();
-        const glm::mat4 mv = cameraView * renderData[i].transformation;
+        const glm::mat4 m = renderData[i].transformation;
 
-        // position within mv * boundingBox
-        
+        // put bounding box in position
+        glm::vec4 boundingBoxMax = glm::vec4(renderData[i].model->boundingBox.maxVertex, 1) * m;
+        glm::vec4 boundingBoxMin = glm::vec4(renderData[i].model->boundingBox.minVertex, 1) * m;
+
+        //Check if within box
+        if (boundingBoxMax.x > position.x 
+            && boundingBoxMin.x < position.x
+            && boundingBoxMax.y > position.y
+            && boundingBoxMin.y < position.y
+            && boundingBoxMax.z > position.z
+            && boundingBoxMin.z < position.z) {
+            std::cout << "Collision" << std::endl;
+            return true;
+        }
     }
-    return true;
+    return false;
 }
 
 
