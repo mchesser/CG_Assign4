@@ -43,7 +43,9 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
 
     shader.uniform_sb_rotate = glGetUniformLocation(skyboxProgram, "rotate");
     shader.uniform_sb_proj = glGetUniformLocation(skyboxProgram, "proj");
-    shader.uniform_sb_texture = glGetUniformLocation(skyboxProgram, "texture");
+    shader.uniform_sb_day_texture = glGetUniformLocation(skyboxProgram, "day_texture");
+    shader.uniform_sb_night_texture = glGetUniformLocation(skyboxProgram, "night_texture");
+    shader.uniform_sb_sun_pos = glGetUniformLocation(skyboxProgram, "sun_position");
 
     // Configure shadow map buffers
     glGenFramebuffers(1, &shadowMapFramebuffer);
@@ -136,8 +138,15 @@ void Renderer::renderScene() const {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-            glBindTexture(GL_TEXTURE_2D, active_skybox->walls[i].textureId);
-            glUniform1i(shader.uniform_sb_texture, 0);
+            glBindTexture(GL_TEXTURE_2D, active_skybox->walls[i].day_textureId);
+            glUniform1i(shader.uniform_sb_day_texture, 0);
+
+            glActiveTexture(GL_TEXTURE1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glBindTexture(GL_TEXTURE_2D, active_skybox->walls[i].night_textureId);
+            glUniform1i(shader.uniform_sb_night_texture, 0);
             
             glDrawElements(GL_TRIANGLES, active_skybox->walls[i].num_elements, GL_UNSIGNED_INT, NULL);
 

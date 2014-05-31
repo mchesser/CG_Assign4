@@ -2,6 +2,7 @@
 #pragma once
 #include "GLHeaders.hpp"
 #include "Renderer.hpp"
+#include <vector>
 #include <string>
 class Renderer;
 
@@ -27,13 +28,15 @@ public:
         std::string left_filename,
         std::string right_filename,
         std::string top_filename,
-        std::string bottom_filename);
+        std::string bottom_filename,
+        std::vector<std::string> night_files);
 
 private:
     struct Wall {
         GLuint vao;
         GLuint buffers[3];
-        GLuint textureId;
+        GLuint day_textureId;
+        GLuint night_textureId;
         unsigned int num_elements;
     } walls[6];
 };
