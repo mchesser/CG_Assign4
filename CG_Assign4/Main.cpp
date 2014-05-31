@@ -164,6 +164,15 @@ void initResources() {
     terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
     city = new City(buildingModel, 30.0f);
     
+    //day filenames
+    std::vector<std::string> day_files;
+    day_files.push_back("data/skybox/bluecloud_ft.jpg");
+    day_files.push_back("data/skybox/bluecloud_bk.jpg");
+    day_files.push_back("data/skybox/bluecloud_lf.jpg");
+    day_files.push_back("data/skybox/bluecloud_rt.jpg");
+    day_files.push_back("data/skybox/bluecloud_up.jpg");
+    day_files.push_back("data/skybox/bluecloud_dn.jpg");
+
     //night filenames
     std::vector<std::string> night_files;
     night_files.push_back("data/skybox/graycloud_ft.jpg");
@@ -182,11 +191,7 @@ void initResources() {
     sunset_files.push_back("data/skybox/yellowcloud_up.jpg");
     sunset_files.push_back("data/skybox/yellowcloud_dn.jpg");
 
-    skybox = new Skybox(renderer, 
-        "data/skybox/bluecloud_ft.jpg", "data/skybox/bluecloud_bk.jpg", "data/skybox/bluecloud_lf.jpg", 
-        "data/skybox/bluecloud_rt.jpg", "data/skybox/bluecloud_up.jpg", "data/skybox/bluecloud_dn.jpg",
-        night_files, sunset_files);
-
+    skybox = new Skybox(renderer, day_files, night_files, sunset_files);
     renderer->attachSkybox(skybox);
 
     keyState.up = false;

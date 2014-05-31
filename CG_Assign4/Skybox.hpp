@@ -16,19 +16,11 @@ public:
     /// </summary>
     ///
     /// <param name="renderer">The Renderer to obtain shader information from</param>
-    /// <param name="front_filename">The filename of the image corresponding to the front of the skybox</param>
-    /// <param name="back_filename">The filename of the image corresponding to the back of the skybox</param>
-    /// <param name="left_filename">The filename of the image corresponding to the left of the skybox</param>
-    /// <param name="right_filename">The filename of the image corresponding to the right of the skybox</param>
-    /// <param name="top_filename">The filename of the image corresponding to the top of the skybox</param>
-    /// <param name="bottom_filename">The filename of the image corresponding to the bottom of the skybox</param>
+    /// <param name="day_files">Contains filenames for the 6 files corresponding to the skybox at daytime, in the following order: front, back, left, right, top, bottom</param>
+    /// <param name="night_files">Contains filenames for the 6 files corresponding to the skybox at nighttime, in the following order: front, back, left, right, top, bottom</param>
+    /// <param name="sunset_files">Contains filenames for the 6 files corresponding to the skybox at sunset, in the following order: front, back, left, right, top, bottom</param>
     Skybox(const Renderer* renderer,
-        std::string front_filename,
-        std::string back_filename,
-        std::string left_filename,
-        std::string right_filename,
-        std::string top_filename,
-        std::string bottom_filename,
+        std::vector<std::string> day_files,
         std::vector<std::string> night_files,
         std::vector<std::string> sunset_files);
 
