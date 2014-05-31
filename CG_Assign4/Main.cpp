@@ -6,6 +6,7 @@
 #include "Renderer.hpp"
 #include "City.hpp"
 #include "Sun.hpp"
+#include "Skybox.hpp"
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -27,6 +28,8 @@ static City* city;
 static Renderer* renderer;
 static Camera* cam1;
 static Sun* sun;
+
+static Skybox* skybox;
 
 static GLsizei screenWidth = 800;
 static GLsizei screenHeight = 600;
@@ -141,13 +144,21 @@ void initResources() {
     GLuint modelProgram = initProgram(shaderFromFile("shaders/vshader.glsl", GL_VERTEX_SHADER),
         shaderFromFile("shaders/fshader.glsl", GL_FRAGMENT_SHADER));
 
+    GLuint skyboxProgram = initProgram(shaderFromFile("shaders/skybox.v.glsl", GL_VERTEX_SHADER),
+        shaderFromFile("shaders/skybox.f.glsl", GL_FRAGMENT_SHADER));
+
     cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, 1.0f));
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
-    renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram);
+    renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
 
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
     city = new City(buildingModel, 30.0f);
+    
+    skybox = new Skybox(renderer, 
+        "data/skybox/bluecloud_ft.jpg", "data/skybox/bluecloud_bk.jpg", "data/skybox/bluecloud_lf.jpg", 
+        "data/skybox/bluecloud_rt.jpg", "data/skybox/bluecloud_up.jpg", "data/skybox/bluecloud_dn.jpg");
+    renderer->attachSkybox(skybox);
 
     keyState.up = false;
     keyState.down = false;
@@ -290,7 +301,7 @@ int main(int argc, char* argv[]) {
     glEnable(GL_TEXTURE_2D);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     // Set up callbacks
     glutDisplayFunc(onDisplay);

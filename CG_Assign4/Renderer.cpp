@@ -8,8 +8,9 @@
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
 
 Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
-    GLuint modelProgram, GLuint shadowMapProgram) : screenWidth(screenWidth), screenHeight(screenHeight), renderDistance(renderDistance),
-    activeCamera(camera), sun(sun), modelProgram(modelProgram), shadowMapProgram(shadowMapProgram) {
+    GLuint modelProgram, GLuint shadowMapProgram, GLuint skyboxProgram) : screenWidth(screenWidth),  
+    screenHeight(screenHeight), renderDistance(renderDistance), activeCamera(camera), 
+    sun(sun), modelProgram(modelProgram), shadowMapProgram(shadowMapProgram), skyboxProgram(skyboxProgram) {
     
     // Configure shaders
     shader.in_coord = glGetAttribLocation(modelProgram, "v_coord");
@@ -36,6 +37,13 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_depthMVP = glGetUniformLocation(shadowMapProgram, "depthMVP");
 
     shader.uniform_renderDistance = glGetUniformLocation(modelProgram, "renderDistance");
+
+    shader.in_sb_coord = glGetAttribLocation(skyboxProgram, "v_coord");
+    shader.in_sb_texcoord = glGetAttribLocation(skyboxProgram, "texcoord");
+
+    shader.uniform_sb_rotate = glGetUniformLocation(skyboxProgram, "rotate");
+    shader.uniform_sb_proj = glGetUniformLocation(skyboxProgram, "proj");
+    shader.uniform_sb_texture = glGetUniformLocation(skyboxProgram, "texture");
 
     // Configure shadow map buffers
     glGenFramebuffers(1, &shadowMapFramebuffer);
@@ -66,6 +74,9 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         exit(1);
     }
+
+    // Initialize skybox to empty
+    active_skybox = NULL;
 }
 
 Renderer::~Renderer() {
@@ -98,6 +109,47 @@ void Renderer::renderScene() const {
     const glm::mat4 sunViewProj = sun->viewProjection(activeCamera->getPosition());
 
     //
+    // Render active skybox
+    //
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // draw if there is an active skybox
+    if (active_skybox != NULL) {
+
+        glUseProgram(skyboxProgram);
+
+        // set appropriate projection for skybox
+        glm::mat4 rotate = cameraView * glm::translate(glm::mat4(1), activeCamera->getPosition());
+        glm::mat4 proj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 100.0f);
+        glUniformMatrix4fv(shader.uniform_sb_rotate, 1, GL_FALSE, glm::value_ptr(rotate));
+        glUniformMatrix4fv(shader.uniform_sb_proj, 1, GL_FALSE, glm::value_ptr(proj));
+
+        // Draw the 6 walls of the skybox
+        for (int i = 0; i < 6; i++) {
+            
+            glBindVertexArray(active_skybox->walls[i].vao);
+
+            glActiveTexture(GL_TEXTURE0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glBindTexture(GL_TEXTURE_2D, active_skybox->walls[i].textureId);
+            glUniform1i(shader.uniform_sb_texture, 0);
+            
+            glDrawElements(GL_TRIANGLES, active_skybox->walls[i].num_elements, GL_UNSIGNED_INT, NULL);
+
+            glBindVertexArray(0);
+        }
+
+        glUseProgram(0);
+    }
+
+
+
+    //
     // Render shadowmap
     //
     glUseProgram(shadowMapProgram);
@@ -121,8 +173,6 @@ void Renderer::renderScene() const {
     glUseProgram(modelProgram);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, screenWidth, screenHeight);
-    glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUniform1f(shader.uniform_renderDistance, renderDistance);
 
@@ -188,6 +238,11 @@ bool Renderer::checkCollision(glm::vec3 position) {
         
     }
     return true;
+}
+
+
+void Renderer::attachSkybox(Skybox* skybox) {
+    active_skybox = skybox;
 }
 
 void Renderer::clear() {

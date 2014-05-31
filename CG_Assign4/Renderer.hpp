@@ -4,10 +4,12 @@
 #include "GLHeaders.hpp"
 #include "Camera.hpp"
 #include "Sun.hpp"
+#include "Skybox.hpp"
 #include "ModelData.hpp"
 #include "glm/mat4x4.hpp"
 
 class ModelData;
+class Skybox;
 
 class Renderer {
 public:
@@ -23,7 +25,7 @@ public:
     /// <param name="modelProgram">The id of the model shader program.</param>
     /// <param name="shadowMapProgram">The id of the shadowMap shader program.</param>
     Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
-        GLuint modelProgram, GLuint shadowMapProgram);
+        GLuint modelProgram, GLuint shadowMapProgram, GLuint skyboxProgram);
 
     /// <summary>
     /// Renderer destructor, frees the buffers and textures allocated by the renderer.
@@ -73,6 +75,14 @@ public:
     /// Checks for collision at position.
     /// </summary>
     bool checkCollision(glm::vec3 position);
+
+
+    /// <summary>
+    /// Attach an active skybox to be rendered before any model data
+    /// </summary>
+    ///
+    /// <param="skybox">The skybox to be rendered</param>
+    void attachSkybox(Skybox* skybox);
    
     struct ShaderInfo {
         GLint in_coord;
@@ -99,6 +109,13 @@ public:
         GLint uniform_depthMVP;
 
         GLint uniform_renderDistance;
+
+        GLint in_sb_coord;
+        GLint in_sb_texcoord;
+
+        GLint uniform_sb_rotate;
+        GLint uniform_sb_proj;
+        GLint uniform_sb_texture;
     } shader;
 
     GLsizei screenWidth;
@@ -114,9 +131,12 @@ public:
 private:
     GLuint modelProgram;
     GLuint shadowMapProgram;
+    GLuint skyboxProgram;
     
     GLuint shadowMapFramebuffer;
     GLuint shadowMapTexture;
+
+    Skybox* active_skybox;
 
     glm::vec3 lightPos;
 

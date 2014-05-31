@@ -1,0 +1,2 @@
+Skybox textures obtained from: http://opengameart.org/content/cloudy-skyboxes
+Used under the Creative Commons 3.0 Attribution Unported License: http://creativecommons.org/licenses/by/3.0/
