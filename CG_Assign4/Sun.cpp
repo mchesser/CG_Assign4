@@ -70,6 +70,14 @@ void Sun::togglePause() {
     paused = !paused;
 }
 
+float Sun::getVerticalAngle() {
+    return verticalAngle;
+}
+
+float Sun::getHorizontalAngle() {
+    return horizontalAngle;
+}
+
 glm::vec3 Sun::diffuse() const { 
     static const glm::vec3 colors[3] = {
         glm::vec3(1), // Day

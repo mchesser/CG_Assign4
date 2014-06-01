@@ -9,29 +9,20 @@
 
 
 // Define Indicees used for internal Wall struct
-#define WALL_UP (0)
-#define WALL_DOWN (1)
+#define WALL_UP (4)
+#define WALL_DOWN (5)
 #define WALL_LEFT (2)
 #define WALL_RIGHT (3)
-#define WALL_FRONT (4)
-#define WALL_BACK (5)
+#define WALL_FRONT (0)
+#define WALL_BACK (1)
 
 
-Skybox::Skybox(const Renderer* renderer, std::string front_filename, std::string back_filename,
-    std::string left_filename, std::string right_filename, std::string top_filename, std::string bottom_filename) {
+Skybox::Skybox(const Renderer* renderer, std::vector<std::string> day_files, std::vector<std::string> night_files, std::vector<std::string> sunset_files) {
 
 
     //
     // Initialize wall vertices
     //
-
-    std::vector<std::string> filenames;
-    filenames.push_back(top_filename);
-    filenames.push_back(bottom_filename);
-    filenames.push_back(left_filename);
-    filenames.push_back(right_filename);
-    filenames.push_back(front_filename);
-    filenames.push_back(back_filename);
 
     GLfloat vertices[6][12];
 
@@ -109,8 +100,14 @@ Skybox::Skybox(const Renderer* renderer, std::string front_filename, std::string
         glEnableVertexAttribArray(renderer->shader.in_sb_texcoord);
         glVertexAttribPointer(renderer->shader.in_sb_texcoord, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-        //Load texture using SOIL
-        walls[i].textureId = SOIL_load_OGL_texture(filenames[i].c_str(), SOIL_LOAD_AUTO,
+        //Load textures using SOIL
+        walls[i].day_textureId = SOIL_load_OGL_texture(day_files[i].c_str(), SOIL_LOAD_AUTO,
+            SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+
+        walls[i].night_textureId = SOIL_load_OGL_texture(night_files[i].c_str(), SOIL_LOAD_AUTO,
+            SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+
+        walls[i].sunset_textureId = SOIL_load_OGL_texture(sunset_files[i].c_str(), SOIL_LOAD_AUTO,
             SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
 
         // Load indices into buffer

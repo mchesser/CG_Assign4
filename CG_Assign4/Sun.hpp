@@ -48,6 +48,16 @@ public:
     void togglePause();
 
 
+    /// <summary>
+    /// Get the verticle angle of the sun
+    /// </summary>
+    float getVerticalAngle();
+
+    /// <summary>
+    /// Get the horizontal angle of the sun
+    /// </summary>
+    float getHorizontalAngle();
+
 private:
     float verticalAngle;
     float horizontalAngle;
