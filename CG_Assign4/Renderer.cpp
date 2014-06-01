@@ -235,8 +235,8 @@ bool Renderer::checkCollision(glm::vec3 position) {
         const glm::mat4 m = renderData[i].transformation;
 
         // put bounding box in position
-        glm::vec4 boundingBoxMax = glm::vec4(renderData[i].model->boundingBox.maxVertex, 1) * m;
-        glm::vec4 boundingBoxMin = glm::vec4(renderData[i].model->boundingBox.minVertex, 1) * m;
+        glm::vec4 boundingBoxMax = m * glm::vec4(renderData[i].model->boundingBox.maxVertex, 1);
+        glm::vec4 boundingBoxMin = m * glm::vec4(renderData[i].model->boundingBox.minVertex, 1); 
 
         //Check if within box
         if (boundingBoxMax.x > position.x 
