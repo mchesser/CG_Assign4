@@ -112,11 +112,36 @@ void Renderer::renderScene() const {
     const glm::mat4 sunViewProj = sun->viewProjection(activeCamera->getPosition());
 
     //
+    // Set Clear Color
+    //
+    glm::vec3 day = glm::vec3(0.7f, 0.8f, 1.0f);
+    glm::vec3 sunset = glm::vec3(1.0f, 0.76f, 0.43f);
+    glm::vec3 night = glm::vec3(0.23f, 0.1f, 0.3f);
+
+    if (sun->position().y < 0) {             
+        glClearColor(night.x, night.y, night.z, 1.0f);
+
+    } else if (sun->position().y < 100) {
+        float t = 1 - (sun->position().y / 100.0);
+
+        glClearColor(night.x * t + sunset.x * (1 - t), night.y * t + sunset.y * (1 - t), 
+            night.z * t + sunset.z * (1 - t), 1.0f);
+
+    } else if (sun->position().y < 200) {
+        float t = 1 - ((sun->position().y - 100) / 100);
+
+        glClearColor(sunset.x * t + day.x * (1 - t), sunset.y * t + day.y * (1 - t), 
+            sunset.z * t + day.z * (1 - t), 1.0f);
+
+    } else {
+        glClearColor(day.x, day.y, day.z, 1.0);
+    }
+
+    //
     // Render active skybox
     //
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // draw if there is an active skybox
