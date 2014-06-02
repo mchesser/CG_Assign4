@@ -44,8 +44,8 @@ const static TileType TILE_KEY[KEY_HEIGHT][KEY_WIDTH] = {
 };
 
 TileType getTile(int x, int y) {
-    x = x < 0 ? KEY_WIDTH-1 + (x % KEY_WIDTH) : x % KEY_WIDTH;
-    y = y < 0 ? KEY_HEIGHT-1 + (y % KEY_HEIGHT): y % KEY_HEIGHT;
+    x = x < 0 ? KEY_WIDTH - 1 + ((x + 1) % KEY_WIDTH) : x % KEY_WIDTH;
+    y = y < 0 ? KEY_HEIGHT - 1 + ((y + 1) % KEY_HEIGHT) : y % KEY_HEIGHT;
 
     return TILE_KEY[y][x];
 }
