@@ -72,7 +72,6 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
         0,
         -static_cast<float>(gridSize)* TILE_SIZE / 2.0f);
 
-    // FIXME: Need to support roads and other features
     for (int y = 0; y < gridSize; ++y) {
         for (int x = 0; x < gridSize; ++x) {
             const int gridx = x + static_cast<int>(cameraPosition.x / TILE_SIZE);

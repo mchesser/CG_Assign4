@@ -125,23 +125,27 @@ RawModelData genCube(const std::string& texture) {
     return data;
 }
 
-void drawProceduralTerrain(const int terrainSize) {
+void drawProceduralTerrain() {
+
+    const float terrainSizeX = 6.0;
+    const float terrainSizeZ = 3.6;
+    const float startingOffset = 0.2;
 
     // Find camera position square
     glm::vec3 cameraPosition = glm::vec3(cam1->getPosition().x, 0.0, cam1->getPosition().z);
     glm::vec3 centerSquare = glm::vec3( 
-        terrainSize * 2 * (int)((cameraPosition.x + terrainSize * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSize * 2)),
+        startingOffset + terrainSizeX * 2 * (int)((cameraPosition.x + terrainSizeX * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSizeX * 2)),
         0.0, 
-        terrainSize * 2 * (int)((cameraPosition.z + terrainSize * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSize * 2))
+        startingOffset + terrainSizeZ * 2 * (int)((cameraPosition.z + terrainSizeZ * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSizeZ * 2))
         );
 
-    // Draw center square and 8 surrounding squares
-    for (int i=-1; i<2; i++) {
-        for (int j=-1; j<2; j++) {
+    // Draw center square and surrounding squares
+    for (int i=-4; i<5; i++) { // 8 Squares on x axis
+        for (int j=-2; j<3; j++) { // 5 squares on z axis
             glm::vec3 square = centerSquare;
-            square.x = centerSquare.x + terrainSize * 2 * j;
-            square.z = centerSquare.z + terrainSize * 2 * i;
-            renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(terrainSize, 1, terrainSize));
+            square.x = centerSquare.x + terrainSizeX * 2 * j;
+            square.z = centerSquare.z + terrainSizeZ * 2 * i;
+            renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
         }
     }
 }
@@ -205,8 +209,7 @@ void onDisplay() {
     renderer->clear();
     city->draw(renderer, cam1->getPosition());
 
-    const int terrainSize = 20;
-    drawProceduralTerrain(terrainSize);
+    drawProceduralTerrain();
     
     renderer->renderScene();
 
