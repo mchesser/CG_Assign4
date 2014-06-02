@@ -257,14 +257,16 @@ bool Renderer::checkCollision(glm::vec3 position) {
         glm::vec4 boundingBoxMax = m * glm::vec4(renderData[i].model->boundingBox.maxVertex, 1);
         glm::vec4 boundingBoxMin = m * glm::vec4(renderData[i].model->boundingBox.minVertex, 1); 
 
+        float boundingOffset = 0.3;
         //Check if within box
-        if (boundingBoxMax.x > position.x 
-            && boundingBoxMin.x < position.x
-            && boundingBoxMax.y > position.y
-            && boundingBoxMin.y < position.y
-            && boundingBoxMax.z > position.z
-            && boundingBoxMin.z < position.z) {
-            std::cout << "Collision" << std::endl;
+        if (boundingBoxMax.x + boundingOffset > position.x 
+            && boundingBoxMin.x - boundingOffset < position.x
+            && boundingBoxMax.y + boundingOffset > position.y
+            && boundingBoxMin.y - boundingOffset < position.y
+            && boundingBoxMax.z + boundingOffset > position.z
+            && boundingBoxMin.z - boundingOffset < position.z) {
+            return true;
+        } else if (position.y < 0.0 + boundingOffset) { // Special case for the ground
             return true;
         }
     }

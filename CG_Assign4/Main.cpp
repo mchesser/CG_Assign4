@@ -161,7 +161,7 @@ void initResources() {
     renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
 
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
-    terrainModel = new ModelData(genTerrainModel("data/default.tga"), renderer);
+    terrainModel = new ModelData(genTerrainModel("data/groundTemplate.tga"), renderer);
     city = new City(buildingModel, 30.0f);
     
     //day filenames
@@ -235,36 +235,27 @@ void onIdle() {
     }
 
 
+    //FIXME: Collision - Not at all smooth, still has bugs where you can go through walls.
+    //  - Smoothness could be fixed by checking if it will collide rather then if it has.
+    //  - Not sure about the bugs...
     bool collision = renderer->checkCollision(cam1->getPosition());
 
     // Key control
-    if (keyState.up) {
-        if (!collision) {
-            cam1->move(glm::vec3(0, 0, 0.2f));
-        } else {
-            cam1->move(glm::vec3(0, 0, -0.1f));
-        }
+    if (keyState.up && !keyState.down) {
+        if (!collision) cam1->move(glm::vec3(0, 0, 0.2f));
+        else cam1->move(glm::vec3(0, 0, -0.3f));
     }
-    if (keyState.down) {
-        if (!collision) {
-            cam1->move(glm::vec3(0, 0, -0.2f));
-        } else {
-            cam1->move(glm::vec3(0, 0, 0.1f));
-        }
+    if (keyState.down && !keyState.up) {
+        if (!collision) cam1->move(glm::vec3(0, 0, -0.2f));
+        else cam1->move(glm::vec3(0, 0, 0.3f));
     }
-    if (keyState.left) {
-        if (!collision) {
-            cam1->move(glm::vec3(-0.2f, 0, 0));
-        } else {
-            cam1->move(glm::vec3(0.1f, 0, 0));
-        }
+    if (keyState.left && !keyState.right) {
+        if (!collision) cam1->move(glm::vec3(-0.2f, 0, 0));
+        else cam1->move(glm::vec3(0.3, 0, 0));
     }
-    if (keyState.right) {
-        if (!collision) {
-            cam1->move(glm::vec3(0.2f, 0, 0));
-        } else {
-            cam1->move(glm::vec3(-0.1f, 0, 0));
-        }
+    if (keyState.right && !keyState.left) {
+        if (!collision) cam1->move(glm::vec3(0.2f, 0, 0));
+        else cam1->move(glm::vec3(-0.3f, 0, 0));
     } 
 
     glutPostRedisplay();

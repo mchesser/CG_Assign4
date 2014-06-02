@@ -60,5 +60,5 @@ void main(void) {
 
 	float fogStart = renderDistance - fogFade;
     float fogFactor = min(max(length(position) - fogStart, 0) / (1.0 + fogFade), 1);
-    out_color = (1 - fogFactor) * texcolor * color + fogFactor * fogColor;
+    out_color = (1 - fogFactor) * texcolor * color + fogFactor * fogColor; 
 }

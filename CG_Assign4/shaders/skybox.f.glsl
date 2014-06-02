@@ -1,6 +1,7 @@
 #version 150
 
 in vec2 texCoord;
+in float fog;
 
 out vec4 fColor;
 
@@ -8,7 +9,6 @@ uniform sampler2D day_texture;
 uniform sampler2D night_texture;
 uniform sampler2D sunset_texture;
 uniform vec3 sun_position;
-
 
 void main() {
     if (sun_position.y < 0.0) {
@@ -27,4 +27,5 @@ void main() {
     } else {
         fColor = texture(day_texture, texCoord);
     }
+    fColor.a = fog;
 }
