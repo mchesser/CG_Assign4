@@ -57,9 +57,12 @@ static struct MouseHandler {
 
 // Generates a square terrain with the specified texture loaded from a file
 RawModelData genTerrainModel(const std::string& terrainTexture) {
+
+    const float groundScale = 0.2;
+
     RawModelData data;
-    RawModelData::Shape shape = shapes::quad(glm::vec3(-1, 0, 1), glm::vec3(-1, 0, -1),
-        glm::vec3(1, 0, -1), glm::vec3(1, 0, 1));
+    RawModelData::Shape shape = shapes::quad(glm::vec3(-1, 0, 1 * groundScale), glm::vec3(-1, 0, -1),
+        glm::vec3(1, 0, -1), glm::vec3(1, 0, 1 * groundScale));
     shape.textureName = terrainTexture;
     data.shapes.push_back(shape);
 
@@ -127,9 +130,9 @@ RawModelData genCube(const std::string& texture) {
 
 void drawProceduralTerrain() {
 
-    const float terrainSizeX = 6.0;
+    const float terrainSizeX = 6;
     const float terrainSizeZ = 3.6;
-    const float startingOffset = 0.2;
+    const float startingOffset = 0;
 
     // Find camera position square
     glm::vec3 cameraPosition = glm::vec3(cam1->getPosition().x, 0.0, cam1->getPosition().z);
@@ -145,7 +148,7 @@ void drawProceduralTerrain() {
             glm::vec3 square = centerSquare;
             square.x = centerSquare.x + terrainSizeX * 2 * j;
             square.z = centerSquare.z + terrainSizeZ * 2 * i;
-            renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
+            renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(6, 1, 6));
         }
     }
 }
