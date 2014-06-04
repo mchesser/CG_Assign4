@@ -241,25 +241,31 @@ void onIdle() {
     //FIXME: Collision - Not at all smooth, still has bugs where you can go through walls.
     //  - Smoothness could be fixed by checking if it will collide rather then if it has.
     //  - Not sure about the bugs...
-    bool collision = renderer->checkCollision(cam1->getPosition());
+    glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    // Key control
     if (keyState.up && !keyState.down) {
-        if (!collision) cam1->move(glm::vec3(0, 0, 0.2f));
-        else cam1->move(glm::vec3(0, 0, -0.3f));
-    }
+        movement.z += 0.2f;
+    } 
     if (keyState.down && !keyState.up) {
-        if (!collision) cam1->move(glm::vec3(0, 0, -0.2f));
-        else cam1->move(glm::vec3(0, 0, 0.3f));
+        movement.z -= 0.2f;
     }
     if (keyState.left && !keyState.right) {
-        if (!collision) cam1->move(glm::vec3(-0.2f, 0, 0));
-        else cam1->move(glm::vec3(0.3, 0, 0));
+        movement.x -= 0.2f; 
     }
     if (keyState.right && !keyState.left) {
-        if (!collision) cam1->move(glm::vec3(0.2f, 0, 0));
-        else cam1->move(glm::vec3(-0.3f, 0, 0));
-    } 
+        movement.x += 0.2f;
+    }
+
+    glm::vec3 movement_x = glm::vec3(movement.x, 0.0f, 0.0f);
+    glm::vec3 movement_z = glm::vec3(0.0f, 0.0f, movement.z);
+
+    if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement)))) {
+        cam1->move(movement);
+    } else if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement_x)))) {
+        cam1->move(movement_x);
+    } else if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement_z)))) {
+        cam1->move(movement_z);
+    }
 
     glutPostRedisplay();
 }
