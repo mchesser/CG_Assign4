@@ -23,6 +23,8 @@
 
 static ModelData* terrainModel;
 static ModelData* buildingModel;
+static ModelData* streetlightModel1;            //NOTE: THESE GIVE ERRORS. TODO: FIX
+static ModelData* streetlightModel2;            //NOTE: THESE GIVE ERRORS. TODO: FIX
 static City* city;
 
 static Renderer* renderer;
@@ -167,6 +169,10 @@ void initResources() {
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/groundTemplate.tga"), renderer);
     city = new City(buildingModel, 30.0f);
+
+    //STREETLIGHTS SEG FAULT: TODO FIND CAUSE
+    streetlightModel1 = new ModelData(loadModelData("data/streetlight/StreetLamp.obj"), renderer); // SEGFAULT in loadModelData
+    streetlightModel2 = new ModelData(loadModelData("data/streetlight/Lamp_Post_Street.obj"), renderer); // SEGFAULT in constructor 
     
     //day filenames
     std::vector<std::string> day_files;
