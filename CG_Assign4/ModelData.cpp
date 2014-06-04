@@ -62,9 +62,11 @@ RawModelData loadModelData(const std::string& filename) {
                 shape.normals.push_back(normal);
             }
 
-            shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i1 * 2])));
-            shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i2 * 2])));
-            shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i3 * 2])));
+            if (baseShapes[i].mesh.texcoords.size() > 0) {
+                shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i1 * 2])));
+                shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i2 * 2])));
+                shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i3 * 2])));
+            }
 
             shape.indices.push_back(static_cast<unsigned int>(j + 0));
             shape.indices.push_back(static_cast<unsigned int>(j + 1));
@@ -114,7 +116,7 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
         glVertexAttribPointer(renderer->shader.in_normal, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
         // Load texture coordinates into a buffer
-        if (data.shapes[i].texCoords.size() != 0) {
+        if (data.shapes[i].texCoords.size() > 0) {
             glBindBuffer(GL_ARRAY_BUFFER, shape.buffers[2]);
             glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE_2(data.shapes[i].texCoords.size()),
                 dataPtr(data.shapes[i].texCoords), GL_STATIC_DRAW);
