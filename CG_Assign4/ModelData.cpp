@@ -114,7 +114,7 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
         glVertexAttribPointer(renderer->shader.in_normal, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
         // Load texture coordinates into a buffer
-        if (data.shapes[i].texCoords.size() == 0) {
+        if (data.shapes[i].texCoords.size() != 0) {
             glBindBuffer(GL_ARRAY_BUFFER, shape.buffers[2]);
             glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE_2(data.shapes[i].texCoords.size()),
                 dataPtr(data.shapes[i].texCoords), GL_STATIC_DRAW);
