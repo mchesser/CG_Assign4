@@ -187,12 +187,12 @@ void initResources() {
 
     //night filenames
     std::vector<std::string> night_files;
-    night_files.push_back("data/skybox/graycloud_ft.jpg");
-    night_files.push_back("data/skybox/graycloud_bk.jpg");
-    night_files.push_back("data/skybox/graycloud_lf.jpg");
-    night_files.push_back("data/skybox/graycloud_rt.jpg");
-    night_files.push_back("data/skybox/graycloud_up.jpg");
-    night_files.push_back("data/skybox/graycloud_dn.jpg");
+    night_files.push_back("data/skybox/starrynight_ft.jpg");
+    night_files.push_back("data/skybox/starrynight_bk.jpg");
+    night_files.push_back("data/skybox/starrynight_lf.jpg");
+    night_files.push_back("data/skybox/starrynight_rt.jpg");
+    night_files.push_back("data/skybox/starrynight_up.jpg");
+    night_files.push_back("data/skybox/starrynight_dn.jpg");
 
     //sunset filenames
     std::vector<std::string> sunset_files;

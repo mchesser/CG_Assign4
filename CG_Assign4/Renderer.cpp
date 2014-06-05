@@ -119,7 +119,7 @@ void Renderer::renderScene() const {
     //
     glm::vec3 day = glm::vec3(0.7f, 0.8f, 1.0f);
     glm::vec3 sunset = glm::vec3(1.0f, 0.76f, 0.43f);
-    glm::vec3 night = glm::vec3(0.23f, 0.1f, 0.3f);
+    glm::vec3 night = glm::vec3(0.0f, 0.0f, 0.03f);
     glm::vec4 daytime_fog = glm::vec4(1.0, 1.0, 1.0, 0.0);
     glm::vec4 nighttime_fog = glm::vec4(0.0, 0.0, 0.0, 0.0);
 
