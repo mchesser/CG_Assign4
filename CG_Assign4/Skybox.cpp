@@ -119,3 +119,14 @@ Skybox::Skybox(const Renderer* renderer, std::vector<std::string> day_files, std
         glBindVertexArray(0);
     }
 }
+
+
+Skybox::~Skybox() {
+    for (int i = 0; i < 6; i++) {
+        glDeleteBuffers(3, walls[i].buffers);
+        glDeleteTextures(1, &walls[i].day_textureId);
+        glDeleteTextures(1, &walls[i].sunset_textureId);
+        glDeleteTextures(1, &walls[i].night_textureId);
+        glDeleteVertexArrays(1, &walls[i].vao);
+    }
+}

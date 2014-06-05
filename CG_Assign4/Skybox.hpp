@@ -24,6 +24,8 @@ public:
         std::vector<std::string> night_files,
         std::vector<std::string> sunset_files);
 
+    ~Skybox();
+
 private:
     struct Wall {
         GLuint vao;
