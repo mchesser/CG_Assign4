@@ -54,6 +54,13 @@ public:
     void move(glm::vec3 amount);
 
     /// <summary>
+    /// Moves the object in world space.
+    /// </summary>
+    ///
+    /// <param name="amount">The amount to move.</param>
+    void moveAbsolute(glm::vec3 amount);
+
+    /// <summary>
     /// Get the positional impact of movement with respect to the direction the object is facing,
     /// without actually moving the object.
     /// </summary>

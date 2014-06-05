@@ -245,34 +245,38 @@ void onIdle() {
         past = time;
     }
 
-
-    //FIXME: Collision - Not at all smooth, still has bugs where you can go through walls.
-    //  - Smoothness could be fixed by checking if it will collide rather then if it has.
-    //  - Not sure about the bugs...
-    glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 relativeMovement = glm::vec3(0.0f, 0.0f, 0.0f);
 
     if (keyState.up && !keyState.down) {
-        movement.z += 0.2f;
+        relativeMovement.z += 0.2f;
     } 
     if (keyState.down && !keyState.up) {
-        movement.z -= 0.2f;
+        relativeMovement.z -= 0.2f;
     }
     if (keyState.left && !keyState.right) {
-        movement.x -= 0.2f; 
+        relativeMovement.x -= 0.2f;
     }
     if (keyState.right && !keyState.left) {
-        movement.x += 0.2f;
+        relativeMovement.x += 0.2f;
     }
 
-    glm::vec3 movement_x = glm::vec3(movement.x, 0.0f, 0.0f);
-    glm::vec3 movement_z = glm::vec3(0.0f, 0.0f, movement.z);
+    glm::vec3 absoluteMovement = cam1->inspectMovement(relativeMovement);
+    // Break the movement down into seperate components
+    glm::vec3 movementX = glm::vec3(absoluteMovement.x, 0, 0);
+    glm::vec3 movementY = glm::vec3(0, absoluteMovement.y, 0);
+    glm::vec3 movementZ = glm::vec3(0, 0, absoluteMovement.z);
 
-    if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement)))) {
-        cam1->move(movement);
-    } else if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement_x)))) {
-        cam1->move(movement_x);
-    } else if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement_z)))) {
-        cam1->move(movement_z);
+    // Move each of the components if they don't collide with something
+    // Not the most efficient but very simple.
+
+    if (!(renderer->checkCollision(cam1->getPosition() + movementX))) {
+        cam1->moveAbsolute(movementX);
+    }
+    if (!(renderer->checkCollision(cam1->getPosition() + movementY))) {
+        cam1->moveAbsolute(movementY);
+    }
+    if (!(renderer->checkCollision(cam1->getPosition() + movementZ))) {
+        cam1->moveAbsolute(movementZ);
     }
 
     glutPostRedisplay();

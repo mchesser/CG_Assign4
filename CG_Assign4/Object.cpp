@@ -53,6 +53,10 @@ void Object::move(glm::vec3 amount) {
     position += amount.x * xAxis + amount.y * up + amount.z * direction;
 }
 
+void Object::moveAbsolute(glm::vec3 amount) {
+    position += amount;
+}
+
 glm::vec3 Object::inspectMovement(glm::vec3 amount) {
     const glm::vec3 xAxis = glm::normalize(glm::cross(direction, up));
     return amount.x * xAxis + amount.y * up + amount.z * direction;
