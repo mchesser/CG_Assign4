@@ -36,6 +36,8 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_shadowMap = glGetUniformLocation(modelProgram, "shadowMap");
     shader.uniform_depthMVP = glGetUniformLocation(shadowMapProgram, "depthMVP");
 
+    shader.uniform_sun_pos = glGetUniformLocation(modelProgram, "sun_position");
+
     shader.uniform_renderDistance = glGetUniformLocation(modelProgram, "renderDistance");
 
     shader.in_sb_coord = glGetAttribLocation(skyboxProgram, "v_coord");
@@ -230,6 +232,7 @@ void Renderer::renderScene() const {
     glUniform3fv(shader.uniform_sunPos, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(sun->position(), 1.0f))));
     glUniform3fv(shader.uniform_sunAmbient, 1, glm::value_ptr(sun->ambient()));
     glUniform3fv(shader.uniform_sunDiffuse, 1, glm::value_ptr(sun->diffuse()));
+    glUniform3fv(shader.uniform_sun_pos, 1, glm::value_ptr(sun->position()));
 
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(cameraProj));

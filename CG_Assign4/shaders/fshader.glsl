@@ -13,6 +13,7 @@ uniform sampler2DShadow shadowMap;
 in vec3 sunDir;
 uniform vec3 sunAmbient;
 uniform vec3 sunDiffuse;
+uniform vec3 sun_position;
 
 struct Material {
     vec3 ambient;
@@ -32,9 +33,20 @@ vec2 poissonDisk[4] = vec2[](
 
 uniform float renderDistance;
 float fogFade = 10.0;
-vec4 fogColor = vec4(1.0, 1.0, 1.0, 0.0);
+vec4 fogColor;
 
 void main(void) {
+
+    
+    if (sun_position.y < 0) {
+        fogColor = vec4(0.0, 0.0, 0.0, 0.0);
+    } else if (sun_position.y < 200) {
+        float t = sun_position.y / 200;
+        fogColor = (1 - t) * vec4(0.0, 0.0, 0.0, 0.0) + t * vec4(1.0, 1.0, 1.0, 0.0);
+    } else {
+        fogColor = vec4(1.0, 1.0, 1.0, 0.0);
+    }
+
     // Compute lighting
     vec4 ambient, diffuse;
     ambient = vec4(material.ambient, 1.0);

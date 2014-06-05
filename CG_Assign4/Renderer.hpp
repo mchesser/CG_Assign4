@@ -108,6 +108,8 @@ public:
         GLint uniform_shadowMap;
         GLint uniform_depthMVP;
 
+        GLint uniform_sun_pos;
+
         GLint uniform_renderDistance;
 
         GLint in_sb_coord;
