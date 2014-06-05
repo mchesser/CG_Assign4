@@ -53,6 +53,11 @@ void Object::move(glm::vec3 amount) {
     position += amount.x * xAxis + amount.y * up + amount.z * direction;
 }
 
+glm::vec3 Object::inspectMovement(glm::vec3 amount) {
+    const glm::vec3 xAxis = glm::normalize(glm::cross(direction, up));
+    return amount.x * xAxis + amount.y * up + amount.z * direction;
+}
+
 glm::mat4 Object::transformationMatrix() const {
     return (
         glm::translate(glm::mat4(1.0f), position) *

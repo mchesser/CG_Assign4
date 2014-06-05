@@ -66,6 +66,10 @@ void Sun::decreaseSpeed() {
         rotate_speed += UPDATE_SPEED;
 }
 
+void Sun::resetSpeed() {
+    rotate_speed = DEFAULT_ROTATE_SPEED;
+}
+
 void Sun::togglePause() {
     paused = !paused;
 }
@@ -76,6 +80,18 @@ float Sun::getVerticalAngle() {
 
 float Sun::getHorizontalAngle() {
     return horizontalAngle;
+}
+
+void Sun::setVerticalAngle(float angle) {
+    if (angle >= 0 && angle <= TAU) {
+        verticalAngle = angle;
+    }
+}
+
+void Sun::setHorizontalAngle(float angle) {
+    if (angle >= 0 && angle <= TAU) {
+        horizontalAngle = angle;
+    }
 }
 
 glm::vec3 Sun::diffuse() const { 

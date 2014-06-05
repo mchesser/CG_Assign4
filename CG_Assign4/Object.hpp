@@ -54,6 +54,14 @@ public:
     void move(glm::vec3 amount);
 
     /// <summary>
+    /// Get the positional impact of movement with respect to the direction the object is facing,
+    /// without actually moving the object.
+    /// </summary>
+    ///
+    /// <param name="amount">The amount to move.</param>
+    glm::vec3 inspectMovement(glm::vec3 amount);
+
+    /// <summary>
     /// Computes the model transformation matrix for the model.
     /// </summary>
     glm::mat4 transformationMatrix() const;

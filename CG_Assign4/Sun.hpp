@@ -43,6 +43,11 @@ public:
     void decreaseSpeed();
 
     /// <summary>
+    /// Reset the speed of the sun to default
+    /// </summary>
+    void resetSpeed();
+
+    /// <summary>
     /// Toggle pause on and off
     /// </summary>
     void togglePause();
@@ -57,6 +62,21 @@ public:
     /// Get the horizontal angle of the sun
     /// </summary>
     float getHorizontalAngle();
+
+    /// <summary>
+    /// Set the vertical angle of the sun
+    /// </summary>
+    ///
+    /// <param name="angle"> The new vertical angle, between 0 and TAU</param>
+    void setVerticalAngle(float angle);
+
+    /// <summary>
+    /// Set the horizontal angle of the sun
+    /// </summary>
+    ///
+    /// <param name="angle"> The new vertical angle, between 0 and TAU</param>
+    void setHorizontalAngle(float angle);
+
 
 private:
     float verticalAngle;

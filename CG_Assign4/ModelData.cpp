@@ -114,15 +114,19 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
         glVertexAttribPointer(renderer->shader.in_normal, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
         // Load texture coordinates into a buffer
-        glBindBuffer(GL_ARRAY_BUFFER, shape.buffers[2]);
-        glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE_2(data.shapes[i].texCoords.size()),
-            dataPtr(data.shapes[i].texCoords), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(renderer->shader.in_texcoord);
-        glVertexAttribPointer(renderer->shader.in_texcoord, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        if (data.shapes[i].texCoords.size() != 0) {
+            glBindBuffer(GL_ARRAY_BUFFER, shape.buffers[2]);
+            glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE_2(data.shapes[i].texCoords.size()),
+                dataPtr(data.shapes[i].texCoords), GL_STATIC_DRAW);
+            glEnableVertexAttribArray(renderer->shader.in_texcoord);
+            glVertexAttribPointer(renderer->shader.in_texcoord, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        }
 
         // Load the texture using SOIL
-        shape.textureId = SOIL_load_OGL_texture(data.shapes[i].textureName.c_str(), SOIL_LOAD_AUTO,
-            SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+        if (!data.shapes[i].textureName.empty()) {
+            shape.textureId = SOIL_load_OGL_texture(data.shapes[i].textureName.c_str(), SOIL_LOAD_AUTO,
+                SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+        }
 
         // Load indices into a buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape.buffers[3]);

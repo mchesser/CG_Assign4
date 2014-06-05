@@ -244,25 +244,31 @@ void onIdle() {
     //FIXME: Collision - Not at all smooth, still has bugs where you can go through walls.
     //  - Smoothness could be fixed by checking if it will collide rather then if it has.
     //  - Not sure about the bugs...
-    bool collision = renderer->checkCollision(cam1->getPosition());
+    glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    // Key control
     if (keyState.up && !keyState.down) {
-        if (!collision) cam1->move(glm::vec3(0, 0, 0.2f));
-        else cam1->move(glm::vec3(0, 0, -0.3f));
-    }
+        movement.z += 0.2f;
+    } 
     if (keyState.down && !keyState.up) {
-        if (!collision) cam1->move(glm::vec3(0, 0, -0.2f));
-        else cam1->move(glm::vec3(0, 0, 0.3f));
+        movement.z -= 0.2f;
     }
     if (keyState.left && !keyState.right) {
-        if (!collision) cam1->move(glm::vec3(-0.2f, 0, 0));
-        else cam1->move(glm::vec3(0.3, 0, 0));
+        movement.x -= 0.2f; 
     }
     if (keyState.right && !keyState.left) {
-        if (!collision) cam1->move(glm::vec3(0.2f, 0, 0));
-        else cam1->move(glm::vec3(-0.3f, 0, 0));
-    } 
+        movement.x += 0.2f;
+    }
+
+    glm::vec3 movement_x = glm::vec3(movement.x, 0.0f, 0.0f);
+    glm::vec3 movement_z = glm::vec3(0.0f, 0.0f, movement.z);
+
+    if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement)))) {
+        cam1->move(movement);
+    } else if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement_x)))) {
+        cam1->move(movement_x);
+    } else if (!(renderer->checkCollision(cam1->getPosition() + cam1->inspectMovement(movement_z)))) {
+        cam1->move(movement_z);
+    }
 
     glutPostRedisplay();
 }
@@ -312,6 +318,52 @@ void onReshape(GLsizei width, GLsizei height) {
     renderer->resize(width, height);
 }
 
+
+void setTimeMenu(int id) {
+    switch(id) {
+        case 1: sun->setVerticalAngle(3.14159); break;
+        case 2: sun->setVerticalAngle(0); break;
+        case 3: sun->setVerticalAngle(0.27); break;
+        case 4: sun->setVerticalAngle(2.89); break;
+    }
+}
+
+void setSpeedMenu(int id) {
+    switch(id) {
+        case 1: sun->increaseSpeed(); break;
+        case 2: sun->decreaseSpeed(); break;
+        case 3: sun->togglePause(); break;
+        case 4: sun->resetSpeed(); break;
+    }
+
+}
+
+void mainMenu(int id) {
+
+}
+
+void initGlutMenu() {
+
+    int settime_menu = glutCreateMenu(setTimeMenu);
+    glutAddMenuEntry("Night", 1);
+    glutAddMenuEntry("Sunrise", 2);
+    glutAddMenuEntry("Day", 3);
+    glutAddMenuEntry("Sunset", 4);
+
+    int setspeed_menu = glutCreateMenu(setSpeedMenu);
+    glutAddMenuEntry("Increase Speed (i)", 1);
+    glutAddMenuEntry("Decrease Speed (o)", 2);
+    glutAddMenuEntry("(Un)Pause Speed (p)", 3);
+    glutAddMenuEntry("Default Speed", 4);
+
+
+    glutCreateMenu(mainMenu);
+    glutAddSubMenu("Set Time of Day", settime_menu);
+    glutAddSubMenu("Set Speed of Sun", setspeed_menu);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+
 // Program entry point
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
@@ -347,7 +399,8 @@ int main(int argc, char* argv[]) {
     glutKeyboardUpFunc(keyboardUp);
     glutMouseFunc(onMouse);
     glutMotionFunc(onMotion);
-
+    initGlutMenu();
+    
     initResources();
 
     glutMainLoop();
