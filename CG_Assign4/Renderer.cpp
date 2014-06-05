@@ -36,7 +36,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_shadowMap = glGetUniformLocation(modelProgram, "shadowMap");
     shader.uniform_depthMVP = glGetUniformLocation(shadowMapProgram, "depthMVP");
 
-    shader.uniform_sun_pos = glGetUniformLocation(modelProgram, "sun_position");
+    shader.uniform_fogColor = glGetUniformLocation(modelProgram, "fogColor");
 
     shader.uniform_renderDistance = glGetUniformLocation(modelProgram, "renderDistance");
 
@@ -112,31 +112,39 @@ void Renderer::drawModel(const ModelData* model, glm::vec3 position, glm::vec3 s
 void Renderer::renderScene() const {
     const glm::mat4 cameraView = activeCamera->view();
     const glm::mat4 sunViewProj = sun->viewProjection(activeCamera->getPosition());
-
+    glm::vec4 fogColor = glm::vec4(0);
+    
     //
-    // Set Clear Color
+    // Set Background Color
     //
     glm::vec3 day = glm::vec3(0.7f, 0.8f, 1.0f);
     glm::vec3 sunset = glm::vec3(1.0f, 0.76f, 0.43f);
     glm::vec3 night = glm::vec3(0.23f, 0.1f, 0.3f);
+    glm::vec4 daytime_fog = glm::vec4(1.0, 1.0, 1.0, 0.0);
+    glm::vec4 nighttime_fog = glm::vec4(0.0, 0.0, 0.0, 0.0);
 
     if (sun->position().y < 0) {             
+        fogColor = nighttime_fog;
         glClearColor(night.x, night.y, night.z, 1.0f);
 
     } else if (sun->position().y < 100) {
         float t = 1 - (sun->position().y / 100.0);
 
+        fogColor = t/2 * daytime_fog;
         glClearColor(night.x * t + sunset.x * (1 - t), night.y * t + sunset.y * (1 - t), 
             night.z * t + sunset.z * (1 - t), 1.0f);
 
     } else if (sun->position().y < 200) {
         float t = 1 - ((sun->position().y - 100) / 100);
 
+        fogColor = (t/2 + 0.5f) * daytime_fog;
         glClearColor(sunset.x * t + day.x * (1 - t), sunset.y * t + day.y * (1 - t), 
             sunset.z * t + day.z * (1 - t), 1.0f);
 
     } else {
+        fogColor = daytime_fog;
         glClearColor(day.x, day.y, day.z, 1.0);
+        
     }
 
     //
@@ -232,7 +240,7 @@ void Renderer::renderScene() const {
     glUniform3fv(shader.uniform_sunPos, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(sun->position(), 1.0f))));
     glUniform3fv(shader.uniform_sunAmbient, 1, glm::value_ptr(sun->ambient()));
     glUniform3fv(shader.uniform_sunDiffuse, 1, glm::value_ptr(sun->diffuse()));
-    glUniform3fv(shader.uniform_sun_pos, 1, glm::value_ptr(sun->position()));
+    glUniform3fv(shader.uniform_fogColor, 1, glm::value_ptr(fogColor));
 
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(cameraProj));

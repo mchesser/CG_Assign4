@@ -32,20 +32,10 @@ vec2 poissonDisk[4] = vec2[](
 );
 
 uniform float renderDistance;
+uniform vec4 fogColor;
 float fogFade = 10.0;
-vec4 fogColor;
 
 void main(void) {
-
-    
-    if (sun_position.y < 0) {
-        fogColor = vec4(0.0, 0.0, 0.0, 0.0);
-    } else if (sun_position.y < 200) {
-        float t = sun_position.y / 200;
-        fogColor = (1 - t) * vec4(0.0, 0.0, 0.0, 0.0) + t * vec4(1.0, 1.0, 1.0, 0.0);
-    } else {
-        fogColor = vec4(1.0, 1.0, 1.0, 0.0);
-    }
 
     // Compute lighting
     vec4 ambient, diffuse;
