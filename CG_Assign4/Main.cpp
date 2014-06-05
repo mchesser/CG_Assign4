@@ -23,6 +23,8 @@
 
 static ModelData* terrainModel;
 static ModelData* buildingModel;
+static ModelData* streetlightModel1;
+static ModelData* streetlightModel2;
 static City* city;
 
 static Renderer* renderer;
@@ -170,6 +172,9 @@ void initResources() {
     buildingModel = new ModelData(genCube("data/default.tga"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/groundTemplate.tga"), renderer);
     city = new City(buildingModel, 30.0f);
+
+    streetlightModel1 = new ModelData(loadModelData("data/streetlight/StreetLamp.obj"), renderer);
+    streetlightModel2 = new ModelData(loadModelData("data/streetlight/Lamp_Post_Street.obj"), renderer);
     
     //day filenames
     std::vector<std::string> day_files;
