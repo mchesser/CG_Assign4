@@ -56,16 +56,22 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
 
     // Configure lights uniform
     shader.uniform_numLights = glGetUniformLocation(modelProgram, "numLights");
+    shader.uniform_lampLight.direction = glGetUniformLocation(modelProgram, "lampLight.direction");
+    shader.uniform_lampLight.maxAngle = glGetUniformLocation(modelProgram, "lampLight.maxAngle");
+    shader.uniform_lampLight.ambient = glGetUniformLocation(modelProgram, "lampLight.ambient");
+    shader.uniform_lampLight.diffuse = glGetUniformLocation(modelProgram, "lampLight.diffuse");
     for (int i = 0; i < MAX_LIGHTS; ++i) {
         std::ostringstream light_ind;
         light_ind << i;
-        const std::string shaderName = "lights[" + light_ind.str() + "]";
-        shader.uniform_lights[i].position = glGetUniformLocation(modelProgram, (shaderName + ".position").c_str());
-        shader.uniform_lights[i].direction = glGetUniformLocation(modelProgram, (shaderName + ".direction").c_str());
-        shader.uniform_lights[i].maxAngle = glGetUniformLocation(modelProgram, (shaderName + ".maxAngle").c_str());
-        shader.uniform_lights[i].ambient = glGetUniformLocation(modelProgram, (shaderName + ".ambient").c_str());
-        shader.uniform_lights[i].diffuse = glGetUniformLocation(modelProgram, (shaderName + ".diffuse").c_str());
+        const std::string shaderName = "lightPositions[" + light_ind.str() + "]";
+        shader.uniform_lightPositions[i]= glGetUniformLocation(modelProgram, (shaderName).c_str());
     }
+    lampLight = {
+        glm::vec3(0, -1, 0),
+        6.0f / 10.0f,
+        glm::vec3(0.0),
+        glm::vec3(1.0, 0.8, 0.6)
+    };
 
     // Configure shadow map buffers
     glGenFramebuffers(1, &shadowMapFramebuffer);
@@ -126,14 +132,14 @@ void Renderer::drawModel(const ModelData* model, glm::vec3 position, glm::vec3 s
     drawModel(model, transformation);
 }
 
-void Renderer::addLight(LightSource light) {
-    lights.push_back(light);
+void Renderer::addLight(glm::vec3 position) {
+    lights.push_back(position);
 }
 
 struct LightSorter {
     glm::vec3 origin;
-    bool operator()(const LightSource& l1, const LightSource& l2) const{
-        return glm::length(l1.position - origin) < glm::length(l2.position - origin);
+    bool operator()(const glm::vec3& l1, const glm::vec3& l2) const {
+        return glm::length(l1 - origin) < glm::length(l2 - origin);
     }
 };
 
@@ -283,12 +289,13 @@ void Renderer::renderScene() {
     LightSorter sorter = { activeCamera->getPosition() };
     std::sort(lights.begin(), lights.end(), sorter);
 
+    glUniform3fv(shader.uniform_lampLight.direction, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lampLight.direction, 0.0))));
+    glUniform1f(shader.uniform_lampLight.maxAngle, lampLight.maxAngle);
+    glUniform3fv(shader.uniform_lampLight.ambient, 1, glm::value_ptr(lampLight.ambient));
+    glUniform3fv(shader.uniform_lampLight.diffuse, 1, glm::value_ptr(lampLight.diffuse));
+
     for (int i = 0; i < numLights; ++i) {
-        glUniform3fv(shader.uniform_lights[i].position, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i].position, 1.0f))));
-        glUniform3fv(shader.uniform_lights[i].direction, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i].direction, 0.0))));
-        glUniform1f(shader.uniform_lights[i].maxAngle, lights[i].maxAngle);
-        glUniform3fv(shader.uniform_lights[i].ambient, 1, glm::value_ptr(lights[i].ambient));
-        glUniform3fv(shader.uniform_lights[i].diffuse, 1, glm::value_ptr(lights[i].diffuse));
+        glUniform3fv(shader.uniform_lightPositions[i], 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i], 1.0f))));
     }
 
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);

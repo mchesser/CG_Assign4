@@ -104,48 +104,20 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             case V: // Vertical road segment
             {
                 if (gridy % 2 == 0) {
-                    LightSource leftLight = {
-                        tileOffset + glm::vec3(-TILE_SIZE / 4, 3, 0),
-                        glm::vec3(0, -1, 0),
-                        TAU / 10,
-                        glm::vec3(0.0),
-                        glm::vec3(1.0, 0.8, 0.6)
-                    };
-                    renderer->addLight(leftLight);
+                    renderer->addLight(tileOffset + glm::vec3(-TILE_SIZE / 4, 3, 0));
                 }
                 else {
-                    LightSource rightLight = {
-                        tileOffset + glm::vec3(TILE_SIZE / 4, 3, 0),
-                        glm::vec3(0, -1, 0),
-                        TAU / 10,
-                        glm::vec3(0.0),
-                        glm::vec3(1.0, 0.8, 0.6)
-                    };
-                    renderer->addLight(rightLight);
+                    renderer->addLight(tileOffset + glm::vec3(TILE_SIZE / 4, 3, 0));
                 }
             }
                 break;
             case H: // Horizontal road segment
             {
                 if (gridx % 2 == 0) {
-                    LightSource topLight = {
-                        tileOffset + glm::vec3(0, 3, -TILE_SIZE / 4),
-                        glm::vec3(0, -1, 0),
-                        TAU / 10,
-                        glm::vec3(0.0),
-                        glm::vec3(1.0, 0.8, 0.6)
-                    };
-                    renderer->addLight(topLight);
+                    renderer->addLight(tileOffset + glm::vec3(0, 3, -TILE_SIZE / 4));
                 }
                 else {
-                    LightSource bottomLight = {
-                        tileOffset + glm::vec3(0, 3, TILE_SIZE / 4),
-                        glm::vec3(0, -1, 0),
-                        TAU / 10,
-                        glm::vec3(0.0),
-                        glm::vec3(1.0, 0.8, 0.6)
-                    };
-                    renderer->addLight(bottomLight);
+                    renderer->addLight(tileOffset + glm::vec3(0, 3, TILE_SIZE / 4));
                 }
             }
             }

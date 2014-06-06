@@ -19,13 +19,13 @@ uniform bool isDay;
 
 uniform int numLights;
 struct LightSource {
-    vec3 position;
     vec3 direction;
     float maxAngle;
     vec3 ambient;
     vec3 diffuse;
 };
-uniform LightSource lights[100];
+uniform LightSource lampLight;
+uniform vec3 lightPositions[100];
 
 struct Material {
     vec3 ambient;
@@ -47,8 +47,8 @@ uniform float renderDistance;
 uniform vec4 fogColor;
 float fogFade = 10.0;
 
-vec3 computeLighting(LightSource light) {
-    vec3 lightToPosition = position - light.position;
+vec3 computeLighting(vec3 lightPosition, LightSource light) {
+    vec3 lightToPosition = position - lightPosition;
     float distance = length(lightToPosition);
     vec3 lightDir = lightToPosition / distance;
 
@@ -93,7 +93,7 @@ void main(void) {
     else {
         vec3 totalLight = vec3(0.0, 0.0, 0.0);
         for (int i = 0; i < numLights; ++i) {
-            totalLight += computeLighting(lights[i]);
+            totalLight += computeLighting(lightPositions[i], lampLight);
         }
 
         color = vec4(totalLight, 1.0);
