@@ -74,7 +74,7 @@ City::City(std::vector <ModelData *> base_models, float renderDistance) {
     for (int i = 0; i< base_models.size(); i++) {
         BuildingData building = {
             glm::vec3(BUILDING_SCALE / 2.0f, 1.0, BUILDING_SCALE / 2.0f),
-            base_models[i]e,
+            base_models[i],
         };
         buildingTypes.push_back(building);
     }
