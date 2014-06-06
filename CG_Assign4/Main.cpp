@@ -57,6 +57,71 @@ static struct MouseHandler {
     inline void update(int nx, int ny) { prevX = x; prevY = y; x = nx; y = ny; }
 } mouseHandler;
 
+RawModelData genCube(const std::string& texture, float width, float height, float depth) {
+    RawModelData data;
+    RawModelData::Shape shape;
+
+    // Top
+    shape = shapes::quad(glm::vec3(-width, height, depth), glm::vec3(-width, height, -depth),
+        glm::vec3(width, height, -depth), glm::vec3(width, height, depth));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Bottom
+    shape = shapes::quad(glm::vec3(width, -height, depth), glm::vec3(width, -height, -depth),
+        glm::vec3(-width, -height, -depth), glm::vec3(-width, -height, depth));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Left
+    shape = shapes::quad(glm::vec3(-width, height, depth), glm::vec3(-width, -height, depth),
+        glm::vec3(-width, -height, -depth), glm::vec3(-width, height, -depth));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Right
+    shape = shapes::quad(glm::vec3(width, height, -depth), glm::vec3(width, -height, -depth),
+        glm::vec3(width, -height, depth), glm::vec3(width, height, depth));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Front
+    shape = shapes::quad(glm::vec3(-width, height, -depth), glm::vec3(-width, -height, -depth),
+        glm::vec3(width, -height, -depth), glm::vec3(width, height, -depth));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // Back
+    shape = shapes::quad(glm::vec3(width, height, depth), glm::vec3(width, -height, depth),
+        glm::vec3(-width, -height, depth), glm::vec3(-width, height, depth));
+    shape.textureName = texture;
+    data.shapes.push_back(shape);
+
+    // BoundingBox of whole cube 
+    //  - May need to put this in genBuilding if its to slow
+    BoundingBox boundingBox;
+    boundingBox.minVertex = glm::vec3(-width, -height, -depth);
+    boundingBox.maxVertex = glm::vec3(width, height, depth);
+    data.boundingBox = boundingBox;
+
+    return data;
+}
+
+RawModelData genBuilding(const std::string& texture) {
+
+    const float scaleOfBuilding = 0.8;
+
+    //Original square
+    RawModelData data;
+    data = genCube(texture, scaleOfBuilding, 1, scaleOfBuilding);
+
+    RawModelData block;
+    block = genCube(texture, 1, 0.95, scaleOfBuilding * 0.8);
+    data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
+
+    return data;
+}
+
 // Generates a square terrain with the specified texture loaded from a file
 RawModelData genTerrainModel(const std::string& terrainTexture) {
 
@@ -72,59 +137,6 @@ RawModelData genTerrainModel(const std::string& terrainTexture) {
     BoundingBox boundingBox;
     boundingBox.minVertex = glm::vec3(-1, 0, -1);
     boundingBox.maxVertex = glm::vec3(1, 0, 1);
-    data.boundingBox = boundingBox;
-
-    return data;
-}
-
-// FIXME: This should be replaced by a better function for generating buildings
-//  - Need to generate normals correctly
-//  - Need to generate textures for day and night
-//  - Need to generate bump map / heightmap
-RawModelData genCube(const std::string& texture) {
-    RawModelData data;
-    RawModelData::Shape shape;
-
-    // Top
-    shape = shapes::quad(glm::vec3(-1, 1, 1), glm::vec3(-1, 1, -1),
-        glm::vec3(1, 1, -1), glm::vec3(1, 1, 1));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Bottom
-    shape = shapes::quad(glm::vec3(1, -1, 1), glm::vec3(1, -1, -1),
-        glm::vec3(-1, -1, -1), glm::vec3(-1, -1, 1));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Left
-    shape = shapes::quad(glm::vec3(-1, 1, 1), glm::vec3(-1, -1, 1),
-        glm::vec3(-1, -1, -1), glm::vec3(-1, 1, -1));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Right
-    shape = shapes::quad(glm::vec3(1, 1, -1), glm::vec3(1, -1, -1),
-        glm::vec3(1, -1, 1), glm::vec3(1, 1, 1));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Front
-    shape = shapes::quad(glm::vec3(-1, 1, -1), glm::vec3(-1, -1, -1),
-        glm::vec3(1, -1, -1), glm::vec3(1, 1, -1));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Back
-    shape = shapes::quad(glm::vec3(1, 1, 1), glm::vec3(1, -1, 1),
-        glm::vec3(-1, -1, 1), glm::vec3(-1, 1, 1));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // BoundingBox of whole cube
-    BoundingBox boundingBox;
-    boundingBox.minVertex = glm::vec3(-1, -1, -1);
-    boundingBox.maxVertex = glm::vec3(1, 1, 1);
     data.boundingBox = boundingBox;
 
     return data;
@@ -169,7 +181,7 @@ void initResources() {
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
     renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
 
-    buildingModel = new ModelData(genCube("data/building/windows.jpg"), renderer);
+    buildingModel = new ModelData(genBuilding("data/building/windows.jpg"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/ground/groundTemplate.tga"), renderer);
     city = new City(buildingModel, 30.0f);
 
