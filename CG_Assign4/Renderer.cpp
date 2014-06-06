@@ -5,6 +5,7 @@
 #include "GLMUtil.hpp"
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 #define TAU (6.283185307179586f)
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
@@ -56,7 +57,9 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     // Configure lights uniform
     shader.uniform_numLights = glGetUniformLocation(modelProgram, "numLights");
     for (int i = 0; i < MAX_LIGHTS; ++i) {
-        const std::string shaderName = "lights[" + std::to_string(i) + "]";
+        std::ostringstream light_ind;
+        light_ind << i;
+        const std::string shaderName = "lights[" + light_ind.str() + "]";
         shader.uniform_lights[i].position = glGetUniformLocation(modelProgram, (shaderName + ".position").c_str());
         shader.uniform_lights[i].direction = glGetUniformLocation(modelProgram, (shaderName + ".direction").c_str());
         shader.uniform_lights[i].maxAngle = glGetUniformLocation(modelProgram, (shaderName + ".maxAngle").c_str());
