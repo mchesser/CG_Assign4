@@ -16,13 +16,13 @@ uniform mat4 depthBiasMVP;
 uniform mat3 normalMatrix;
 uniform vec3 sunPos;
 
-void main() {    
+void main() {
     vec4 pos = mv * vec4(v_coord, 1.0);
     gl_Position = proj * pos;
     position = vec3(pos);
 
     shadowCoord = depthBiasMVP * vec4(v_coord, 1.0);
     normal = normalize(normalMatrix * v_normal);
-	sunDir = -normalize(sunPos - vec3(pos));
+    sunDir = -normalize(sunPos - vec3(pos));
     texcoord = v_texcoord;
 }
