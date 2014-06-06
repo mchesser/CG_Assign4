@@ -11,6 +11,17 @@
 class ModelData;
 class Skybox;
 
+#define MAX_LIGHTS 100
+
+struct LightSource {
+    glm::vec3 position;
+    glm::vec3 direction;
+    float maxAngle;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+};
+
+
 class Renderer {
 public:
     /// <summary>
@@ -62,9 +73,14 @@ public:
         glm::vec3 rotation = glm::vec3(0));
 
     /// <summary>
+    /// Adds a light to the scene
+    /// </summary>
+    void addLight(LightSource light);
+
+    /// <summary>
     /// Renders the scene to the screen.
     /// </summary>
-    void renderScene() const;
+    void renderScene();
     
     /// <summary>
     /// Clears the current scene in the renderer.
@@ -75,7 +91,6 @@ public:
     /// Checks for collision at position.
     /// </summary>
     bool checkCollision(glm::vec3 position);
-
 
     /// <summary>
     /// Attach an active skybox to be rendered before any model data
@@ -103,6 +118,7 @@ public:
         GLint uniform_sunPos;
         GLint uniform_sunAmbient;
         GLint uniform_sunDiffuse;
+        GLint uniform_isDay;
 
         GLint uniform_modelTexture;
         GLint uniform_shadowMap;
@@ -121,6 +137,17 @@ public:
         GLint uniform_sb_sunset_texture;
         GLint uniform_sb_night_texture;
         GLint uniform_sb_sun_pos;
+
+        GLint uniform_numLights;
+        struct LightSource {
+            GLint position;
+            GLint direction;
+            GLint maxAngle;
+            GLint ambient;
+            GLint diffuse;
+        };
+        LightSource uniform_lights[MAX_LIGHTS];
+
     } shader;
 
     GLsizei screenWidth;
@@ -135,6 +162,7 @@ public:
     const Sun* sun;
 private:
     GLuint modelProgram;
+    GLuint nightProgram;
     GLuint shadowMapProgram;
     GLuint skyboxProgram;
     
@@ -151,6 +179,8 @@ private:
     };
 
     std::vector<RenderData> renderData;
+
+    std::vector<LightSource> lights;
 
     /// <summary>
     /// Computes the current aspect ratio of the renderer's screen.

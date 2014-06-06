@@ -1,16 +1,18 @@
 #include "Renderer.hpp"
+#include "glm/common.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "GLMUtil.hpp"
 #include <iostream>
+#include <algorithm>
 
 #define TAU (6.283185307179586f)
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
 
 Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
     GLuint modelProgram, GLuint shadowMapProgram, GLuint skyboxProgram) : screenWidth(screenWidth),  
-    screenHeight(screenHeight), renderDistance(renderDistance), activeCamera(camera), 
-    sun(sun), modelProgram(modelProgram), shadowMapProgram(shadowMapProgram), skyboxProgram(skyboxProgram) {
+    screenHeight(screenHeight), renderDistance(renderDistance), activeCamera(camera), sun(sun), 
+    modelProgram(modelProgram), shadowMapProgram(shadowMapProgram), skyboxProgram(skyboxProgram) {
     
     // Configure shaders
     shader.in_coord = glGetAttribLocation(modelProgram, "v_coord");
@@ -31,6 +33,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_sunPos = glGetUniformLocation(modelProgram, "sunPos");
     shader.uniform_sunAmbient = glGetUniformLocation(modelProgram, "sunAmbient");
     shader.uniform_sunDiffuse = glGetUniformLocation(modelProgram, "sunDiffuse");
+    shader.uniform_isDay = glGetUniformLocation(modelProgram, "isDay");
 
     shader.uniform_modelTexture = glGetUniformLocation(modelProgram, "modelTexture");
     shader.uniform_shadowMap = glGetUniformLocation(modelProgram, "shadowMap");
@@ -49,6 +52,17 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_sb_night_texture = glGetUniformLocation(skyboxProgram, "night_texture");
     shader.uniform_sb_sunset_texture = glGetUniformLocation(skyboxProgram, "sunset_texture");
     shader.uniform_sb_sun_pos = glGetUniformLocation(skyboxProgram, "sun_position");
+
+    // Configure lights uniform
+    shader.uniform_numLights = glGetUniformLocation(modelProgram, "numLights");
+    for (int i = 0; i < MAX_LIGHTS; ++i) {
+        const std::string shaderName = "lights[" + std::to_string(i) + "]";
+        shader.uniform_lights[i].position = glGetUniformLocation(modelProgram, (shaderName + ".position").c_str());
+        shader.uniform_lights[i].direction = glGetUniformLocation(modelProgram, (shaderName + ".direction").c_str());
+        shader.uniform_lights[i].maxAngle = glGetUniformLocation(modelProgram, (shaderName + ".maxAngle").c_str());
+        shader.uniform_lights[i].ambient = glGetUniformLocation(modelProgram, (shaderName + ".ambient").c_str());
+        shader.uniform_lights[i].diffuse = glGetUniformLocation(modelProgram, (shaderName + ".diffuse").c_str());
+    }
 
     // Configure shadow map buffers
     glGenFramebuffers(1, &shadowMapFramebuffer);
@@ -109,53 +123,92 @@ void Renderer::drawModel(const ModelData* model, glm::vec3 position, glm::vec3 s
     drawModel(model, transformation);
 }
 
-void Renderer::renderScene() const {
+void Renderer::addLight(LightSource light) {
+    lights.push_back(light);
+}
+
+struct LightSorter {
+    glm::vec3 origin;
+    bool operator()(const LightSource& l1, const LightSource& l2) const{
+        return glm::length(l1.position - origin) < glm::length(l2.position - origin);
+    }
+};
+
+
+void Renderer::renderScene() {
     const glm::mat4 cameraView = activeCamera->view();
     const glm::mat4 sunViewProj = sun->viewProjection(activeCamera->getPosition());
-    glm::vec4 fogColor = glm::vec4(0);
+    const glm::vec3 sunPosition = sun->position();
+
+    //
+    // Render shadowmap
+    //
+
+    // Render the shadow map only if the sun position is above the horizon
+    if (sunPosition.y > 0) {
+        glUseProgram(shadowMapProgram);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFramebuffer);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glViewport(0, 0, 4 * 1024, 4 * 1024);
+        for (size_t i = 0; i < renderData.size(); ++i) {
+            const glm::mat4 depthMVP = sunViewProj * renderData[i].transformation;
+            glUniformMatrix4fv(shader.uniform_depthMVP, 1, GL_FALSE, glm::value_ptr(depthMVP));
+
+            const ModelData* model = renderData[i].model;
+            for (size_t i = 0; i < model->shapes.size(); ++i) {
+                glBindVertexArray(model->shapes[i].vao);
+                glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, NULL);
+            }
+        }
+    }
     
     //
-    // Set Background Color
+    // Set background color and fog color
     //
-    glm::vec3 day = glm::vec3(0.7f, 0.8f, 1.0f);
-    glm::vec3 sunset = glm::vec3(1.0f, 0.76f, 0.43f);
-    glm::vec3 night = glm::vec3(0.0f, 0.0f, 0.03f);
-    glm::vec4 daytime_fog = glm::vec4(1.0, 1.0, 1.0, 0.0);
-    glm::vec4 nighttime_fog = glm::vec4(0.0, 0.0, 0.0, 0.0);
+    const glm::vec3 day = glm::vec3(0.7f, 0.8f, 1.0f);
+    const glm::vec3 sunset = glm::vec3(1.0f, 0.76f, 0.43f);
+    const glm::vec3 night = glm::vec3(0.0f, 0.0f, 0.03f);
+    const glm::vec4 daytime_fog = glm::vec4(1.0, 1.0, 1.0, 1.0);
+    const glm::vec4 nighttime_fog = glm::vec4(0.0, 0.0, 0.0, 1.0);
 
-    if (sun->position().y < 0) {             
+    glm::vec4 fogColor;
+    glm::vec3 clearColor;
+
+    // Night
+    if (sunPosition.y < 0) {
         fogColor = nighttime_fog;
-        glClearColor(night.x, night.y, night.z, 1.0f);
+        clearColor = night;
+    } 
+    // Night -> Sunrise / sunset
+    else if (sunPosition.y < 100) {
+        float t = 1.0f - (sunPosition.y / 100.0f);
 
-    } else if (sun->position().y < 100) {
-        float t = 1 - (sun->position().y / 100.0);
-
-        fogColor = t/2 * daytime_fog;
-        glClearColor(night.x * t + sunset.x * (1 - t), night.y * t + sunset.y * (1 - t), 
-            night.z * t + sunset.z * (1 - t), 1.0f);
-
-    } else if (sun->position().y < 200) {
-        float t = 1 - ((sun->position().y - 100) / 100);
-
-        fogColor = (t/2 + 0.5f) * daytime_fog;
-        glClearColor(sunset.x * t + day.x * (1 - t), sunset.y * t + day.y * (1 - t), 
-            sunset.z * t + day.z * (1 - t), 1.0f);
-
-    } else {
-        fogColor = daytime_fog;
-        glClearColor(day.x, day.y, day.z, 1.0);
-        
+        fogColor = (t / 2.0f) * daytime_fog;
+        clearColor = t * night + (1.0f - t) * sunset;
     }
+    // Sunrise / sunset -> Day
+    else if (sunPosition.y < 200) {
+        float t = 1.0f - ((sunPosition.y - 100.0f) / 100.0f);
+
+        fogColor = (t / 2.0f + 0.5f) * daytime_fog;
+        clearColor = t * sunset + (1.0f - t) * day;
+    }
+    // Day
+    else {
+        fogColor = daytime_fog;
+        clearColor = day;
+    }
+    glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 
     //
     // Render active skybox
     //
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, screenWidth, screenHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // draw if there is an active skybox
+    // Draw if there is an active skybox
     if (active_skybox != NULL) {
-
         glUseProgram(skyboxProgram);
 
         // set appropriate projection for skybox
@@ -168,7 +221,6 @@ void Renderer::renderScene() const {
 
         // Draw the 6 walls of the skybox
         for (int i = 0; i < 6; i++) {
-            
             glBindVertexArray(active_skybox->walls[i].vao);
 
             glActiveTexture(GL_TEXTURE0);
@@ -199,34 +251,11 @@ void Renderer::renderScene() const {
 
         glUseProgram(0);
     }
-
-
-
-    //
-    // Render shadowmap
-    //
-    glUseProgram(shadowMapProgram);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFramebuffer);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, 4 * 1024, 4 * 1024);
-    for (size_t i = 0; i < renderData.size(); ++i) {
-        const glm::mat4 depthMVP = sunViewProj * renderData[i].transformation;
-        glUniformMatrix4fv(shader.uniform_depthMVP, 1, GL_FALSE, glm::value_ptr(depthMVP));
-
-        const ModelData* model = renderData[i].model;
-        for (size_t i = 0; i < model->shapes.size(); ++i) {
-            glBindVertexArray(model->shapes[i].vao);
-            glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, NULL);
-        }
-    }
     
     //
     // Render models
     //
     glUseProgram(modelProgram);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, screenWidth, screenHeight);
-
     glUniform1f(shader.uniform_renderDistance, renderDistance);
 
     // Bind shadowmap
@@ -237,10 +266,27 @@ void Renderer::renderScene() const {
     // Change the active texture (used later)
     glActiveTexture(GL_TEXTURE1);
 
-    glUniform3fv(shader.uniform_sunPos, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(sun->position(), 1.0f))));
+    // Add lights
+    glUniform3fv(shader.uniform_sunPos, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(sunPosition, 1.0f))));
     glUniform3fv(shader.uniform_sunAmbient, 1, glm::value_ptr(sun->ambient()));
     glUniform3fv(shader.uniform_sunDiffuse, 1, glm::value_ptr(sun->diffuse()));
     glUniform3fv(shader.uniform_fogColor, 1, glm::value_ptr(fogColor));
+    glUniform1i(shader.uniform_isDay, (GLboolean)(sunPosition.y > 0.0f));
+
+    const GLint numLights = glm::min((GLint)lights.size(), MAX_LIGHTS);
+    glUniform1i(shader.uniform_numLights, numLights);
+
+    // Sort the lights so that the nearest lights are more likely to be shown
+    LightSorter sorter = { activeCamera->getPosition() };
+    std::sort(lights.begin(), lights.end(), sorter);
+
+    for (int i = 0; i < numLights; ++i) {
+        glUniform3fv(shader.uniform_lights[i].position, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i].position, 1.0f))));
+        glUniform3fv(shader.uniform_lights[i].direction, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i].direction, 0.0))));
+        glUniform1f(shader.uniform_lights[i].maxAngle, lights[i].maxAngle);
+        glUniform3fv(shader.uniform_lights[i].ambient, 1, glm::value_ptr(lights[i].ambient));
+        glUniform3fv(shader.uniform_lights[i].diffuse, 1, glm::value_ptr(lights[i].diffuse));
+    }
 
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(cameraProj));
@@ -282,9 +328,7 @@ void Renderer::renderScene() const {
 }
 
 bool Renderer::checkCollision(glm::vec3 position) { 
-
-    for (size_t i=0; i<renderData.size(); i++) {
-
+    for (size_t i = 0; i < renderData.size(); i++) {
         // Position of object
         const glm::mat4 m = renderData[i].transformation;
 
@@ -292,7 +336,7 @@ bool Renderer::checkCollision(glm::vec3 position) {
         glm::vec4 boundingBoxMax = m * glm::vec4(renderData[i].model->boundingBox.maxVertex, 1);
         glm::vec4 boundingBoxMin = m * glm::vec4(renderData[i].model->boundingBox.minVertex, 1); 
 
-        float boundingOffset = 0.3;
+        float boundingOffset = 0.3f;
         //Check if within box
         if (boundingBoxMax.x + boundingOffset > position.x 
             && boundingBoxMin.x - boundingOffset < position.x
@@ -301,7 +345,8 @@ bool Renderer::checkCollision(glm::vec3 position) {
             && boundingBoxMax.z + boundingOffset > position.z
             && boundingBoxMin.z - boundingOffset < position.z) {
             return true;
-        } else if (position.y < 0.0 + boundingOffset) { // Special case for the ground
+        } 
+        else if (position.y < 0.0 + boundingOffset) { // Special case for the ground
             return true;
         }
     }
@@ -315,6 +360,7 @@ void Renderer::attachSkybox(Skybox* skybox) {
 
 void Renderer::clear() {
     renderData.clear();
+    lights.clear();
 }
 
 float Renderer::aspectRatio() const {

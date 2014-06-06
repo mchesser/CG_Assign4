@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <cmath>
 
+#define TAU (6.283185307179586f)
+
 // FIXME: This should be dynamic
 #define BUILDING_SCALE (2.0f)
 // FIXME: This should by dynamic
@@ -63,12 +65,14 @@ City::City(const ModelData* base_model, float renderDistance) {
         buildingTypes.push_back(building);
     }
 
+    // Compute a grid size such that the buildings will be rendered so that new buildings
+    // can't be seen appearing as the camera moves.
     gridSize = static_cast<int>(ceilf(renderDistance * 2 / TILE_SIZE)) + 5;
 }
 
 void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
-    const glm::vec3 offset = glm::vec3(
-        -static_cast<float>(gridSize) * TILE_SIZE / 2.0f,
+    const glm::vec3 baseOffset = glm::vec3(
+        -static_cast<float>(gridSize)* TILE_SIZE / 2.0f,
         0,
         -static_cast<float>(gridSize)* TILE_SIZE / 2.0f);
 
@@ -77,18 +81,73 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             const int gridx = x + static_cast<int>(cameraPosition.x / TILE_SIZE);
             const int gridy = y + static_cast<int>(cameraPosition.z / TILE_SIZE);
 
-            if (getTile(gridx, gridy) == B) {
+            const glm::vec3 tileOffset = glm::vec3(static_cast<float>(gridx)* TILE_SIZE,
+                0,
+                static_cast<float>(gridy)* TILE_SIZE) + baseOffset;
+
+            switch (getTile(gridx, gridy)) {
+            case B: // Building case
+            {
+                // Get the random building model from the array
                 const int index = (int)(noise(gridx, gridy) * (float)(buildingTypes.size()));
                 const BuildingData building = buildingTypes[index];
 
-                const glm::vec3 position = glm::vec3(static_cast<float>(gridx)* TILE_SIZE,
-                    building.scale.y,
-                    static_cast<float>(gridy)* TILE_SIZE) + offset;
+                const glm::vec3 position = tileOffset + glm::vec3(0, building.scale.y, 0);
 
                 const glm::mat4 transform = Object(position, STREET_DIR, SKY_DIR,
                     building.scale).transformationMatrix();
 
                 renderer->drawModel(building.model, transform);
+            }
+                break;
+
+            case V: // Vertical road segment
+            {
+                if (gridy % 2 == 0) {
+                    LightSource leftLight = {
+                        tileOffset + glm::vec3(-TILE_SIZE / 4, 3, 0),
+                        glm::vec3(0, -1, 0),
+                        TAU / 10,
+                        glm::vec3(0.0),
+                        glm::vec3(1.0, 0.8, 0.6)
+                    };
+                    renderer->addLight(leftLight);
+                }
+                else {
+                    LightSource rightLight = {
+                        tileOffset + glm::vec3(TILE_SIZE / 4, 3, 0),
+                        glm::vec3(0, -1, 0),
+                        TAU / 10,
+                        glm::vec3(0.0),
+                        glm::vec3(1.0, 0.8, 0.6)
+                    };
+                    renderer->addLight(rightLight);
+                }
+            }
+                break;
+            case H: // Horizontal road segment
+            {
+                if (gridx % 2 == 0) {
+                    LightSource topLight = {
+                        tileOffset + glm::vec3(0, 3, -TILE_SIZE / 4),
+                        glm::vec3(0, -1, 0),
+                        TAU / 10,
+                        glm::vec3(0.0),
+                        glm::vec3(1.0, 0.8, 0.6)
+                    };
+                    renderer->addLight(topLight);
+                }
+                else {
+                    LightSource bottomLight = {
+                        tileOffset + glm::vec3(0, 3, TILE_SIZE / 4),
+                        glm::vec3(0, -1, 0),
+                        TAU / 10,
+                        glm::vec3(0.0),
+                        glm::vec3(1.0, 0.8, 0.6)
+                    };
+                    renderer->addLight(bottomLight);
+                }
+            }
             }
         }
     }

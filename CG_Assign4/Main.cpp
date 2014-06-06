@@ -378,9 +378,9 @@ int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
 
 #ifndef __APPLE__
-    glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #else
-    glutInitDisplayMode( GLUT_3_2_CORE_PROFILE | GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #endif
     
     glutInitWindowSize(800, 600);
@@ -392,7 +392,6 @@ int main(int argc, char* argv[]) {
 
     // Enable GL properties
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
