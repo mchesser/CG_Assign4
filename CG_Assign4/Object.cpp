@@ -73,3 +73,7 @@ glm::mat4 Object::transformationMatrix() const {
 glm::vec3 Object::getPosition() const {
     return position;
 }
+
+glm::vec3 Object::getDirection() const {
+    return direction;
+}

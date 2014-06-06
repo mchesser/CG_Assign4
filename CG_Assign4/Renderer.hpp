@@ -11,10 +11,9 @@
 class ModelData;
 class Skybox;
 
-#define MAX_LIGHTS 100
+#define MAX_LIGHTS 30
 
 struct LightSource {
-    glm::vec3 position;
     glm::vec3 direction;
     float maxAngle;
     glm::vec3 ambient;
@@ -75,7 +74,7 @@ public:
     /// <summary>
     /// Adds a light to the scene
     /// </summary>
-    void addLight(LightSource light);
+    void addLight(glm::vec3 position);
 
     /// <summary>
     /// Renders the scene to the screen.
@@ -140,14 +139,13 @@ public:
 
         GLint uniform_numLights;
         struct LightSource {
-            GLint position;
             GLint direction;
             GLint maxAngle;
             GLint ambient;
             GLint diffuse;
         };
-        LightSource uniform_lights[MAX_LIGHTS];
-
+        LightSource uniform_lampLight;
+        GLint uniform_lightPositions[MAX_LIGHTS];
     } shader;
 
     GLsizei screenWidth;
@@ -180,7 +178,8 @@ private:
 
     std::vector<RenderData> renderData;
 
-    std::vector<LightSource> lights;
+    LightSource lampLight;
+    std::vector<glm::vec3> lights;
 
     /// <summary>
     /// Computes the current aspect ratio of the renderer's screen.

@@ -78,6 +78,11 @@ public:
     /// </summary>
     glm::vec3 getPosition() const;
 
+    /// <summary>
+    /// Returns the direction of the object.
+    /// </summary>
+    glm::vec3 getDirection() const;
+
 protected:
     /// <summary>
     /// The position of the object in the world.
