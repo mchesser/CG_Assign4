@@ -7,6 +7,7 @@
 #include "City.hpp"
 #include "Sun.hpp"
 #include "Skybox.hpp"
+#include "BuildingFactory.hpp"
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -22,10 +23,10 @@
 #define ORIGIN  (glm::vec3(0))
 
 static ModelData* terrainModel;
-static ModelData* buildingModel;
 static ModelData* streetlightModel1;
 static ModelData* streetlightModel2;
 static City* city;
+static BuildingFactory* buildingFactory;
 
 static Renderer* renderer;
 static Camera* cam1;
@@ -56,71 +57,6 @@ static struct MouseHandler {
     inline int dy() { return y - prevY; }
     inline void update(int nx, int ny) { prevX = x; prevY = y; x = nx; y = ny; }
 } mouseHandler;
-
-RawModelData genCube(const std::string& texture, float width, float height, float depth) {
-    RawModelData data;
-    RawModelData::Shape shape;
-
-    // Top
-    shape = shapes::quad(glm::vec3(-width, height, depth), glm::vec3(-width, height, -depth),
-        glm::vec3(width, height, -depth), glm::vec3(width, height, depth));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Bottom
-    shape = shapes::quad(glm::vec3(width, -height, depth), glm::vec3(width, -height, -depth),
-        glm::vec3(-width, -height, -depth), glm::vec3(-width, -height, depth));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Left
-    shape = shapes::quad(glm::vec3(-width, height, depth), glm::vec3(-width, -height, depth),
-        glm::vec3(-width, -height, -depth), glm::vec3(-width, height, -depth));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Right
-    shape = shapes::quad(glm::vec3(width, height, -depth), glm::vec3(width, -height, -depth),
-        glm::vec3(width, -height, depth), glm::vec3(width, height, depth));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Front
-    shape = shapes::quad(glm::vec3(-width, height, -depth), glm::vec3(-width, -height, -depth),
-        glm::vec3(width, -height, -depth), glm::vec3(width, height, -depth));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // Back
-    shape = shapes::quad(glm::vec3(width, height, depth), glm::vec3(width, -height, depth),
-        glm::vec3(-width, -height, depth), glm::vec3(-width, height, depth));
-    shape.textureName = texture;
-    data.shapes.push_back(shape);
-
-    // BoundingBox of whole cube 
-    //  - May need to put this in genBuilding if its to slow
-    BoundingBox boundingBox;
-    boundingBox.minVertex = glm::vec3(-width, -height, -depth);
-    boundingBox.maxVertex = glm::vec3(width, height, depth);
-    data.boundingBox = boundingBox;
-
-    return data;
-}
-
-RawModelData genBuilding(const std::string& texture) {
-
-    const float scaleOfBuilding = 0.8;
-
-    //Original square
-    RawModelData data;
-    data = genCube(texture, scaleOfBuilding, 1, scaleOfBuilding);
-
-    RawModelData block;
-    block = genCube(texture, 1, 0.95, scaleOfBuilding * 0.8);
-    data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
-
-    return data;
-}
 
 // Generates a square terrain with the specified texture loaded from a file
 RawModelData genTerrainModel(const std::string& terrainTexture) {
@@ -181,9 +117,18 @@ void initResources() {
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
     renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
 
-    buildingModel = new ModelData(genBuilding("data/building/windows.jpg"), renderer);
     terrainModel = new ModelData(genTerrainModel("data/ground/groundTemplate.tga"), renderer);
-    city = new City(buildingModel, 30.0f);
+    buildingFactory = new BuildingFactory();
+
+    // Generate city
+    std::vector <ModelData *> modelBuildings;
+    std::vector <RawModelData> buildings;
+    buildings = buildingFactory->genBuildings("data/building/windows.jpg", 10);
+    for (int i=0; i<buildings.size(); i++) {
+        ModelData *buildingModel = new ModelData(buildings[i], renderer);
+        modelBuildings.push_back(buildingModel);
+    }
+    city = new City(modelBuildings, 30.0f);
 
     streetlightModel1 = new ModelData(loadModelData("data/streetlight/StreetLamp.obj"), renderer);
     streetlightModel2 = new ModelData(loadModelData("data/streetlight/Lamp_Post_Street.obj"), renderer);

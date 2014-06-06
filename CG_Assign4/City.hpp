@@ -1,5 +1,6 @@
 //! A basic class for creating, storing and rendering a basic city
 #pragma once
+#include <vector>
 #include "Renderer.hpp"
 #include "ModelData.hpp"
 #include "Array2d.hpp"
@@ -17,6 +18,11 @@ public:
     /// Creates a new city.
     /// </summary>
     City(const ModelData* base_model, float renderDistance);
+
+    /// <summary>
+    /// Creates a new city with multiple buildings.
+    /// </summary>
+    City(std::vector <ModelData *> base_models, float renderDistance);
 
     /// <summary>
     /// Draws the city.
