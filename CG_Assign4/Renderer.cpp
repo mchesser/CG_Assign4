@@ -8,6 +8,7 @@
 #include <sstream>
 
 #define TAU (6.283185307179586f)
+#define FOV 45.0f
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
 
 Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
@@ -136,11 +137,24 @@ void Renderer::addLight(glm::vec3 position) {
 
 struct LightSorter {
     glm::vec3 origin;
+    glm::vec3 viewDirection;
+
     bool operator()(const glm::vec3& l1, const glm::vec3& l2) const {
         return glm::length(l1 - origin) < glm::length(l2 - origin);
     }
+
+    bool inFOV(const glm::vec3& pt) const {
+        return glm::abs(glm::acos(glm::dot(viewDirection, glm::normalize(pt - origin)))) < DEG2RAD(FOV);
+    }
 };
 
+bool inFOV(glm::vec3 pt, glm::vec3 origin, glm::vec3 viewDirection) {
+    if (glm::length(pt - origin) < 5.0f) {
+        return true;
+    }
+
+    return glm::abs(glm::acos(glm::dot(viewDirection, glm::normalize(pt - origin)))) < DEG2RAD(FOV);
+}
 
 void Renderer::renderScene() {
     const glm::mat4 cameraView = activeCamera->view();
@@ -220,7 +234,7 @@ void Renderer::renderScene() {
 
         // set appropriate projection for skybox
         glm::mat4 rotate = cameraView * glm::translate(glm::mat4(1), activeCamera->getPosition());
-        glm::mat4 proj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 100.0f);
+        glm::mat4 proj = glm::perspective(DEG2RAD(FOV), aspectRatio(), 0.1f, 100.0f);
         glm::vec3 sun_position = sun->position();
         glUniformMatrix4fv(shader.uniform_sb_rotate, 1, GL_FALSE, glm::value_ptr(rotate));
         glUniformMatrix4fv(shader.uniform_sb_proj, 1, GL_FALSE, glm::value_ptr(proj));
@@ -280,11 +294,8 @@ void Renderer::renderScene() {
     glUniform3fv(shader.uniform_fogColor, 1, glm::value_ptr(fogColor));
     glUniform1i(shader.uniform_isDay, (GLboolean)(sunPosition.y > 0.0f));
 
-    const GLint numLights = glm::min((GLint)lights.size(), MAX_LIGHTS);
-    glUniform1i(shader.uniform_numLights, numLights);
-
     // Sort the lights so that the nearest lights are more likely to be shown
-    LightSorter sorter = { activeCamera->getPosition() };
+    LightSorter sorter = { activeCamera->getPosition(), activeCamera->getDirection() };
     std::sort(lights.begin(), lights.end(), sorter);
 
     glUniform3fv(shader.uniform_lampLight.direction, 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lampLight.direction, 0.0))));
@@ -292,9 +303,26 @@ void Renderer::renderScene() {
     glUniform3fv(shader.uniform_lampLight.ambient, 1, glm::value_ptr(lampLight.ambient));
     glUniform3fv(shader.uniform_lampLight.diffuse, 1, glm::value_ptr(lampLight.diffuse));
 
-    for (int i = 0; i < numLights; ++i) {
-        glUniform3fv(shader.uniform_lightPositions[i], 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i], 1.0f))));
+    int shader_i = 0;
+    int light_i = 0;
+    while (shader_i < MAX_LIGHTS) {
+        while (light_i < lights.size() && !inFOV(lights[light_i], activeCamera->getPosition(), activeCamera->getDirection())) {
+            light_i += 1;
+        }
+        if (light_i >= lights.size()) {
+            break;
+        }
+
+        glUniform3fv(shader.uniform_lightPositions[shader_i], 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[light_i], 1.0f))));
+
+        light_i += 1;
+        shader_i += 1;
     }
+    glUniform1i(shader.uniform_numLights, shader_i);
+
+   // for (int i = 0; i < numLights; ++i) {
+   //     glUniform3fv(shader.uniform_lightPositions[i], 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i], 1.0f))));
+   // }
 
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(cameraProj));

@@ -25,7 +25,7 @@ struct LightSource {
     vec3 diffuse;
 };
 uniform LightSource lampLight;
-uniform vec3 lightPositions[100];
+uniform vec3 lightPositions[30];
 
 struct Material {
     vec3 ambient;

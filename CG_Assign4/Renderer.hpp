@@ -11,7 +11,7 @@
 class ModelData;
 class Skybox;
 
-#define MAX_LIGHTS 100
+#define MAX_LIGHTS 30
 
 struct LightSource {
     glm::vec3 direction;
