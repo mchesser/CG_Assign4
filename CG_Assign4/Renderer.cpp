@@ -66,12 +66,10 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
         const std::string shaderName = "lightPositions[" + light_ind.str() + "]";
         shader.uniform_lightPositions[i]= glGetUniformLocation(modelProgram, (shaderName).c_str());
     }
-    lampLight = {
-        glm::vec3(0, -1, 0),
-        6.0f / 10.0f,
-        glm::vec3(0.0),
-        glm::vec3(1.0, 0.8, 0.6)
-    };
+    lampLight.direction = glm::vec3(0, -1, 0);
+    lampLight.maxAngle = 6.0f / 10.0f;
+    lampLight.ambient = glm::vec3(0.0);
+    lampLight.diffuse = glm::vec3(1.0, 0.8, 0.6);
 
     // Configure shadow map buffers
     glGenFramebuffers(1, &shadowMapFramebuffer);
