@@ -169,8 +169,8 @@ void initResources() {
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
     renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
 
-    buildingModel = new ModelData(genCube("data/default.tga"), renderer);
-    terrainModel = new ModelData(genTerrainModel("data/groundTemplate.tga"), renderer);
+    buildingModel = new ModelData(genCube("data/building/windows.jpg"), renderer);
+    terrainModel = new ModelData(genTerrainModel("data/ground/groundTemplate.tga"), renderer);
     city = new City(buildingModel, 30.0f);
 
     streetlightModel1 = new ModelData(loadModelData("data/streetlight/StreetLamp.obj"), renderer);
