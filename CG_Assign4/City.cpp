@@ -1,6 +1,7 @@
 #include "City.hpp"
 #include <stdlib.h>
 #include <cmath>
+#include <iostream>
 
 #define TAU (6.283185307179586f)
 
@@ -19,6 +20,8 @@
 #define rand_max(max) (rand() % max)
 // FIXME: Very poor way of generating a random float
 #define randf() (static_cast<float>(rand()) / RAND_MAX)
+
+#define STREETLIGHT_HEIGHT 1.1
 
 float noise(int x, int y) {
     int n = x + y * 57;
@@ -52,32 +55,41 @@ TileType getTile(int x, int y) {
     return TILE_KEY[y][x];
 }
 
-City::City(const ModelData* base_model, float renderDistance) {
+City::City(const ModelData* base_model, const ModelData* streetlight_model, float renderDistance) {
     // Generate 10 buildings of different heights
     // FIXME: There might be other ways of varying the buildings
     buildingTypes.reserve(10);
     for (size_t i = 0; i < 10; ++i) {
-        BuildingData building = {
-            glm::vec3(BUILDING_SCALE / 2.0f, 1.0, BUILDING_SCALE / 2.0f), //1.0f + 4.0f * randf()
+        ObjectData building = {
+            glm::vec3(BUILDING_SCALE / 2.0f, 1.0f + 4.0f * randf(), BUILDING_SCALE / 2.0f),
             // FIXME: Probably should have more than one base model
             base_model,
         };
         buildingTypes.push_back(building);
     }
 
+    //Streetlight
+    streetlight.model = streetlight_model;
+    streetlight.scale = glm::vec3(0.001, 0.001, 0.001);
+
     // Compute a grid size such that the buildings will be rendered so that new buildings
     // can't be seen appearing as the camera moves.
     gridSize = static_cast<int>(ceilf(renderDistance * 2 / TILE_SIZE)) + 5;
 }
 
-City::City(std::vector <ModelData *> base_models, float renderDistance) {
-    for (int i = 0; i< base_models.size(); i++) {
-        BuildingData building = {
-            glm::vec3(BUILDING_SCALE / 2.0f, 1.0, BUILDING_SCALE / 2.0f),
+City::City(std::vector <ModelData *> base_models, const ModelData* streetlight_model, float renderDistance) {
+    buildingTypes.reserve(base_models.size());
+    for (int i = 0; i < base_models.size(); i++) {
+        ObjectData building = {
+            glm::vec3(BUILDING_SCALE / 2.0f, 1.0f + 2.0f * randf(), BUILDING_SCALE / 2.0f),
             base_models[i],
         };
         buildingTypes.push_back(building);
     }
+
+    //Streetlight
+    streetlight.model = streetlight_model;
+    streetlight.scale = glm::vec3(0.001, 0.001, 0.001);
 
     // Compute a grid size such that the buildings will be rendered so that new buildings
     // can't be seen appearing as the camera moves.
@@ -104,7 +116,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             {
                 // Get the random building model from the array
                 const int index = (int)(noise(gridx, gridy) * (float)(buildingTypes.size()));
-                const BuildingData building = buildingTypes[index];
+                const ObjectData building = buildingTypes[index];
 
                 const glm::vec3 position = tileOffset + glm::vec3(0, building.scale.y, 0);
 
@@ -118,20 +130,43 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             case V: // Vertical road segment
             {
                 if (gridy % 2 == 0) {
-                    renderer->addLight(tileOffset + glm::vec3(-TILE_SIZE / 4, 3, 0));
+                    const glm::vec3 position = tileOffset + glm::vec3(-TILE_SIZE/2, 0.01, 0.0);
+                    Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
+                    arrangement.rotate(glm::vec3(0.0, TAU/4, 0.0));
+                    const glm::mat4 transform = arrangement.transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
+                    renderer->addLight(tileOffset + glm::vec3(-TILE_SIZE / 4, STREETLIGHT_HEIGHT, 0));
                 }
                 else {
-                    renderer->addLight(tileOffset + glm::vec3(TILE_SIZE / 4, 3, 0));
+                    const glm::vec3 position = tileOffset + glm::vec3(TILE_SIZE/2, 0.01, 0.0);
+                    Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
+                    arrangement.rotate(glm::vec3(0.0, TAU/-4, 0.0));
+                    const glm::mat4 transform = arrangement.transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
+                    renderer->addLight(tileOffset + glm::vec3(TILE_SIZE / 4, STREETLIGHT_HEIGHT, 0));
                 }
             }
                 break;
             case H: // Horizontal road segment
             {
                 if (gridx % 2 == 0) {
-                    renderer->addLight(tileOffset + glm::vec3(0, 3, -TILE_SIZE / 4));
+                    const glm::vec3 position = tileOffset + glm::vec3(0.0, 0.01, -TILE_SIZE / 2);
+                    const glm::mat4 transform = Object(position, STREET_DIR, SKY_DIR, 
+                        streetlight.scale).transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
+                    renderer->addLight(tileOffset + glm::vec3(0, STREETLIGHT_HEIGHT, -TILE_SIZE / 4));
                 }
                 else {
-                    renderer->addLight(tileOffset + glm::vec3(0, 3, TILE_SIZE / 4));
+                    const glm::vec3 position = tileOffset + glm::vec3(0.0, 0.01, TILE_SIZE / 2);
+                    Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
+                    arrangement.rotate(glm::vec3(0.0, TAU/2, 0.0));
+                    const glm::mat4 transform = arrangement.transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
+                    renderer->addLight(tileOffset + glm::vec3(0, STREETLIGHT_HEIGHT, TILE_SIZE / 4));
                 }
             }
             }

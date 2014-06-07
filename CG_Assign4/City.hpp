@@ -6,7 +6,7 @@
 #include "Array2d.hpp"
 #include "glm/vec2.hpp"
 
-struct BuildingData {
+struct ObjectData {
     glm::vec3 scale;
     const ModelData* model;
 };
@@ -17,12 +17,12 @@ public:
     /// <summary>
     /// Creates a new city.
     /// </summary>
-    City(const ModelData* base_model, float renderDistance);
+    City(const ModelData* base_model, const ModelData* streetlight_model, float renderDistance);
 
     /// <summary>
     /// Creates a new city with multiple buildings.
     /// </summary>
-    City(std::vector <ModelData *> base_models, float renderDistance);
+    City(std::vector <ModelData *> base_models, const ModelData* streetlight_model, float renderDistance);
 
     /// <summary>
     /// Draws the city.
@@ -32,7 +32,8 @@ public:
     void draw(Renderer* renderer, glm::vec3 cameraPosition) const;
 
 private:
-    std::vector<BuildingData> buildingTypes;
+    std::vector<ObjectData> buildingTypes;
+    ObjectData streetlight;
     int gridSize;
 };
 

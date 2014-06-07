@@ -1,5 +1,4 @@
 #include "BuildingFactory.hpp"
-#include <iostream>
 #include <ctime>
 
 #define rand_pos_neg ((rand() % 2) * 2 - 1)
@@ -49,13 +48,6 @@ RawModelData genCube(const std::string& texture, float width, float height, floa
     shape.textureName = texture;
     data.shapes.push_back(shape);
 
-    // BoundingBox of whole cube 
-    //  - May need to put this in genBuilding if its to slow
-    BoundingBox boundingBox;
-    boundingBox.minVertex = glm::vec3(-width + center.x, -1, -depth + center.z);
-    boundingBox.maxVertex = glm::vec3(width + center.z, height, depth + center.z);
-    data.boundingBox = boundingBox;
-
     return data;
 }
 
@@ -64,13 +56,13 @@ RawModelData BuildingFactory::genBlockBuilding(const std::string& texture) {
     
     const float buildingDimension = 1.0;
     const float buildingHeight = 5.0;
+    const float firstBlockSize = 0.7;
 
     // Original square
     RawModelData data;
     data = genCube(texture, buildingDimension, 0.1f, buildingDimension, glm::vec3(0, 0, 0));
 
     // First block
-    const float firstBlockSize = 0.7;
     RawModelData block;
     block = genCube(texture,
         firstBlockSize,
@@ -94,6 +86,11 @@ RawModelData BuildingFactory::genBlockBuilding(const std::string& texture) {
         randFloat(0.3, 0.8),
         glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
+
+    BoundingBox boundingBox;
+    boundingBox.minVertex = glm::vec3(-buildingDimension, -1, -buildingDimension);
+    boundingBox.maxVertex = glm::vec3(buildingDimension, buildingHeight, buildingDimension);
+    data.boundingBox = boundingBox;
 
     return data;
 }
