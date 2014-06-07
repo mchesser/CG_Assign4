@@ -67,16 +67,22 @@ public:
     /// </summary>
     ~ModelData();
 
+    /// <summary>
+    /// Unify all the shapes into a single shape, discarding any extra material and texture information
+    /// </summary>
+    void unify();
+
 private:
+    GLuint vao;
+    GLuint buffers[4];
     struct Shape {
-        GLuint vao;
-        GLuint buffers[4];
         Material material;
         GLuint textureId;
+        unsigned int arrayBufferOffset;
+        unsigned int elementBufferOffset;
         unsigned int numElements;
     };
     std::vector<Shape> shapes;
 
     BoundingBox boundingBox;
-
 };
