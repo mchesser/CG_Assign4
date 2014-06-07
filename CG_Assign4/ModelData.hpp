@@ -78,8 +78,7 @@ private:
     struct Shape {
         Material material;
         GLuint textureId;
-        unsigned int arrayBufferOffset;
-        unsigned int elementBufferOffset;
+        unsigned int elementOffset;
         unsigned int numElements;
     };
     std::vector<Shape> shapes;
