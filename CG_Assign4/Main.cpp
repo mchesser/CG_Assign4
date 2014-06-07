@@ -123,7 +123,7 @@ void initResources() {
     // Generate city
     std::vector <ModelData *> modelBuildings;
     std::vector <RawModelData> buildings;
-    buildings = buildingFactory->genBuildings("data/building/windows.jpg", 10);
+    buildings = buildingFactory->genBuildings("data/building/windows.jpg", 5);
     for (int i=0; i<buildings.size(); i++) {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
         modelBuildings.push_back(buildingModel);
