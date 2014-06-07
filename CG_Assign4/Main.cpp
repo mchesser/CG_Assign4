@@ -22,6 +22,8 @@
 #define FORWARD_DIR (glm::vec3(0, 0, 1))
 #define ORIGIN  (glm::vec3(0))
 
+#define NUMBER_OF_BUILDINGS 1
+
 static ModelData* terrainModel;
 static ModelData* streetlightModel;
 static City* city;
@@ -122,7 +124,7 @@ void initResources() {
     // Generate city
     std::vector <ModelData *> modelBuildings;
     std::vector <RawModelData> buildings;
-    buildings = buildingFactory->genBuildings("data/building/windows.jpg", 5);
+    buildings = buildingFactory->genBuildings("data/building/windows.jpg", NUMBER_OF_BUILDINGS);
     for (int i=0; i<buildings.size(); i++) {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
         modelBuildings.push_back(buildingModel);
