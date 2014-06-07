@@ -97,7 +97,6 @@ RawModelData BuildingFactory::genBlockBuilding(const std::string& texture) {
 
 std::vector <RawModelData> BuildingFactory::genBuildings(const std::string& texture, int number)
 {
-    if (number < 1) number = 1;
     std::vector <RawModelData> buildings;
     for (int i=0; i<number; i++) {
         buildings.push_back(genBlockBuilding(texture));

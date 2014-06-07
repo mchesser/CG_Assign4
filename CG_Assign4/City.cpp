@@ -61,7 +61,7 @@ City::City(const ModelData* base_model, const ModelData* streetlight_model, floa
     buildingTypes.reserve(10);
     for (size_t i = 0; i < 10; ++i) {
         ObjectData building = {
-            glm::vec3(BUILDING_SCALE / 2.0f, 1.0, BUILDING_SCALE / 2.0f), //1.0f + 4.0f * randf()
+            glm::vec3(BUILDING_SCALE / 2.0f, 1.0f + 4.0f * randf(), BUILDING_SCALE / 2.0f),
             // FIXME: Probably should have more than one base model
             base_model,
         };
