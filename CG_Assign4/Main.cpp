@@ -130,7 +130,7 @@ void initResources() {
         buildingModel->unify();
         modelBuildings.push_back(buildingModel);
     }
-    streetlightModel = new ModelData(loadModelData("data/streetlight/lamppost_01.obj"), renderer);
+    streetlightModel = new ModelData(loadModelData("data/streetlight/lamppost_01.obj", true), renderer);
     city = new City(modelBuildings, streetlightModel, 30.0f);
 
     //day filenames

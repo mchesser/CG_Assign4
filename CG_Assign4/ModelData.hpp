@@ -48,7 +48,7 @@ struct RawModelData {
 /// </summary>
 ///
 /// <param name="filename">The filename of the model.</param>
-RawModelData loadModelData(const std::string& filename);
+RawModelData loadModelData(const std::string& filename, bool opposite_winding = false);
 
 class ModelData {
     friend class Renderer;
@@ -78,8 +78,7 @@ private:
     struct Shape {
         Material material;
         GLuint textureId;
-        unsigned int arrayBufferOffset;
-        unsigned int elementBufferOffset;
+        unsigned int elementOffset;
         unsigned int numElements;
     };
     std::vector<Shape> shapes;

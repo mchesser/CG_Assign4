@@ -14,7 +14,7 @@ static GLvoid** dataPtr(const std::vector<T>& vec) {
     return (GLvoid**)(&vec[0]);
 }
 
-RawModelData loadModelData(const std::string& filename) {
+RawModelData loadModelData(const std::string& filename, bool opposite_winding) {
     // --------------------------------------------------
     // Load the base model using the tinyobjreader library
     // --------------------------------------------------
@@ -40,7 +40,6 @@ RawModelData loadModelData(const std::string& filename) {
         shape.normals.reserve(baseShapes[i].mesh.indices.size());
         shape.texCoords.reserve(baseShapes[i].mesh.indices.size());
 
-        unsigned int indexOffset = 0;
         for (size_t j = 0; j < baseShapes[i].mesh.indices.size(); j += 3) {
             const unsigned int i1 = baseShapes[i].mesh.indices[j + 0];
             const unsigned int i2 = baseShapes[i].mesh.indices[j + 1];
@@ -54,7 +53,12 @@ RawModelData loadModelData(const std::string& filename) {
             shape.vertices.push_back(b);
             shape.vertices.push_back(c);
 
-            const glm::vec3 normal = glm::normalize(glm::cross(b - a, c - a));
+            glm::vec3 normal; 
+            if (!opposite_winding) {
+                normal = glm::normalize(glm::cross(b - a, c - a));
+            } else {
+                normal = glm::normalize(glm::cross(c - a, b - a));
+            }
             for (int n = 0; n < 3; ++n) {
                 shape.normals.push_back(normal);
             }
@@ -64,10 +68,16 @@ RawModelData loadModelData(const std::string& filename) {
                 shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i2 * 2])));
                 shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i3 * 2])));
             }
-
-            shape.indices.push_back(static_cast<unsigned int>(j + 0));
-            shape.indices.push_back(static_cast<unsigned int>(j + 1));
-            shape.indices.push_back(static_cast<unsigned int>(j + 2));
+            if (!opposite_winding) {
+                shape.indices.push_back(static_cast<unsigned int>(j + 0));
+                shape.indices.push_back(static_cast<unsigned int>(j + 1));
+                shape.indices.push_back(static_cast<unsigned int>(j + 2));
+            }
+            else {
+                shape.indices.push_back(static_cast<unsigned int>(j + 0));
+                shape.indices.push_back(static_cast<unsigned int>(j + 2));
+                shape.indices.push_back(static_cast<unsigned int>(j + 1));
+            }
         }
 
         // Read the material properties
@@ -92,21 +102,18 @@ RawModelData loadModelData(const std::string& filename) {
 }
 
 ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
-    unsigned int totalArrayBufferSize = 0;
-    unsigned int totalElementBufferSize = 0;
+    unsigned int totalAttributes = 0;
+    unsigned int totalElements = 0;
     
     std::vector<unsigned int> indices;
-    unsigned int jOffset = 0;
-
     for (size_t i = 0; i < data.shapes.size(); ++i) {
-        totalArrayBufferSize += data.shapes[i].vertices.size() * sizeof(glm::vec3);
-        totalElementBufferSize += data.shapes[i].indices.size() * sizeof(unsigned int);
-
-        // Unwrap indices
+        // Recalculate indices based on the position in the buffer
         for (size_t j = 0; j < data.shapes[i].indices.size(); ++j) {
-            indices.push_back(data.shapes[i].indices[j] + jOffset);
+            indices.push_back(data.shapes[i].indices[j] + totalAttributes);
         }
-        jOffset += data.shapes[i].vertices.size();
+
+        totalAttributes += data.shapes[i].vertices.size();
+        totalElements += data.shapes[i].indices.size();
     }
 
     glGenVertexArrays(1, &vao);
@@ -116,42 +123,45 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
 
     // Allocate memory for buffers
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, totalArrayBufferSize, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalAttributes * sizeof(glm::vec3), NULL, GL_STATIC_DRAW);
     glEnableVertexAttribArray(renderer->shader.in_coord);
     glVertexAttribPointer(renderer->shader.in_coord, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, totalArrayBufferSize, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalAttributes * sizeof(glm::vec3), NULL, GL_STATIC_DRAW);
     glEnableVertexAttribArray(renderer->shader.in_normal);
     glVertexAttribPointer(renderer->shader.in_normal, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
-    glBufferData(GL_ARRAY_BUFFER, totalArrayBufferSize, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalAttributes * sizeof(glm::vec2), NULL, GL_STATIC_DRAW);
     glEnableVertexAttribArray(renderer->shader.in_texcoord);
     glVertexAttribPointer(renderer->shader.in_texcoord, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalElementBufferSize, dataPtr(indices), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalElements * sizeof(unsigned int), dataPtr(indices), GL_STATIC_DRAW);
     
-    unsigned int arrayBufferOffset = 0;
-    unsigned int elementBufferOffset = 0;
+    unsigned int attributeArrayOffset = 0;
+    unsigned int elementArrayOffset = 0;
     for (size_t i = 0; i < data.shapes.size(); ++i) {
         Shape shape;
-        unsigned int arrayBufferSize = data.shapes[i].vertices.size() * sizeof(glm::vec3);
-        unsigned int elementBufferSize = data.shapes[i].indices.size() * sizeof(unsigned int);
+        unsigned int attributeArraySize = data.shapes[i].vertices.size();
+        unsigned int elementArraySize = data.shapes[i].indices.size();
 
         // Load vertices into the buffer
         glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-        glBufferSubData(GL_ARRAY_BUFFER, arrayBufferOffset, arrayBufferSize, dataPtr(data.shapes[i].vertices));
+        glBufferSubData(GL_ARRAY_BUFFER, attributeArrayOffset * sizeof(glm::vec3),
+            attributeArraySize * sizeof(glm::vec3), dataPtr(data.shapes[i].vertices));
 
         // Load normals into the buffer
         glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-        glBufferSubData(GL_ARRAY_BUFFER, arrayBufferOffset, arrayBufferSize, dataPtr(data.shapes[i].normals));
+        glBufferSubData(GL_ARRAY_BUFFER, attributeArrayOffset * sizeof(glm::vec3),
+            attributeArraySize * sizeof(glm::vec3), dataPtr(data.shapes[i].normals));
 
         // Load texture coordinates into the buffer
         if (data.shapes[i].texCoords.size() > 0) {
             glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
-            glBufferSubData(GL_ARRAY_BUFFER, arrayBufferOffset, arrayBufferSize, dataPtr(data.shapes[i].texCoords));
+            glBufferSubData(GL_ARRAY_BUFFER, attributeArrayOffset * sizeof(glm::vec2),
+                attributeArraySize * sizeof(glm::vec2), dataPtr(data.shapes[i].texCoords));
         }
 
         // Load the texture using SOIL
@@ -159,14 +169,13 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
             shape.textureId = AssetManager::loadTexture(data.shapes[i].textureName);
         }
 
-        shape.arrayBufferOffset = arrayBufferOffset;
-        shape.elementBufferOffset = elementBufferOffset;
+        shape.elementOffset = elementArrayOffset * sizeof(unsigned int);
         shape.numElements = data.shapes[i].indices.size();
         shape.material = data.shapes[i].material;
         shapes.push_back(shape);
 
-        arrayBufferOffset += arrayBufferSize;
-        elementBufferOffset += elementBufferSize;
+        attributeArrayOffset += attributeArraySize;
+        elementArrayOffset += elementArraySize;
     }
 
     boundingBox.minVertex = data.boundingBox.minVertex;

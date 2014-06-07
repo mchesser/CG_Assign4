@@ -21,7 +21,8 @@
 // FIXME: Very poor way of generating a random float
 #define randf() (static_cast<float>(rand()) / RAND_MAX)
 
-#define STREETLIGHT_HEIGHT 1.1
+#define STREETLIGHT_HEIGHT 0.85f
+#define STREETLIGHT_POS_DIV 3.0f
 
 float noise(int x, int y) {
     int n = x + y * 57;
@@ -136,7 +137,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
                     const glm::mat4 transform = arrangement.transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 
-                    renderer->addLight(tileOffset + glm::vec3(-TILE_SIZE / 4, STREETLIGHT_HEIGHT, 0));
+                    renderer->addLight(tileOffset + glm::vec3(-TILE_SIZE / STREETLIGHT_POS_DIV, STREETLIGHT_HEIGHT, 0));
                 }
                 else {
                     const glm::vec3 position = tileOffset + glm::vec3(TILE_SIZE/2, 0.01, 0.0);
@@ -145,7 +146,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
                     const glm::mat4 transform = arrangement.transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 
-                    renderer->addLight(tileOffset + glm::vec3(TILE_SIZE / 4, STREETLIGHT_HEIGHT, 0));
+                    renderer->addLight(tileOffset + glm::vec3(TILE_SIZE / STREETLIGHT_POS_DIV, STREETLIGHT_HEIGHT, 0));
                 }
             }
                 break;
@@ -157,7 +158,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
                         streetlight.scale).transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 
-                    renderer->addLight(tileOffset + glm::vec3(0, STREETLIGHT_HEIGHT, -TILE_SIZE / 4));
+                    renderer->addLight(tileOffset + glm::vec3(0, STREETLIGHT_HEIGHT, -TILE_SIZE / STREETLIGHT_POS_DIV));
                 }
                 else {
                     const glm::vec3 position = tileOffset + glm::vec3(0.0, 0.01, TILE_SIZE / 2);
@@ -166,7 +167,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
                     const glm::mat4 transform = arrangement.transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 
-                    renderer->addLight(tileOffset + glm::vec3(0, STREETLIGHT_HEIGHT, TILE_SIZE / 4));
+                    renderer->addLight(tileOffset + glm::vec3(0, STREETLIGHT_HEIGHT, TILE_SIZE / STREETLIGHT_POS_DIV));
                 }
             }
             }

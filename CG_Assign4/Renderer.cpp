@@ -68,7 +68,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
         shader.uniform_lightPositions[i]= glGetUniformLocation(modelProgram, (shaderName).c_str());
     }
     lampLight.direction = glm::vec3(0, -1, 0);
-    lampLight.maxAngle = 6.0f / 10.0f;
+    lampLight.maxAngle = 1.1f;
     lampLight.ambient = glm::vec3(0.0);
     lampLight.diffuse = glm::vec3(1.0, 0.8, 0.6);
 
@@ -178,7 +178,7 @@ void Renderer::renderScene() {
             const ModelData* model = renderData[i].model;
             glBindVertexArray(model->vao);
             for (size_t i = 0; i < model->shapes.size(); ++i) {
-                glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, (GLvoid*)model->shapes[i].elementBufferOffset);
+                glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, (GLvoid*)model->shapes[i].elementOffset);
             }
         }
     }
@@ -354,7 +354,7 @@ void Renderer::renderScene() {
             glBindTexture(GL_TEXTURE_2D, model->shapes[i].textureId);
             glUniform1i(shader.uniform_modelTexture, /*GL_TEXTURE*/1);
 
-            glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, (GLvoid*)model->shapes[i].elementBufferOffset);
+            glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, (GLvoid*)model->shapes[i].elementOffset);
         }
     }
 }
