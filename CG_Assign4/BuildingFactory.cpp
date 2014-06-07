@@ -150,10 +150,16 @@ RawModelData BuildingFactory::genClassicBuilding(const std::string& texture) {
     block = genCube(texture, buildingDimension * 0.6, thirdHeight, buildingDimension * 0.6, glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
+    BoundingBox boundingBox;
+    boundingBox.minVertex = glm::vec3(-buildingDimension, -1, -buildingDimension);
+    boundingBox.maxVertex = glm::vec3(buildingDimension, buildingHeight, buildingDimension);
+    data.boundingBox = boundingBox;
+
     // Triangle top
     if (triangleHeight > 0.1) {
         block = genTrianglePrism(texture, buildingDimension * 0.6, triangleHeight, buildingDimension * 0.6, glm::vec3(0, buildingHeight, 0));
         data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
+        boundingBox.maxVertex = glm::vec3(buildingDimension, buildingHeight + triangleHeight, buildingDimension);
     }
 
     return data;
