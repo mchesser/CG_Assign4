@@ -292,7 +292,7 @@ void Renderer::renderScene() {
     glUniform3fv(shader.uniform_sunAmbient, 1, glm::value_ptr(sun->ambient()));
     glUniform3fv(shader.uniform_sunDiffuse, 1, glm::value_ptr(sun->diffuse()));
     glUniform3fv(shader.uniform_fogColor, 1, glm::value_ptr(fogColor));
-    glUniform1i(shader.uniform_isDay, (GLboolean)(sunPosition.y > 100.0f));
+    glUniform1i(shader.uniform_isDay, (GLboolean)(sunPosition.y > 0.0f));
 
     // Sort the lights so that the nearest lights are more likely to be shown
     LightSorter sorter = { activeCamera->getPosition(), activeCamera->getDirection() };

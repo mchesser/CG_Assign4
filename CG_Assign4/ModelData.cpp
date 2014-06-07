@@ -1,12 +1,8 @@
 #include "ModelData.hpp"
 #include "tiny_obj_loader/tiny_obj_loader.h"
-#include "SOIL2/SOIL2.h"
+#include "AssetManager.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <iostream>
-
-// Utility macros for determining the size of buffers
-#define BUFFER_SIZE_3(n) (n * sizeof(glm::vec3))
-#define BUFFER_SIZE_2(n) (n * sizeof(glm::vec2))
 
 // Reads a glm::vec3 from an array of floats
 #define READ_VEC3(v) (glm::vec3((v)[0], (v)[1], (v)[2]))
@@ -160,8 +156,7 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
 
         // Load the texture using SOIL
         if (!data.shapes[i].textureName.empty()) {
-            shape.textureId = SOIL_load_OGL_texture(data.shapes[i].textureName.c_str(), SOIL_LOAD_AUTO,
-                SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+            shape.textureId = AssetManager::loadTexture(data.shapes[i].textureName);
         }
 
         shape.arrayBufferOffset = arrayBufferOffset;
