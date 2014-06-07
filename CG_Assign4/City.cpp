@@ -61,7 +61,7 @@ City::City(const ModelData* base_model, const ModelData* streetlight_model, floa
     buildingTypes.reserve(10);
     for (size_t i = 0; i < 10; ++i) {
         ObjectData building = {
-            glm::vec3(BUILDING_SCALE / 2.0f, 1.0f + 4.0f * randf(), BUILDING_SCALE / 2.0f),
+            glm::vec3(BUILDING_SCALE / 2.0f, 1.0 * (2.0 + randf()), BUILDING_SCALE / 2.0f),
             // FIXME: Probably should have more than one base model
             base_model,
         };
@@ -81,7 +81,7 @@ City::City(std::vector <ModelData *> base_models, const ModelData* streetlight_m
     buildingTypes.reserve(base_models.size());
     for (int i = 0; i < base_models.size(); i++) {
         ObjectData building = {
-            glm::vec3(BUILDING_SCALE / 2.0f, 1.0f + 2.0f * randf(), BUILDING_SCALE / 2.0f),
+            glm::vec3(BUILDING_SCALE / 2.0f, 1.0 * (1.0 + randf()), BUILDING_SCALE / 2.0f),
             base_models[i],
         };
         buildingTypes.push_back(building);
@@ -115,7 +115,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             case B: // Building case
             {
                 // Get the random building model from the array
-                const int index = (int)(noise(gridx, gridy) * (float)(buildingTypes.size()));
+                const int index = (int)(noise(gridx, gridy) * (buildingTypes.size()));
                 const ObjectData building = buildingTypes[index];
 
                 const glm::vec3 position = tileOffset + glm::vec3(0, building.scale.y, 0);
