@@ -6,7 +6,7 @@
 #include "Array2d.hpp"
 #include "glm/vec2.hpp"
 
-struct BuildingData {
+struct ObjectData {
     glm::vec3 scale;
     const ModelData* model;
 };
@@ -32,8 +32,8 @@ public:
     void draw(Renderer* renderer, glm::vec3 cameraPosition) const;
 
 private:
-    std::vector<BuildingData> buildingTypes;
-    BuildingData streetlight;
+    std::vector<ObjectData> buildingTypes;
+    ObjectData streetlight;
     int gridSize;
 };
 
