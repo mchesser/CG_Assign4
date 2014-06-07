@@ -49,7 +49,7 @@ namespace shapes {
         shape.normals.reserve(3);
         const glm::vec3 normal = glm::normalize(glm::cross(p2 - p1, p3 - p2));
         for (size_t i = 0; i < 3; ++i) {
-            shape.normals.push_back(normal);
+            shape.normals.push_back(-normal);
         }
 
         shape.texCoords.reserve(3);
@@ -58,8 +58,8 @@ namespace shapes {
         shape.texCoords.push_back(glm::vec2(1, 0));
 
         shape.indices.push_back(0);
-        shape.indices.push_back(1);
         shape.indices.push_back(2);
+        shape.indices.push_back(1);
 
         shape.material = DEFAULT_MATERIAL;
 

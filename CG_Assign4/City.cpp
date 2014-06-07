@@ -21,8 +21,8 @@
 // FIXME: Very poor way of generating a random float
 #define randf() (static_cast<float>(rand()) / RAND_MAX)
 
-#define STREETLIGHT_HEIGHT 0.85f
-#define STREETLIGHT_POS_DIV 3.0f
+#define STREETLIGHT_HEIGHT 0.80f
+#define STREETLIGHT_POS_DIV 2.9f
 
 float noise(int x, int y) {
     int n = x + y * 57;
