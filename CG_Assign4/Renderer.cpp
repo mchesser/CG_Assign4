@@ -176,9 +176,9 @@ void Renderer::renderScene() {
             glUniformMatrix4fv(shader.uniform_depthMVP, 1, GL_FALSE, glm::value_ptr(depthMVP));
 
             const ModelData* model = renderData[i].model;
+            glBindVertexArray(model->vao);
             for (size_t i = 0; i < model->shapes.size(); ++i) {
-                glBindVertexArray(model->shapes[i].vao);
-                glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, NULL);
+                glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, (GLvoid*)model->shapes[i].elementBufferOffset);
             }
         }
     }
@@ -292,7 +292,7 @@ void Renderer::renderScene() {
     glUniform3fv(shader.uniform_sunAmbient, 1, glm::value_ptr(sun->ambient()));
     glUniform3fv(shader.uniform_sunDiffuse, 1, glm::value_ptr(sun->diffuse()));
     glUniform3fv(shader.uniform_fogColor, 1, glm::value_ptr(fogColor));
-    glUniform1i(shader.uniform_isDay, (GLboolean)(sunPosition.y > 100.0f));
+    glUniform1i(shader.uniform_isDay, (GLboolean)(sunPosition.y > 0.0f));
 
     // Sort the lights so that the nearest lights are more likely to be shown
     LightSorter sorter = { activeCamera->getPosition(), activeCamera->getDirection() };
@@ -320,10 +320,6 @@ void Renderer::renderScene() {
     }
     glUniform1i(shader.uniform_numLights, shader_i);
 
-   // for (int i = 0; i < numLights; ++i) {
-   //     glUniform3fv(shader.uniform_lightPositions[i], 1, glm::value_ptr(glm::vec3(cameraView * glm::vec4(lights[i], 1.0f))));
-   // }
-
     const glm::mat4 cameraProj = glm::perspective(DEG2RAD(60.0f), aspectRatio(), 0.1f, 200.0f);
     glUniformMatrix4fv(shader.uniform_proj, 1, GL_FALSE, glm::value_ptr(cameraProj));
 
@@ -347,6 +343,7 @@ void Renderer::renderScene() {
 
         // Render the model
         const ModelData* model = renderData[i].model;
+        glBindVertexArray(model->vao);
         for (size_t i = 0; i < model->shapes.size(); ++i) {
             Material mat = model->shapes[i].material;
             glUniform3fv(shader.uniform_materialAmbient, 1, glm::value_ptr(mat.ambient));
@@ -357,8 +354,7 @@ void Renderer::renderScene() {
             glBindTexture(GL_TEXTURE_2D, model->shapes[i].textureId);
             glUniform1i(shader.uniform_modelTexture, /*GL_TEXTURE*/1);
 
-            glBindVertexArray(model->shapes[i].vao);
-            glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, NULL);
+            glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, (GLvoid*)model->shapes[i].elementBufferOffset);
         }
     }
 }

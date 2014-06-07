@@ -1,12 +1,8 @@
 #include "ModelData.hpp"
 #include "tiny_obj_loader/tiny_obj_loader.h"
-#include "SOIL2/SOIL2.h"
+#include "AssetManager.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <iostream>
-
-// Utility macros for determining the size of buffers
-#define BUFFER_SIZE_3(n) (n * sizeof(glm::vec3))
-#define BUFFER_SIZE_2(n) (n * sizeof(glm::vec2))
 
 // Reads a glm::vec3 from an array of floats
 #define READ_VEC3(v) (glm::vec3((v)[0], (v)[1], (v)[2]))
@@ -44,6 +40,7 @@ RawModelData loadModelData(const std::string& filename) {
         shape.normals.reserve(baseShapes[i].mesh.indices.size());
         shape.texCoords.reserve(baseShapes[i].mesh.indices.size());
 
+        unsigned int indexOffset = 0;
         for (size_t j = 0; j < baseShapes[i].mesh.indices.size(); j += 3) {
             const unsigned int i1 = baseShapes[i].mesh.indices[j + 0];
             const unsigned int i2 = baseShapes[i].mesh.indices[j + 1];
@@ -95,51 +92,81 @@ RawModelData loadModelData(const std::string& filename) {
 }
 
 ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
+    unsigned int totalArrayBufferSize = 0;
+    unsigned int totalElementBufferSize = 0;
+    
+    std::vector<unsigned int> indices;
+    unsigned int jOffset = 0;
+
+    for (size_t i = 0; i < data.shapes.size(); ++i) {
+        totalArrayBufferSize += data.shapes[i].vertices.size() * sizeof(glm::vec3);
+        totalElementBufferSize += data.shapes[i].indices.size() * sizeof(unsigned int);
+
+        // Unwrap indices
+        for (size_t j = 0; j < data.shapes[i].indices.size(); ++j) {
+            indices.push_back(data.shapes[i].indices[j] + jOffset);
+        }
+        jOffset += data.shapes[i].vertices.size();
+    }
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    
+    glGenBuffers(4, buffers);
+
+    // Allocate memory for buffers
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, totalArrayBufferSize, NULL, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(renderer->shader.in_coord);
+    glVertexAttribPointer(renderer->shader.in_coord, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, totalArrayBufferSize, NULL, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(renderer->shader.in_normal);
+    glVertexAttribPointer(renderer->shader.in_normal, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+    glBufferData(GL_ARRAY_BUFFER, totalArrayBufferSize, NULL, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(renderer->shader.in_texcoord);
+    glVertexAttribPointer(renderer->shader.in_texcoord, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalElementBufferSize, dataPtr(indices), GL_STATIC_DRAW);
+    
+    unsigned int arrayBufferOffset = 0;
+    unsigned int elementBufferOffset = 0;
     for (size_t i = 0; i < data.shapes.size(); ++i) {
         Shape shape;
-        glGenVertexArrays(1, &shape.vao);
-        glBindVertexArray(shape.vao);
+        unsigned int arrayBufferSize = data.shapes[i].vertices.size() * sizeof(glm::vec3);
+        unsigned int elementBufferSize = data.shapes[i].indices.size() * sizeof(unsigned int);
 
-        glGenBuffers(4, shape.buffers);
+        // Load vertices into the buffer
+        glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, arrayBufferOffset, arrayBufferSize, dataPtr(data.shapes[i].vertices));
 
-        // Load vertices into a buffer
-        glBindBuffer(GL_ARRAY_BUFFER, shape.buffers[0]);
-        glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE_3(data.shapes[i].vertices.size()),
-            dataPtr(data.shapes[i].vertices), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(renderer->shader.in_coord);
-        glVertexAttribPointer(renderer->shader.in_coord, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        // Load normals into the buffer
+        glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+        glBufferSubData(GL_ARRAY_BUFFER, arrayBufferOffset, arrayBufferSize, dataPtr(data.shapes[i].normals));
 
-        // Load normals into a buffer
-        glBindBuffer(GL_ARRAY_BUFFER, shape.buffers[1]);
-        glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE_3(data.shapes[i].normals.size()),
-            dataPtr(data.shapes[i].normals), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(renderer->shader.in_normal);
-        glVertexAttribPointer(renderer->shader.in_normal, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-        // Load texture coordinates into a buffer
+        // Load texture coordinates into the buffer
         if (data.shapes[i].texCoords.size() > 0) {
-            glBindBuffer(GL_ARRAY_BUFFER, shape.buffers[2]);
-            glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE_2(data.shapes[i].texCoords.size()),
-                dataPtr(data.shapes[i].texCoords), GL_STATIC_DRAW);
-            glEnableVertexAttribArray(renderer->shader.in_texcoord);
-            glVertexAttribPointer(renderer->shader.in_texcoord, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+            glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+            glBufferSubData(GL_ARRAY_BUFFER, arrayBufferOffset, arrayBufferSize, dataPtr(data.shapes[i].texCoords));
         }
 
         // Load the texture using SOIL
         if (!data.shapes[i].textureName.empty()) {
-            shape.textureId = SOIL_load_OGL_texture(data.shapes[i].textureName.c_str(), SOIL_LOAD_AUTO,
-                SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_TEXTURE_REPEATS);
+            shape.textureId = AssetManager::loadTexture(data.shapes[i].textureName);
         }
 
-        // Load indices into a buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape.buffers[3]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.shapes[i].indices.size() * sizeof(unsigned int),
-            dataPtr(data.shapes[i].indices), GL_STATIC_DRAW);
-
+        shape.arrayBufferOffset = arrayBufferOffset;
+        shape.elementBufferOffset = elementBufferOffset;
         shape.numElements = data.shapes[i].indices.size();
         shape.material = data.shapes[i].material;
-
         shapes.push_back(shape);
+
+        arrayBufferOffset += arrayBufferSize;
+        elementBufferOffset += elementBufferSize;
     }
 
     boundingBox.minVertex = data.boundingBox.minVertex;
@@ -147,9 +174,17 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
 }
 
 ModelData::~ModelData() {
-    for (size_t i = 0; i < shapes.size(); ++i) {
-        glDeleteBuffers(4, shapes[i].buffers);
-        glDeleteTextures(1, &shapes[i].textureId);
-        glDeleteVertexArrays(1, &shapes[i].vao);
+    glDeleteBuffers(4, buffers);
+    glDeleteVertexArrays(1, &vao);
+}
+
+void ModelData::unify() {
+    if (shapes.size() > 1) {
+        unsigned int totalElements = 0;
+        for (size_t i = 0; i < shapes.size(); ++i) {
+            totalElements += shapes[i].numElements;
+        }
+        shapes[0].numElements = totalElements;
+        shapes.resize(1);
     }
 }
