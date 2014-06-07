@@ -17,12 +17,12 @@ public:
     /// <summary>
     /// Creates a new city.
     /// </summary>
-    City(const ModelData* base_model, float renderDistance);
+    City(const ModelData* base_model, const ModelData* streetlight_model, float renderDistance);
 
     /// <summary>
     /// Creates a new city with multiple buildings.
     /// </summary>
-    City(std::vector <ModelData *> base_models, float renderDistance);
+    City(std::vector <ModelData *> base_models, const ModelData* streetlight_model, float renderDistance);
 
     /// <summary>
     /// Draws the city.
@@ -33,6 +33,7 @@ public:
 
 private:
     std::vector<BuildingData> buildingTypes;
+    BuildingData streetlight;
     int gridSize;
 };
 

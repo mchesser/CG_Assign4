@@ -52,7 +52,7 @@ TileType getTile(int x, int y) {
     return TILE_KEY[y][x];
 }
 
-City::City(const ModelData* base_model, float renderDistance) {
+City::City(const ModelData* base_model, const ModelData* streetlight_model, float renderDistance) {
     // Generate 10 buildings of different heights
     // FIXME: There might be other ways of varying the buildings
     buildingTypes.reserve(10);
@@ -65,12 +65,16 @@ City::City(const ModelData* base_model, float renderDistance) {
         buildingTypes.push_back(building);
     }
 
+    //Streetlight
+    streetlight.model = streetlight_model;
+    streetlight.scale = glm::vec3(0.001, 0.001, 0.001);
+
     // Compute a grid size such that the buildings will be rendered so that new buildings
     // can't be seen appearing as the camera moves.
     gridSize = static_cast<int>(ceilf(renderDistance * 2 / TILE_SIZE)) + 5;
 }
 
-City::City(std::vector <ModelData *> base_models, float renderDistance) {
+City::City(std::vector <ModelData *> base_models, const ModelData* streetlight_model, float renderDistance) {
     for (int i = 0; i< base_models.size(); i++) {
         BuildingData building = {
             glm::vec3(BUILDING_SCALE / 2.0f, 1.0, BUILDING_SCALE / 2.0f),
@@ -78,6 +82,11 @@ City::City(std::vector <ModelData *> base_models, float renderDistance) {
         };
         buildingTypes.push_back(building);
     }
+
+    //Streetlight
+    streetlight.model = streetlight_model;
+    streetlight.scale = glm::vec3(0.001, 0.001, 0.001);
+
 
     // Compute a grid size such that the buildings will be rendered so that new buildings
     // can't be seen appearing as the camera moves.
@@ -118,9 +127,21 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             case V: // Vertical road segment
             {
                 if (gridy % 2 == 0) {
+                    const glm::vec3 position = tileOffset + glm::vec3(-TILE_SIZE/2, 0.01, 0.0);
+                    Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
+                    arrangement.rotate(glm::vec3(0.0, TAU/4, 0.0));
+                    const glm::mat4 transform = arrangement.transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
                     renderer->addLight(tileOffset + glm::vec3(-TILE_SIZE / 4, 3, 0));
                 }
                 else {
+                    const glm::vec3 position = tileOffset + glm::vec3(TILE_SIZE/2, 0.01, 0.0);
+                    Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
+                    arrangement.rotate(glm::vec3(0.0, TAU/-4, 0.0));
+                    const glm::mat4 transform = arrangement.transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
                     renderer->addLight(tileOffset + glm::vec3(TILE_SIZE / 4, 3, 0));
                 }
             }
@@ -128,9 +149,20 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             case H: // Horizontal road segment
             {
                 if (gridx % 2 == 0) {
+                    const glm::vec3 position = tileOffset + glm::vec3(0.0, 0.01, -TILE_SIZE / 2);
+                    const glm::mat4 transform = Object(position, STREET_DIR, SKY_DIR, 
+                        streetlight.scale).transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
                     renderer->addLight(tileOffset + glm::vec3(0, 3, -TILE_SIZE / 4));
                 }
                 else {
+                    const glm::vec3 position = tileOffset + glm::vec3(0.0, 0.01, TILE_SIZE / 2);
+                    Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
+                    arrangement.rotate(glm::vec3(0.0, TAU/2, 0.0));
+                    const glm::mat4 transform = arrangement.transformationMatrix();
+                    renderer->drawModel(streetlight.model, transform);
+
                     renderer->addLight(tileOffset + glm::vec3(0, 3, TILE_SIZE / 4));
                 }
             }
