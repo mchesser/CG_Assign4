@@ -14,7 +14,7 @@ static GLvoid** dataPtr(const std::vector<T>& vec) {
     return (GLvoid**)(&vec[0]);
 }
 
-RawModelData loadModelData(const std::string& filename) {
+RawModelData loadModelData(const std::string& filename, bool opposite_winding) {
     // --------------------------------------------------
     // Load the base model using the tinyobjreader library
     // --------------------------------------------------
@@ -53,7 +53,12 @@ RawModelData loadModelData(const std::string& filename) {
             shape.vertices.push_back(b);
             shape.vertices.push_back(c);
 
-            const glm::vec3 normal = glm::normalize(glm::cross(b - a, c - a));
+            glm::vec3 normal; 
+            if (!opposite_winding) {
+                normal = glm::normalize(glm::cross(b - a, c - a));
+            } else {
+                normal = glm::normalize(glm::cross(c - a, b - a));
+            }
             for (int n = 0; n < 3; ++n) {
                 shape.normals.push_back(normal);
             }
@@ -63,10 +68,16 @@ RawModelData loadModelData(const std::string& filename) {
                 shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i2 * 2])));
                 shape.texCoords.push_back(READ_VEC2(&(baseShapes[i].mesh.texcoords[i3 * 2])));
             }
-
-            shape.indices.push_back(static_cast<unsigned int>(j + 0));
-            shape.indices.push_back(static_cast<unsigned int>(j + 1));
-            shape.indices.push_back(static_cast<unsigned int>(j + 2));
+            if (!opposite_winding) {
+                shape.indices.push_back(static_cast<unsigned int>(j + 0));
+                shape.indices.push_back(static_cast<unsigned int>(j + 1));
+                shape.indices.push_back(static_cast<unsigned int>(j + 2));
+            }
+            else {
+                shape.indices.push_back(static_cast<unsigned int>(j + 0));
+                shape.indices.push_back(static_cast<unsigned int>(j + 2));
+                shape.indices.push_back(static_cast<unsigned int>(j + 1));
+            }
         }
 
         // Read the material properties

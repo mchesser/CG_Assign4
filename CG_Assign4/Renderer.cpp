@@ -68,7 +68,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
         shader.uniform_lightPositions[i]= glGetUniformLocation(modelProgram, (shaderName).c_str());
     }
     lampLight.direction = glm::vec3(0, -1, 0);
-    lampLight.maxAngle = 6.0f / 10.0f;
+    lampLight.maxAngle = 1.1f;
     lampLight.ambient = glm::vec3(0.0);
     lampLight.diffuse = glm::vec3(1.0, 0.8, 0.6);
 
