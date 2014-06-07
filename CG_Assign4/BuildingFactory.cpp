@@ -11,7 +11,7 @@ float randFloat(float min, float max)
 RawModelData genCube(const std::string& texture, float width, float height, float depth, glm::vec3 center) {
     RawModelData data;
     RawModelData::Shape shape;
-
+    
     // Top
     shape = shapes::quad(glm::vec3(-width + center.x, height, depth + center.z), glm::vec3(-width + center.x, height, -depth + center.z),
         glm::vec3(width + center.x, height, -depth + center.z), glm::vec3(width + center.x, height, depth + center.z));
@@ -23,9 +23,9 @@ RawModelData genCube(const std::string& texture, float width, float height, floa
         glm::vec3(-width + center.x, -1, -depth + center.z), glm::vec3(-width + center.x, -1, depth + center.z));
     shape.textureName = texture;
     data.shapes.push_back(shape);
-
+    
     // Left
-    shape = shapes::quad(glm::vec3(-width + center.x, height, depth + center.z), glm::vec3(-width + center.x, -height, depth + center.z),
+    shape = shapes::quad(glm::vec3(-width + center.x, height, depth + center.z), glm::vec3(-width + center.x, -1, depth + center.z),
         glm::vec3(-width + center.x, -1, -depth + center.z), glm::vec3(-width + center.x, height, -depth + center.z));
     shape.textureName = texture;
     data.shapes.push_back(shape);
@@ -59,7 +59,7 @@ RawModelData BuildingFactory::genBlockBuilding(const std::string& texture) {
     // Original square
     RawModelData data;
     data = genCube(texture, buildingDimension, 0.1f, buildingDimension, glm::vec3(0, 0, 0));
-
+    
     // First block
     RawModelData block;
     block = genCube(texture,
