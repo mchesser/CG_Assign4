@@ -22,7 +22,7 @@
 #define FORWARD_DIR (glm::vec3(0, 0, 1))
 #define ORIGIN  (glm::vec3(0))
 
-#define NUMBER_OF_BUILDINGS 2
+#define NUMBER_OF_BUILDINGS 10
 
 static ModelData* terrainModel;
 static ModelData* streetlightModel;

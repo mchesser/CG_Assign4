@@ -8,5 +8,10 @@ namespace shapes {
     /// Returns a new quad shape.
     /// </summary>
     RawModelData::Shape quad(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4);
+
+    /// <summary>
+    /// Returns a new triangle shape.
+    /// </summary>
+    RawModelData::Shape triangle(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 };
 
