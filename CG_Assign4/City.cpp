@@ -1,6 +1,7 @@
 #include "City.hpp"
 #include <stdlib.h>
 #include <cmath>
+#include <iostream>
 
 #define TAU (6.283185307179586f)
 
@@ -77,9 +78,10 @@ City::City(const ModelData* base_model, const ModelData* streetlight_model, floa
 }
 
 City::City(std::vector <ModelData *> base_models, const ModelData* streetlight_model, float renderDistance) {
-    for (int i = 0; i< base_models.size(); i++) {
+    buildingTypes.reserve(base_models.size());
+    for (int i = 0; i < base_models.size(); i++) {
         ObjectData building = {
-            glm::vec3(BUILDING_SCALE / 2.0f, 1.0, BUILDING_SCALE / 2.0f),
+            glm::vec3(BUILDING_SCALE / 2.0f, 1.0f + 2.0f * randf(), BUILDING_SCALE / 2.0f),
             base_models[i],
         };
         buildingTypes.push_back(building);
@@ -88,7 +90,6 @@ City::City(std::vector <ModelData *> base_models, const ModelData* streetlight_m
     //Streetlight
     streetlight.model = streetlight_model;
     streetlight.scale = glm::vec3(0.001, 0.001, 0.001);
-
 
     // Compute a grid size such that the buildings will be rendered so that new buildings
     // can't be seen appearing as the camera moves.

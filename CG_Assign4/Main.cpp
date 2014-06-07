@@ -22,7 +22,7 @@
 #define FORWARD_DIR (glm::vec3(0, 0, 1))
 #define ORIGIN  (glm::vec3(0))
 
-#define NUMBER_OF_BUILDINGS 1
+#define NUMBER_OF_BUILDINGS 2
 
 static ModelData* terrainModel;
 static ModelData* streetlightModel;
@@ -132,8 +132,6 @@ void initResources() {
     streetlightModel = new ModelData(loadModelData("data/streetlight/lamppost_01.obj"), renderer);
     city = new City(modelBuildings, streetlightModel, 30.0f);
 
-    
-    
     //day filenames
     std::vector<std::string> day_files;
     day_files.push_back("data/skybox/bluecloud_ft.jpg");
