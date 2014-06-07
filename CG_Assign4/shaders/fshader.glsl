@@ -47,6 +47,8 @@ uniform float renderDistance;
 uniform vec4 fogColor;
 float fogFade = 10.0;
 
+vec3 minAmbient = vec3(0.2, 0.2, 0.2);
+
 vec3 computeLighting(vec3 lightPosition, LightSource light) {
     vec3 lightToPosition = position - lightPosition;
     float distance = length(lightToPosition);
@@ -100,7 +102,8 @@ void main(void) {
         color.a = 1.0;
     }
 
-    color += vec4(material.ambient * sunAmbient, 1.0);
+    vec3 ambientLevel = max(sunAmbient, minAmbient);
+    color += vec4(material.ambient * ambientLevel, 1.0);
 
     vec4 texcolor = texture(modelTexture, texcoord);
 
