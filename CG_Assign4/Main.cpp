@@ -23,8 +23,7 @@
 #define ORIGIN  (glm::vec3(0))
 
 static ModelData* terrainModel;
-static ModelData* streetlightModel1;
-static ModelData* streetlightModel2;
+static ModelData* streetlightModel;
 static City* city;
 static BuildingFactory* buildingFactory;
 
@@ -128,10 +127,10 @@ void initResources() {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
         modelBuildings.push_back(buildingModel);
     }
-    city = new City(modelBuildings, 30.0f);
+    streetlightModel = new ModelData(loadModelData("data/streetlight/lamppost_01.obj"), renderer);
+    city = new City(modelBuildings, streetlightModel, 30.0f);
 
-    streetlightModel1 = new ModelData(loadModelData("data/streetlight/StreetLamp.obj"), renderer);
-    streetlightModel2 = new ModelData(loadModelData("data/streetlight/Lamp_Post_Street.obj"), renderer);
+    
     
     //day filenames
     std::vector<std::string> day_files;

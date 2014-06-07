@@ -1,5 +1,6 @@
 #include "BuildingFactory.hpp"
 #include <iostream>
+#include <ctime>
 
 #define rand_pos_neg ((rand() % 2) * 2 - 1)
 
