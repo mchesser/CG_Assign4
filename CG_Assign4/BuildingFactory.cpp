@@ -51,9 +51,7 @@ RawModelData genCube(const std::string& texture, float width, float height, floa
     return data;
 }
 
-RawModelData BuildingFactory::genBlockBuilding(const std::string& texture) {
-    srand(time(NULL));
-    
+RawModelData BuildingFactory::genBlockBuilding(const std::string& texture) {    
     const float buildingDimension = 1.0;
     const float buildingHeight = 5.0;
     const float firstBlockSize = 0.7;

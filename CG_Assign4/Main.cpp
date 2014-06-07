@@ -114,7 +114,7 @@ void initResources() {
     GLuint skyboxProgram = initProgram(shaderFromFile("shaders/skybox.v.glsl", GL_VERTEX_SHADER),
         shaderFromFile("shaders/skybox.f.glsl", GL_FRAGMENT_SHADER));
 
-    cam1 = new Camera(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, 1.0f));
+    cam1 = new Camera(glm::vec3(0.0f, 10.0f, 10.0f), glm::vec3(0.0f, 10.0f, 1.0f));
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
     renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
 
