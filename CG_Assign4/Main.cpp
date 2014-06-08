@@ -87,7 +87,7 @@ void initResources() {
     buildings = buildingFactory->genBuildings(NUMBER_OF_BUILDINGS);
     for (int i=0; i<buildings.size(); i++) {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
-        buildingModel->unify();
+        //buildingModel->unify();
         modelBuildings.push_back(buildingModel);
     }
     streetlightModel = new ModelData(loadModelData("data/streetlight/lamppost_01.obj", true), renderer);
