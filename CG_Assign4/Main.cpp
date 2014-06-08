@@ -8,6 +8,7 @@
 #include "Sun.hpp"
 #include "Skybox.hpp"
 #include "BuildingFactory.hpp"
+#include "Terrain.hpp"
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -22,12 +23,13 @@
 #define FORWARD_DIR (glm::vec3(0, 0, 1))
 #define ORIGIN  (glm::vec3(0))
 
-#define NUMBER_OF_BUILDINGS 10
+#define NUMBER_OF_BUILDINGS 20
 
-static ModelData* terrainModel;
+
 static ModelData* streetlightModel;
 static City* city;
 static BuildingFactory* buildingFactory;
+static Terrain* ground;
 
 static Renderer* renderer;
 static Camera* cam1;
@@ -59,51 +61,6 @@ static struct MouseHandler {
     inline void update(int nx, int ny) { prevX = x; prevY = y; x = nx; y = ny; }
 } mouseHandler;
 
-// Generates a square terrain with the specified texture loaded from a file
-RawModelData genTerrainModel(const std::string& terrainTexture) {
-
-    const float groundScale = 0.2;
-
-    RawModelData data;
-    RawModelData::Shape shape = shapes::quad(glm::vec3(-1, 0, 1 * groundScale), glm::vec3(-1, 0, -1),
-        glm::vec3(1, 0, -1), glm::vec3(1, 0, 1 * groundScale));
-    shape.textureName = terrainTexture;
-    data.shapes.push_back(shape);
-
-    // BoundingBox of terrain
-    BoundingBox boundingBox;
-    boundingBox.minVertex = glm::vec3(-1, 0, -1);
-    boundingBox.maxVertex = glm::vec3(1, 0, 1);
-    data.boundingBox = boundingBox;
-
-    return data;
-}
-
-void drawProceduralTerrain() {
-
-    const float terrainSizeX = 6;
-    const float terrainSizeZ = 3.6;
-    const float startingOffset = 0;
-
-    // Find camera position square
-    glm::vec3 cameraPosition = glm::vec3(cam1->getPosition().x, 0.0, cam1->getPosition().z);
-    glm::vec3 centerSquare = glm::vec3( 
-        startingOffset + terrainSizeX * 2 * (int)((cameraPosition.x + terrainSizeX * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSizeX * 2)),
-        0.0, 
-        startingOffset + terrainSizeZ * 2 * (int)((cameraPosition.z + terrainSizeZ * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSizeZ * 2))
-        );
-
-    // Draw center square and surrounding squares
-    for (int i=-4; i<5; i++) { // 8 Squares on x axis
-        for (int j=-2; j<3; j++) { // 5 squares on z axis
-            glm::vec3 square = centerSquare;
-            square.x = centerSquare.x + terrainSizeX * 2 * j;
-            square.z = centerSquare.z + terrainSizeZ * 2 * i;
-            renderer->drawModel(terrainModel, ORIGIN + square, glm::vec3(6, 1, 6));
-        }
-    }
-}
-
 // Initialise the program resources
 void initResources() {
     GLuint shadowMapProgram = initProgram(shaderFromFile("shaders/shadowmap.v.glsl", GL_VERTEX_SHADER),
@@ -117,8 +74,8 @@ void initResources() {
     cam1 = new Camera(glm::vec3(0.0f, 10.0f, 10.0f), glm::vec3(0.0f, 10.0f, 1.0f));
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
     renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
-
-    terrainModel = new ModelData(genTerrainModel("data/ground/groundTemplate.tga"), renderer);
+    
+    ground = new Terrain(renderer);
     buildingFactory = new BuildingFactory();
 
     // Generate city
@@ -172,10 +129,9 @@ void initResources() {
 // Display callback
 void onDisplay() {
     renderer->clear();
-    city->draw(renderer, cam1->getPosition());
 
-    drawProceduralTerrain();
-    
+    ground->draw(renderer, city, cam1->getPosition(), 15);
+    city->draw(renderer, cam1->getPosition());
     renderer->renderScene();
 
     // Swap buffers

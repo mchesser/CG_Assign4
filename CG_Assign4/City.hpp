@@ -11,6 +11,12 @@ struct ObjectData {
     const ModelData* model;
 };
 
+enum TileType {
+    H, // Horizontal road
+    V, // Vertical road
+    I, // Intersection road
+    B, // Building
+};
 
 class City {
 public:
@@ -30,6 +36,11 @@ public:
     ///
     /// <param name="renderer>The renderer to draw to.</renderer>
     void draw(Renderer* renderer, glm::vec3 cameraPosition) const;
+
+    /// <summary>
+    /// Gets the type of tile at specified position
+    /// </summary>
+    TileType tileForPosition(glm::vec3 position) const;
 
 private:
     std::vector<ObjectData> buildingTypes;

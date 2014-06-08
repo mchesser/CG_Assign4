@@ -30,13 +30,6 @@ float noise(int x, int y) {
     return ((1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) + 1.0) / 2.0;
 }
 
-enum TileType {
-    H, // Horizontal road
-    V, // Vertical road
-    I, // Intersection road
-    B, // Building
-};
-
 #define KEY_WIDTH 5
 #define KEY_HEIGHT 6
 
@@ -56,14 +49,18 @@ TileType getTile(int x, int y) {
     return TILE_KEY[y][x];
 }
 
+TileType City::tileForPosition(glm::vec3 position) const {
+    const int gridx = static_cast<int>(position.x / TILE_SIZE);
+    const int gridy = static_cast<int>(position.z / TILE_SIZE);
+
+    return getTile(gridx, gridy);
+}
+
 City::City(const ModelData* base_model, const ModelData* streetlight_model, float renderDistance) {
-    // Generate 10 buildings of different heights
-    // FIXME: There might be other ways of varying the buildings
     buildingTypes.reserve(10);
     for (size_t i = 0; i < 10; ++i) {
         ObjectData building = {
             glm::vec3(BUILDING_SCALE / 2.0f, 1.0 * (2.0 + randf()), BUILDING_SCALE / 2.0f),
-            // FIXME: Probably should have more than one base model
             base_model,
         };
         buildingTypes.push_back(building);
