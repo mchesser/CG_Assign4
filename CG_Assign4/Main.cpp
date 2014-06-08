@@ -25,7 +25,6 @@
 
 #define NUMBER_OF_BUILDINGS 20
 
-
 static ModelData* streetlightModel;
 static City* city;
 static BuildingFactory* buildingFactory;
@@ -74,14 +73,18 @@ void initResources() {
     cam1 = new Camera(glm::vec3(0.0f, 10.0f, 10.0f), glm::vec3(0.0f, 10.0f, 1.0f));
     sun = new Sun(-TAU / 24.0f, TAU / 12.0f);
     renderer = new Renderer(screenWidth, screenHeight, 30.0f, cam1, sun, modelProgram, shadowMapProgram, skyboxProgram);
-    
+
     ground = new Terrain(renderer);
-    buildingFactory = new BuildingFactory();
+
+    std::vector <std::string> sideTextureNames;
+    sideTextureNames.push_back("data/building/windows.jpg");
+    std::string topTextureName = "data/default.tga";
+    buildingFactory = new BuildingFactory(sideTextureNames, topTextureName);
 
     // Generate city
     std::vector <ModelData *> modelBuildings;
     std::vector <RawModelData> buildings;
-    buildings = buildingFactory->genBuildings("data/building/windows.jpg", NUMBER_OF_BUILDINGS);
+    buildings = buildingFactory->genBuildings(NUMBER_OF_BUILDINGS);
     for (int i=0; i<buildings.size(); i++) {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
         buildingModel->unify();
@@ -216,7 +219,6 @@ void keyboardUp(unsigned char key, int x, int y) {
     case 'a': keyState.left = false; break;
     case 'd': keyState.right = false; break;
     }
-
 }
 
 // Mouse click callback

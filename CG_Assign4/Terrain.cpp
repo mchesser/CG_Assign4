@@ -1,4 +1,5 @@
 #include "Terrain.hpp"
+#include <iostream>
 
 #define HORIZONTAL_TEXTURE "data/ground/groundTemplate.tga"
 #define VERTICAL_TEXTURE "data/ground/groundTemplate.tga"
@@ -43,6 +44,10 @@ void Terrain::draw(Renderer* renderer, City* city, glm::vec3 cameraPosition, int
         0.0, 
         terrainSizeZ * 2 * (int)((cameraPosition.z + terrainSizeZ * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSizeZ * 2))
         );
+
+    // Handle division by 0
+    if (cameraPosition.x == 0) centerSquare.x = 0.0;
+    if (cameraPosition.z == 0) centerSquare.z = 0.0;
 
     // Draw center square and surrounding squares
     for (int i=-size; i<size+1; i++) { 

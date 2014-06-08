@@ -13,22 +13,29 @@
 class BuildingFactory
 {
 public:
-	BuildingFactory();
+	BuildingFactory(std::vector <std::string> windowTexturesName, std::string topTextureName);
+
 	/// <summary>
     /// Returns a block styled building
     /// </summary>
-	RawModelData genBlockBuilding(const std::string& texture);
+	RawModelData genBlockBuilding();
 
 	/// <summary>
     /// Returns a classic styled building
     /// </summary>
-	RawModelData genClassicBuilding(const std::string& texture);    
+	RawModelData genClassicBuilding();    
 
 	/// <summary>
     /// Returns a number of random generated buildings
     /// </summary>
-	std::vector <RawModelData> genBuildings(const std::string& texture, int number);
+	std::vector <RawModelData> genBuildings(int number);
 private:
 	float buildingDimension;
 	float buildingHeight;
+	std::vector <std::string> windowTextures;
+	std::string topTexture;
+
+	RawModelData genTrianglePrism(float width, float height, float depth, glm::vec3 center);
+	RawModelData genCube(float width, float height, float depth, glm::vec3 center);
+
 };
