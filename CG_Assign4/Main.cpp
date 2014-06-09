@@ -78,8 +78,11 @@ void initResources() {
 
     // Building textures
     std::vector <std::string> sideTextureNames;
-    sideTextureNames.push_back("data/building/windows.jpg");
+    sideTextureNames.push_back("data/building/highRiseGlass1.jpg");
     sideTextureNames.push_back("data/building/highRiseGlass2.jpg");
+    sideTextureNames.push_back("data/building/highRiseOffice1.jpg");
+    sideTextureNames.push_back("data/building/highRiseOffice2.jpg");
+    sideTextureNames.push_back("data/building/highRiseOffice3.jpg");
     std::string topTextureName = "data/building/roof.jpg";
     buildingFactory = new BuildingFactory(sideTextureNames, topTextureName);
 
