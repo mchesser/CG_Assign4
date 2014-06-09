@@ -36,6 +36,6 @@ private:
 	std::string topTexture;
 
 	RawModelData genTrianglePrism(float width, float height, float depth, glm::vec3 center);
-	RawModelData genCube(float width, float height, float depth, glm::vec3 center);
+	RawModelData genCube(std::string texture, float width, float height, float depth, glm::vec3 center);
 
 };

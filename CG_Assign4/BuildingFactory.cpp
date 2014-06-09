@@ -52,13 +52,10 @@ RawModelData BuildingFactory::genTrianglePrism(float width, float height, float 
     return data;
 }
 
-RawModelData BuildingFactory::genCube(float width, float height, float depth, glm::vec3 center) {
+RawModelData BuildingFactory::genCube(std::string texture, float width, float height, float depth, glm::vec3 center) {
     RawModelData data;
     RawModelData::Shape shape;
    
-    // Get random building side texture
-    const std::string sideTexture = windowTextures[rand() % windowTextures.size()]; 
-
     // Top
     shape = shapes::quad(glm::vec3(-width + center.x, height, depth + center.z), glm::vec3(-width + center.x, height, -depth + center.z),
         glm::vec3(width + center.x, height, -depth + center.z), glm::vec3(width + center.x, height, depth + center.z));
@@ -68,31 +65,31 @@ RawModelData BuildingFactory::genCube(float width, float height, float depth, gl
     // Bottom
     shape = shapes::quad(glm::vec3(width + center.x, -1, depth + center.z), glm::vec3(width + center.x, -1, -depth + center.z),
         glm::vec3(-width + center.x, -1, -depth + center.z), glm::vec3(-width + center.x, -1, depth + center.z));
-    shape.textureName = sideTexture;
+    shape.textureName = texture;
     data.shapes.push_back(shape);
     
     // Left
     shape = shapes::quad(glm::vec3(-width + center.x, height, depth + center.z), glm::vec3(-width + center.x, -1, depth + center.z),
         glm::vec3(-width + center.x, -1, -depth + center.z), glm::vec3(-width + center.x, height, -depth + center.z));
-    shape.textureName = sideTexture;
+    shape.textureName = texture;
     data.shapes.push_back(shape);
 
     // Right
     shape = shapes::quad(glm::vec3(width + center.x, height, -depth + center.z), glm::vec3(width + center.x, -1, -depth + center.z),
         glm::vec3(width + center.x, -1, depth + center.z), glm::vec3(width + center.x, height, depth + center.z));
-    shape.textureName = sideTexture;
+    shape.textureName = texture;
     data.shapes.push_back(shape);
 
     // Front
     shape = shapes::quad(glm::vec3(-width + center.x, height, -depth + center.z), glm::vec3(-width + center.x, -1, -depth + center.z),
         glm::vec3(width + center.x, -1, -depth + center.z), glm::vec3(width + center.x, height, -depth + center.z));
-    shape.textureName = sideTexture;
+    shape.textureName = texture;
     data.shapes.push_back(shape);
 
     // Back
     shape = shapes::quad(glm::vec3(width + center.x, height, depth + center.z), glm::vec3(width + center.x, -1, depth + center.z),
         glm::vec3(-width + center.x, -1, depth + center.z), glm::vec3(-width + center.x, height, depth + center.z));
-    shape.textureName = sideTexture;
+    shape.textureName = texture;
     data.shapes.push_back(shape);
 
     return data;
@@ -101,13 +98,16 @@ RawModelData BuildingFactory::genCube(float width, float height, float depth, gl
 RawModelData BuildingFactory::genBlockBuilding() {    
     const float firstBlockSize = randFloat(0.5, 1.0);
 
+    // Get random building side texture
+    const std::string sideTexture = windowTextures[rand() % windowTextures.size()]; 
+
     // Original square
     RawModelData data;
-    data = genCube(buildingDimension, 0.1f, buildingDimension, glm::vec3(0, 0, 0));
+    data = genCube(sideTexture, buildingDimension, 0.1f, buildingDimension, glm::vec3(0, 0, 0));
     
     // First block
     RawModelData block;
-    block = genCube(
+    block = genCube(sideTexture,
         firstBlockSize,
         buildingHeight,
         firstBlockSize,
@@ -115,7 +115,7 @@ RawModelData BuildingFactory::genBlockBuilding() {
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     // Second block
-    block = genCube(
+    block = genCube(sideTexture,
         randFloat(0.3, 0.8),
         buildingHeight * randFloat(0.3, 1.0),
         buildingDimension,
@@ -123,7 +123,7 @@ RawModelData BuildingFactory::genBlockBuilding() {
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     // Third block
-    block = genCube(
+    block = genCube(sideTexture,
         buildingDimension,
         buildingHeight * randFloat(0.8, 1.0),
         randFloat(0.3, 0.8),
@@ -145,17 +145,20 @@ RawModelData BuildingFactory::genClassicBuilding() {
     const float secondHeight = (buildingHeight - triangleHeight) * 0.8;
     const float thirdHeight = (buildingHeight - triangleHeight);
 
+    // Get random building side texture
+    const std::string sideTexture = windowTextures[rand() % windowTextures.size()]; 
+
     // Base structure
     RawModelData data; 
-    data = genCube(buildingDimension, startingHeight, buildingDimension, glm::vec3(0, 0, 0));
+    data = genCube(sideTexture, buildingDimension, startingHeight, buildingDimension, glm::vec3(0, 0, 0));
 
     // Second
     RawModelData block;
-    block = genCube(buildingDimension * 0.8, secondHeight, buildingDimension * 0.8, glm::vec3(0, 0, 0));
+    block = genCube(sideTexture, buildingDimension * 0.8, secondHeight, buildingDimension * 0.8, glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     // Third
-    block = genCube(buildingDimension * 0.6, thirdHeight, buildingDimension * 0.6, glm::vec3(0, 0, 0));
+    block = genCube(sideTexture, buildingDimension * 0.6, thirdHeight, buildingDimension * 0.6, glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     BoundingBox boundingBox;

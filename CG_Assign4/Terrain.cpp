@@ -1,12 +1,10 @@
 #include "Terrain.hpp"
 #include <iostream>
 
-#define HORIZONTAL_TEXTURE "data/ground/groundTemplate.tga"
-#define VERTICAL_TEXTURE "data/ground/groundTemplate.tga"
-#define INTERSECTION_TEXTURE "data/ground/groundTemplate.tga"
-#define BUILDING_GROUND_TEXTURE "data/default.tga"
-
-#define NUM_SURROUNDING
+#define HORIZONTAL_TEXTURE "data/ground/RoadstraightHorizontal.jpg"
+#define VERTICAL_TEXTURE "data/ground/RoadstraightVertical.jpg"
+#define INTERSECTION_TEXTURE "data/ground/Intersection.jpg"
+#define BUILDING_GROUND_TEXTURE "data/ground/Vereda.jpg"
 
 // Generates a square tile with the specified texture loaded from a file
 RawModelData genTerrainModel(const std::string& terrainTexture) {

@@ -76,9 +76,11 @@ void initResources() {
 
     ground = new Terrain(renderer);
 
+    // Building textures
     std::vector <std::string> sideTextureNames;
     sideTextureNames.push_back("data/building/windows.jpg");
-    std::string topTextureName = "data/default.tga";
+    sideTextureNames.push_back("data/building/highRiseGlass2.jpg");
+    std::string topTextureName = "data/building/roof.jpg";
     buildingFactory = new BuildingFactory(sideTextureNames, topTextureName);
 
     // Generate city
