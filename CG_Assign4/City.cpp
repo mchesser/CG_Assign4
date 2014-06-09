@@ -50,8 +50,8 @@ TileType getTile(int x, int y) {
 }
 
 TileType City::tileForPosition(glm::vec3 position) const {
-    const int gridx = static_cast<int>(position.x / TILE_SIZE);
-    const int gridy = static_cast<int>(position.z / TILE_SIZE);
+    const int gridx = static_cast<int>(round(position.x / TILE_SIZE));
+    const int gridy = static_cast<int>(round(position.z / TILE_SIZE));
 
     return getTile(gridx, gridy);
 }

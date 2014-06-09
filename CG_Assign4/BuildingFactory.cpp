@@ -97,6 +97,7 @@ RawModelData BuildingFactory::genCube(std::string texture, float width, float he
 
 RawModelData BuildingFactory::genBlockBuilding() {    
     const float firstBlockSize = randFloat(0.5, 1.0);
+    const float zFightOffset = 0.05;
 
     // Get random building side texture
     const std::string sideTexture = windowTextures[rand() % windowTextures.size()]; 
@@ -108,25 +109,25 @@ RawModelData BuildingFactory::genBlockBuilding() {
     // First block
     RawModelData block;
     block = genCube(sideTexture,
-        firstBlockSize,
+        firstBlockSize - zFightOffset,
         buildingHeight,
-        firstBlockSize,
+        firstBlockSize - zFightOffset,
         glm::vec3(rand_pos_neg * (buildingDimension - firstBlockSize), 0, rand_pos_neg * (buildingDimension - firstBlockSize)));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     // Second block
     block = genCube(sideTexture,
-        randFloat(0.3, 0.8),
-        buildingHeight * randFloat(0.3, 1.0),
-        buildingDimension,
+        randFloat(0.3, 0.8 - zFightOffset),
+        buildingHeight * randFloat(0.3, 1.0 - zFightOffset),
+        buildingDimension - 2 * zFightOffset,
         glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     // Third block
     block = genCube(sideTexture,
-        buildingDimension,
-        buildingHeight * randFloat(0.8, 1.0),
-        randFloat(0.3, 0.8),
+        buildingDimension - 2 * zFightOffset,
+        buildingHeight * randFloat(0.8, 1.0 - zFightOffset),
+        randFloat(0.3, 0.8 - zFightOffset),
         glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
