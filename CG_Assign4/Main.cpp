@@ -87,15 +87,16 @@ void initResources() {
     buildingFactory = new BuildingFactory(sideTextureNames, topTextureName);
 
     // Generate city
-    std::vector <ModelData *> modelBuildings;
-    std::vector <RawModelData> buildings;
+    std::vector<ModelData*> modelBuildings;
+    std::vector<RawModelData> buildings;
     buildings = buildingFactory->genBuildings(NUMBER_OF_BUILDINGS);
     for (int i=0; i<buildings.size(); i++) {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
-        //buildingModel->unify();
+        buildingModel->reduce();
         modelBuildings.push_back(buildingModel);
     }
     streetlightModel = new ModelData(loadModelData("data/streetlight/lamppost_01.obj", true), renderer);
+    streetlightModel->reduce();
     city = new City(modelBuildings, streetlightModel, 30.0f);
 
     //day filenames

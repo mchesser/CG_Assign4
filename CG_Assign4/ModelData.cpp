@@ -197,3 +197,27 @@ void ModelData::unify() {
         shapes.resize(1);
     }
 }
+
+void ModelData::reduce() {
+    std::vector<Shape> newShapes;
+    unsigned int offset = 0;
+
+    size_t i = 0;
+    while (i < shapes.size()) {
+        unsigned int numElements = 0;
+        size_t j = i + 1;
+        while (j < shapes.size() && shapes[j].textureId == shapes[i].textureId) {
+            numElements += shapes[j].numElements;
+            j += 1;
+        }
+
+        Shape newShape = shapes[i];
+        newShape.numElements += numElements;
+        newShapes.push_back(newShape);
+        offset += numElements * sizeof(unsigned int);
+
+        i = j;
+    }
+
+    shapes = newShapes;
+}

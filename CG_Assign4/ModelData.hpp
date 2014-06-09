@@ -72,6 +72,12 @@ public:
     /// </summary>
     void unify();
 
+    /// <summary>
+    /// Reduces shapes as much as it can without losing any texture data.
+    /// </summary>
+    void reduce();
+
+
 private:
     GLuint vao;
     GLuint buffers[4];
