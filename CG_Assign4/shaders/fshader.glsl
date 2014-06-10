@@ -91,10 +91,10 @@ void main(void) {
             vec3 localCoords = 2.0 * encodedNormal.rgb - vec3(1.0);
 
             vec3 normalDirection = normalize(localSurface2World * localCoords);
-            vec3 viewDirection = normalize(vec3(v * vec4(0.0, 0.0, 0.0, 1.0)));
+            vec3 viewDirection = normalize(position - sun_position);
 
             float attenuation = 1.0; // no attenuation
-            vec3 lightDirection = normalize(sun_position);
+            vec3 lightDirection = normalize(sunDir);
 
             diffuse = attenuation * Ld * Kd * cosTheta * max(0.0, dot(normalDirection, lightDirection));
         } else {
