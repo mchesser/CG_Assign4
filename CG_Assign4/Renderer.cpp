@@ -11,7 +11,7 @@
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
 
 #define FOV 45.0f
-#define SHADOW_QUALITY 8
+#define SHADOW_QUALITY 4
 
 Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
     GLuint modelProgram, GLuint shadowMapProgram, GLuint skyboxProgram) : screenWidth(screenWidth),
