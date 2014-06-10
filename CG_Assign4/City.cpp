@@ -27,7 +27,8 @@
 float noise(int x, int y) {
     int n = x + y * 57;
     n = (n << 13) ^ n;
-    return ((1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0) + 1.0) / 2.0;
+    return static_cast<float>(((1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) /
+        1073741824.0) + 1.0) / 2.0);
 }
 
 #define KEY_WIDTH 5
@@ -77,7 +78,7 @@ City::City(const ModelData* base_model, const ModelData* streetlight_model, floa
 
 City::City(std::vector <ModelData *> base_models, const ModelData* streetlight_model, float renderDistance) {
     buildingTypes.reserve(base_models.size());
-    for (int i = 0; i < base_models.size(); i++) {
+    for (size_t i = 0; i < base_models.size(); i++) {
         ObjectData building = {
             glm::vec3(BUILDING_SCALE / 2.0f, 1.0 * (1.0 + randf()), BUILDING_SCALE / 2.0f),
             base_models[i],

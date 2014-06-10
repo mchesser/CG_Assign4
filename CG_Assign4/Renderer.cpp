@@ -303,8 +303,8 @@ void Renderer::renderScene() {
     glUniform3fv(shader.uniform_lampLight.ambient, 1, glm::value_ptr(lampLight.ambient));
     glUniform3fv(shader.uniform_lampLight.diffuse, 1, glm::value_ptr(lampLight.diffuse));
 
-    int shader_i = 0;
-    int light_i = 0;
+    size_t shader_i = 0;
+    size_t light_i = 0;
     while (shader_i < MAX_LIGHTS) {
         while (light_i < lights.size() && !inFOV(lights[light_i], activeCamera->getPosition(), activeCamera->getDirection())) {
             light_i += 1;

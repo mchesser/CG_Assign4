@@ -92,8 +92,8 @@ RawModelData BuildingFactory::genCube(std::string texture, float width, float he
 }
 
 RawModelData BuildingFactory::genBlockBuilding() {
-    const float firstBlockSize = randFloat(0.5, 1.0);
-    const float zFightOffset = 0.05;
+    const float firstBlockSize = randFloat(0.5f, 1.0f);
+    const float zFightOffset = 0.05f;
 
     // Get random building side texture
     const std::string sideTexture = windowTextures[rand() % windowTextures.size()];
@@ -113,8 +113,8 @@ RawModelData BuildingFactory::genBlockBuilding() {
 
     // Second block
     block = genCube(sideTexture,
-        randFloat(0.3, 0.8 - zFightOffset),
-        buildingHeight * randFloat(0.3, 1.0 - zFightOffset),
+        randFloat(0.3f, 0.8f - zFightOffset),
+        buildingHeight * randFloat(0.3f, 1.0f - zFightOffset),
         buildingDimension - 2 * zFightOffset,
         glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
@@ -122,8 +122,8 @@ RawModelData BuildingFactory::genBlockBuilding() {
     // Third block
     block = genCube(sideTexture,
         buildingDimension - 2 * zFightOffset,
-        buildingHeight * randFloat(0.8, 1.0 - zFightOffset),
-        randFloat(0.3, 0.8 - zFightOffset),
+        buildingHeight * randFloat(0.8f, 1.0f - zFightOffset),
+        randFloat(0.3f, 0.8f - zFightOffset),
         glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
@@ -136,10 +136,10 @@ RawModelData BuildingFactory::genBlockBuilding() {
 }
 
 RawModelData BuildingFactory::genClassicBuilding() {
-    const float triangleHeight = randFloat(0.0, 0.3);
+    const float triangleHeight = randFloat(0.0f, 0.3f);
 
-    const float startingHeight = (buildingHeight - triangleHeight) * 0.6;
-    const float secondHeight = (buildingHeight - triangleHeight) * 0.8;
+    const float startingHeight = (buildingHeight - triangleHeight) * 0.6f;
+    const float secondHeight = (buildingHeight - triangleHeight) * 0.8f;
     const float thirdHeight = (buildingHeight - triangleHeight);
 
     // Get random building side texture
@@ -151,11 +151,11 @@ RawModelData BuildingFactory::genClassicBuilding() {
 
     // Second
     RawModelData block;
-    block = genCube(sideTexture, buildingDimension * 0.8, secondHeight, buildingDimension * 0.8, glm::vec3(0, 0, 0));
+    block = genCube(sideTexture, buildingDimension * 0.8f, secondHeight, buildingDimension * 0.8f, glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     // Third
-    block = genCube(sideTexture, buildingDimension * 0.6, thirdHeight, buildingDimension * 0.6, glm::vec3(0, 0, 0));
+    block = genCube(sideTexture, buildingDimension * 0.6f, thirdHeight, buildingDimension * 0.6f, glm::vec3(0, 0, 0));
     data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
 
     BoundingBox boundingBox;
@@ -165,7 +165,7 @@ RawModelData BuildingFactory::genClassicBuilding() {
 
     // Triangle top
     if (triangleHeight > 0.1) {
-        block = genTrianglePrism(buildingDimension * 0.6, triangleHeight, buildingDimension * 0.6, glm::vec3(0, buildingHeight, 0));
+        block = genTrianglePrism(buildingDimension * 0.6f, triangleHeight, buildingDimension * 0.6f, glm::vec3(0, buildingHeight, 0));
         data.shapes.insert(data.shapes.end(), block.shapes.begin(), block.shapes.end());
         boundingBox.maxVertex = glm::vec3(buildingDimension, buildingHeight + triangleHeight, buildingDimension);
     }

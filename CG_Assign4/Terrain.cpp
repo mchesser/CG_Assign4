@@ -33,7 +33,7 @@ Terrain::Terrain(Renderer* renderer) {
 
 void Terrain::draw(Renderer* renderer, City* city, glm::vec3 cameraPosition, int size) const {
 
-    const float terrainSizeX = 1.2;
+    const float terrainSizeX = 1.2f;
     const float terrainSizeZ = terrainSizeX;
 
     // Find camera position square

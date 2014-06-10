@@ -3,7 +3,6 @@
 #include <vector>
 #include "Renderer.hpp"
 #include "ModelData.hpp"
-#include "Array2d.hpp"
 #include "glm/vec2.hpp"
 
 struct ObjectData {

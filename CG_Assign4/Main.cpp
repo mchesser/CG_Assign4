@@ -90,7 +90,7 @@ void initResources() {
     std::vector<ModelData*> modelBuildings;
     std::vector<RawModelData> buildings;
     buildings = buildingFactory->genBuildings(NUMBER_OF_BUILDINGS);
-    for (int i = 0; i < buildings.size(); i++) {
+    for (size_t i = 0; i < buildings.size(); ++i) {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
         buildingModel->reduce();
         modelBuildings.push_back(buildingModel);
@@ -154,14 +154,14 @@ int frames = 0;
 // Idle callback
 void onIdle() {
     long time = glutGet(GLUT_ELAPSED_TIME);
-    double dt = static_cast<double>(time - prevTime) / 1000.0;
+    float dt = static_cast<float>(time - prevTime) / 1000.0f;
     prevTime = time;
 
     sun->update(dt);
 
     // FPS counter
     frames += 1;
-    if (static_cast<double>(time - past) / 1000.0 >= 1.0) {
+    if (static_cast<float>(time - past) / 1000.0f >= 1.0f) {
         std::cout << "FPS: " << frames << std::endl;
         frames = 0;
         past = time;
@@ -251,10 +251,10 @@ void onReshape(GLsizei width, GLsizei height) {
 
 void setTimeMenu(int id) {
     switch (id) {
-    case 1: sun->setVerticalAngle(3.14159); break;
+    case 1: sun->setVerticalAngle(TAU / 2.0f); break;
     case 2: sun->setVerticalAngle(0); break;
-    case 3: sun->setVerticalAngle(0.27); break;
-    case 4: sun->setVerticalAngle(2.89); break;
+    case 3: sun->setVerticalAngle(0.27f); break;
+    case 4: sun->setVerticalAngle(2.89f); break;
     }
 }
 

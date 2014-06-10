@@ -10,15 +10,15 @@
 
 glm::vec3 linear_color_gradient(const glm::vec3 colors[], size_t numColors, float x) {
     // Handle the the cases where there is only one color to sample
-    if (x <= 0.0) {
+    if (x <= 0.0f) {
         return colors[0];
     }
-    else if (x >= 1.0) {
+    else if (x >= 1.0f) {
         return colors[numColors - 1];
     }
 
-    const float band_width = numColors - 1.0;
-    const int left_color = x * band_width;
+    const float band_width = numColors - 1.0f;
+    const int left_color = static_cast<int>(x * band_width);
     const int right_color = left_color + 1;
     const float x_new = x * band_width - left_color;
 
@@ -109,7 +109,7 @@ glm::vec3 Sun::diffuse() const {
     }
     else if (sun_position.y < 200.0f) {
         float x = sun_position.y / 200.0f;
-        return linear_color_gradient(colors, 3, 1.0 - x);
+        return linear_color_gradient(colors, 3, 1.0f - x);
     }
     return colors[0];
 }
