@@ -112,7 +112,7 @@ void main(void) {
         bias = clamp(bias, 0, 0.01);
         float visibility = 1.0;
         for (int i = 0; i < 4; ++i) {
-            visibility -= 0.2 * (1.0 - texture(shadowMap, vec3(shadowCoord.xy + poissonDisk[i]/4000.0,
+            visibility -= 0.2 * (1.0 - texture(shadowMap, vec3(shadowCoord.xy + poissonDisk[i] / 8000.0,
                 (shadowCoord.z - bias) / shadowCoord.w)));
          }
 

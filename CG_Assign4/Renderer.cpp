@@ -8,8 +8,10 @@
 #include <sstream>
 
 #define TAU (6.283185307179586f)
-#define FOV 45.0f
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
+
+#define FOV 45.0f
+#define SHADOW_QUALITY 8
 
 Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
     GLuint modelProgram, GLuint shadowMapProgram, GLuint skyboxProgram) : screenWidth(screenWidth),
@@ -84,7 +86,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     glGenTextures(1, &shadowMapTexture);
     glBindTexture(GL_TEXTURE_2D, shadowMapTexture);
     // Setup a 1024x1024 texture image with no data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 4 * 1024, 4 * 1024, 0, GL_DEPTH_COMPONENT,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, SHADOW_QUALITY * 1024, SHADOW_QUALITY * 1024, 0, GL_DEPTH_COMPONENT,
         GL_FLOAT, NULL);
 
     // Setup sampling settings
@@ -174,7 +176,7 @@ void Renderer::renderScene() {
         glUseProgram(shadowMapProgram);
         glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFramebuffer);
         glClear(GL_DEPTH_BUFFER_BIT);
-        glViewport(0, 0, 4 * 1024, 4 * 1024);
+        glViewport(0, 0, SHADOW_QUALITY * 1024, SHADOW_QUALITY * 1024);
         for (size_t i = 0; i < renderData.size(); ++i) {
             const glm::mat4 depthMVP = sunViewProj * renderData[i].transformation;
             glUniformMatrix4fv(shader.uniform_depthMVP, 1, GL_FALSE, glm::value_ptr(depthMVP));
