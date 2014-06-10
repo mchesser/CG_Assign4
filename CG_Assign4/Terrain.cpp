@@ -8,7 +8,7 @@
 
 #define HORIZONTAL_NORMAL_TEXTURE "data/ground/RoadstraightHorizontal_NORMAL.png"
 #define VERTICAL_NORMAL_TEXTURE "data/ground/RoadstraightVertical_NORMAL.png"
-#define INTERSECTION_NORMAL_TEXTURE "data/ground/RoadstraightVertical_NORMAL.png"
+#define INTERSECTION_NORMAL_TEXTURE "data/ground/RoadstraightIntersection_NORMAL.png"
 #define BUILDING_GROUND_NORMAL_TEXTURE "data/ground/Vereda_NORMAL.png"
 
 // Generates a square tile with the specified texture loaded from a file
