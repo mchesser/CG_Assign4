@@ -58,7 +58,7 @@ vec3 minAmbient = vec3(0.2, 0.2, 0.2);
 vec3 computeDiffuse(vec4 lightVector, LightSource light) {
     float distance;
     vec3 lightDir;
-    if (lightVector.w != 0) {
+    if (lightVector.w > 0.0) {
         vec3 lightToPosition = position - vec3(lightVector);
         distance = length(lightToPosition);
         lightDir = lightToPosition / distance;
@@ -68,13 +68,15 @@ vec3 computeDiffuse(vec4 lightVector, LightSource light) {
         lightDir = normalize(vec3(lightVector));
     }
 
-    float theta = 0.0;
-    if (light.direction != vec3(0, 0, 0)) {
-        theta = acos(dot(lightDir, light.direction));
+    float fadeFactor = 1.0;
+    if (lightVector.w > 0.0) {
+        float theta = acos(dot(lightDir, light.direction));
         if (theta > light.maxAngle) {
             return vec3(0, 0, 0);
         }
+        fadeFactor = 1.0 - pow(theta / light.maxAngle, 5);
     }
+
 
     float cosTheta = 0.0;
 
@@ -90,7 +92,7 @@ vec3 computeDiffuse(vec4 lightVector, LightSource light) {
         cosTheta = clamp(dot(normal, lightDir), 0.0, 1.0);
     }
 
-    vec3 diffuse = light.diffuse * material.diffuse * cosTheta * (1.0 - pow(theta / light.maxAngle, 2));
+    vec3 diffuse = light.diffuse * material.diffuse * pow(cosTheta, 3.0) * fadeFactor;
     return diffuse / (1.0 + 0.1 * distance * distance);
 }
 
