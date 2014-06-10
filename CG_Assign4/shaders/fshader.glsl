@@ -4,11 +4,17 @@ in vec4 shadowCoord;
 in vec3 position;
 in vec3 normal;
 in vec2 texcoord;
+in mat3 localSurface2World;
 
 out vec4 out_color;
 
+uniform sampler2D normalMap;
 uniform sampler2D modelTexture;
 uniform sampler2DShadow shadowMap;
+
+uniform mat4 v;
+uniform mat3 normalMatrix;
+uniform bool bumpMapFlag;
 
 in vec3 sunDir;
 uniform vec3 sunAmbient;
@@ -41,7 +47,7 @@ vec2 poissonDisk[4] = vec2[](
     vec2(0.94558609, -0.76890725),
     vec2(-0.094184101, -0.92938870),
     vec2(0.34495938, 0.29387760)
-);
+    );
 
 uniform float renderDistance;
 uniform vec4 fogColor;
@@ -71,14 +77,29 @@ vec3 computeLighting(vec3 lightPosition, LightSource light) {
 void main(void) {
     vec4 color;
 
-    if (isDay) {
+    if (isDay) { 
         // Compute lighting
         vec4 diffuse;
 
         vec4 Ld = vec4(1.0, 1.0, 1.0, 1.0);
         vec4 Kd = vec4(material.diffuse, 1.0);
         float cosTheta = clamp(dot(normal, sunDir), 0.0, 1.0);
-        diffuse = Ld * Kd * cosTheta;
+
+        // Bump map
+        if (bumpMapFlag) {
+            vec4 encodedNormal = texture(normalMap, texcoord);
+            vec3 localCoords = 2.0 * encodedNormal.rgb - vec3(1.0);
+
+            vec3 normalDirection = normalize(localSurface2World * localCoords);
+            vec3 viewDirection = normalize(vec3(v * vec4(0.0, 0.0, 0.0, 1.0)));
+
+            float attenuation = 1.0; // no attenuation
+            vec3 lightDirection = normalize(sun_position);
+
+            diffuse = attenuation * Ld * Kd * cosTheta * max(0.0, dot(normalDirection, lightDirection));
+        } else {
+            diffuse = Ld * Kd * cosTheta;
+        }
 
         float bias = 0.005 * tan(acos(cosTheta));
         bias = clamp(bias, 0, 0.01);

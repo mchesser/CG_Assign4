@@ -1,6 +1,7 @@
 #include "Shapes.hpp"
 #include "glm/vec2.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <iostream>
 
 namespace shapes {
     RawModelData::Shape quad(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4) {
@@ -31,6 +32,35 @@ namespace shapes {
         shape.indices.push_back(2);
         shape.indices.push_back(3);
 
+        // Compute Tangents
+        shape.tangents.resize(shape.vertices.size(), glm::vec3(0.0,0.0,0.0));
+
+        for (int i = 0; i < shape.indices.size(); i+=3) {
+            int i1 = shape.indices.at(i);
+            int i2 = shape.indices.at(i+1);
+            int i3 = shape.indices.at(i+2);
+            glm::vec3 point1 = shape.vertices.at(i1);
+            glm::vec3 point2 = shape.vertices.at(i2);
+            glm::vec3 point3 = shape.vertices.at(i3);
+            glm::vec2 uv1 = shape.texCoords.at(i1);
+            glm::vec2 uv2 = shape.texCoords.at(i2);
+            glm::vec2 uv3 = shape.texCoords.at(i3);
+
+            glm::vec3 p1p2 = point2 - point1;
+            glm::vec3 p1p3 = point3 - point1;
+            glm::vec2 uv1uv2 = uv2 - uv1;
+            glm::vec2 uv1uv3 = uv3 - uv1;
+
+            float c = uv1uv2.s * uv1uv3.t - uv1uv3.s * uv1uv2.t;
+            if (c != 0) {
+                float mul = 1.0 / c;
+                glm::vec3 tangent = (p1p2 * uv1uv3.t - p1p3 * uv1uv2.t) * mul;
+                shape.tangents.at(i1) = glm::normalize(tangent);
+                shape.tangents.at(i2) = glm::normalize(tangent);
+                shape.tangents.at(i3) = glm::normalize(tangent);
+            }
+        }
+
         shape.material = DEFAULT_MATERIAL;
 
         shape.textureName = "";
@@ -38,11 +68,11 @@ namespace shapes {
         return shape;
     }
 
-    RawModelData::Shape triangle(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3) {
-        RawModelData::Shape shape;
+RawModelData::Shape triangle(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3) {
+    RawModelData::Shape shape;
 
-        shape.vertices.reserve(3);
-        shape.vertices.push_back(p1);
+    shape.vertices.reserve(3);
+    shape.vertices.push_back(p1);
         shape.vertices.push_back(p2);
         shape.vertices.push_back(p3);
 
