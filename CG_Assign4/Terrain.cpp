@@ -6,13 +6,19 @@
 #define INTERSECTION_TEXTURE "data/ground/Intersection.jpg"
 #define BUILDING_GROUND_TEXTURE "data/ground/Vereda.jpg"
 
-// Generates a square tile with the specified texture loaded from a file
-RawModelData genTerrainModel(const std::string& terrainTexture) {
+#define HORIZONTAL_NORMAL_TEXTURE "data/ground/RoadstraightHorizontal_NORMAL.png"
+#define VERTICAL_NORMAL_TEXTURE "data/ground/RoadstraightVertical_NORMAL.png"
+#define INTERSECTION_NORMAL_TEXTURE "data/ground/RoadstraightVertical_NORMAL.png"
+#define BUILDING_GROUND_NORMAL_TEXTURE "data/ground/Vereda_NORMAL.png"
 
-    RawModelData data;
+// Generates a square tile with the specified texture loaded from a file
+RawModelData genTerrainModel(const std::string& terrainTexture, const std::string& normalTexture) {
+
+    RawModelData data;  
     RawModelData::Shape shape = shapes::quad(glm::vec3(-1, 0, 1), glm::vec3(-1, 0, -1),
         glm::vec3(1, 0, -1), glm::vec3(1, 0, 1));
     shape.textureName = terrainTexture;
+    shape.normalMap = normalTexture;
     data.shapes.push_back(shape);
 
     // BoundingBox of terrain
@@ -25,10 +31,10 @@ RawModelData genTerrainModel(const std::string& terrainTexture) {
 }
 
 Terrain::Terrain(Renderer* renderer) {
-    horizontalRoad = new ModelData(genTerrainModel(HORIZONTAL_TEXTURE), renderer);
-    verticalRoad = new ModelData(genTerrainModel(VERTICAL_TEXTURE), renderer);
-    intersection = new ModelData(genTerrainModel(INTERSECTION_TEXTURE), renderer);
-    building = new ModelData(genTerrainModel(BUILDING_GROUND_TEXTURE), renderer);
+    horizontalRoad = new ModelData(genTerrainModel(HORIZONTAL_TEXTURE, HORIZONTAL_NORMAL_TEXTURE), renderer);
+    verticalRoad = new ModelData(genTerrainModel(VERTICAL_TEXTURE, VERTICAL_NORMAL_TEXTURE), renderer);
+    intersection = new ModelData(genTerrainModel(INTERSECTION_TEXTURE, INTERSECTION_NORMAL_TEXTURE), renderer);
+    building = new ModelData(genTerrainModel(BUILDING_GROUND_TEXTURE, BUILDING_GROUND_NORMAL_TEXTURE), renderer);
 }
 
 void Terrain::draw(Renderer* renderer, City* city, glm::vec3 cameraPosition, int size) const {

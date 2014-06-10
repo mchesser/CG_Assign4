@@ -20,11 +20,14 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.in_coord = glGetAttribLocation(modelProgram, "v_coord");
     shader.in_normal = glGetAttribLocation(modelProgram, "v_normal");
     shader.in_texcoord = glGetAttribLocation(modelProgram, "v_texcoord");
+    shader.in_tangent = glGetAttribLocation(modelProgram, "v_tangent");
 
-    shader.uniform_mv = glGetUniformLocation(modelProgram, "mv");
+    shader.uniform_m = glGetUniformLocation(modelProgram, "m");
+    shader.uniform_v = glGetUniformLocation(modelProgram, "v");
     shader.uniform_proj = glGetUniformLocation(modelProgram, "proj");
     shader.uniform_depthBiasMVP = glGetUniformLocation(modelProgram, "depthBiasMVP");
     shader.uniform_normalMatrix = glGetUniformLocation(modelProgram, "normalMatrix");
+    shader.uniform_bumpMapFlag = glGetUniformLocation(modelProgram, "bumpMapFlag");
 
     shader.uniform_materialAmbient = glGetUniformLocation(modelProgram, "material.ambient");
     shader.uniform_materialDiffuse = glGetUniformLocation(modelProgram, "material.diffuse");
@@ -37,6 +40,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_sunDiffuse = glGetUniformLocation(modelProgram, "sunDiffuse");
     shader.uniform_isDay = glGetUniformLocation(modelProgram, "isDay");
 
+    shader.uniform_normalMap = glGetUniformLocation(modelProgram, "normalMap");
     shader.uniform_modelTexture = glGetUniformLocation(modelProgram, "modelTexture");
     shader.uniform_shadowMap = glGetUniformLocation(modelProgram, "shadowMap");
     shader.uniform_depthMVP = glGetUniformLocation(shadowMapProgram, "depthMVP");
@@ -336,9 +340,11 @@ void Renderer::renderScene() {
         glUniformMatrix4fv(shader.uniform_depthBiasMVP, 1, GL_FALSE, glm::value_ptr(depthBiasMVP));
 
         // Calculate model transformations
-        const glm::mat4 mv = cameraView * renderData[i].transformation;
-        glUniformMatrix4fv(shader.uniform_mv, 1, GL_FALSE, glm::value_ptr(mv));
-        const glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(mv)));
+        const glm::mat4 m = renderData[i].transformation;
+        glUniformMatrix4fv(shader.uniform_m, 1, GL_FALSE, glm::value_ptr(m));
+        const glm::mat4 v = cameraView; 
+        glUniformMatrix4fv(shader.uniform_v, 1, GL_FALSE, glm::value_ptr(v));
+        const glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(v * m)));
         glUniformMatrix3fv(shader.uniform_normalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
         // Render the model
@@ -351,8 +357,19 @@ void Renderer::renderScene() {
             glUniform3fv(shader.uniform_materialSpecular, 1, glm::value_ptr(mat.specular));
             glUniform1f(shader.uniform_materialShine, mat.shininess);
 
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, model->shapes[i].textureId);
             glUniform1i(shader.uniform_modelTexture, /*GL_TEXTURE*/1);
+
+            if (model->shapes[i].normalMapId != -1) {
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, model->shapes[i].normalMapId);
+                glUniform1i(shader.uniform_normalMap, /*GL_TEXTURE*/2);
+                glUniform1i(shader.uniform_bumpMapFlag, (GLboolean)model->shapes[i].normalMapId);
+                glUniform1i(shader.uniform_bumpMapFlag, 1);
+            } else {
+                glUniform1i(shader.uniform_bumpMapFlag, 0);
+            }
 
             glDrawElements(GL_TRIANGLES, model->shapes[i].numElements, GL_UNSIGNED_INT, (GLvoid*)model->shapes[i].elementOffset);
         }

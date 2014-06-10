@@ -37,8 +37,10 @@ struct RawModelData {
         std::vector<glm::vec3> normals;
         std::vector<glm::vec2> texCoords;
         std::vector<unsigned int> indices;
+        std::vector<glm::vec3> tangents;
         Material material;
         std::string textureName;
+        std::string normalMap;
     };
     std::vector<Shape> shapes;
 };
@@ -80,10 +82,11 @@ public:
 
 private:
     GLuint vao;
-    GLuint buffers[4];
+    GLuint buffers[5];
     struct Shape {
         Material material;
         GLuint textureId;
+        GLint normalMapId;
         unsigned int elementOffset;
         unsigned int numElements;
     };

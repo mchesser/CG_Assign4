@@ -102,11 +102,14 @@ public:
         GLint in_coord;
         GLint in_normal;
         GLint in_texcoord;
+        GLint in_tangent;
 
-        GLint uniform_mv;
+        GLint uniform_m;
+        GLint uniform_v;
         GLint uniform_proj;
         GLint uniform_depthBiasMVP;
         GLint uniform_normalMatrix;
+        GLint uniform_bumpMapFlag;
 
         GLint uniform_materialAmbient;
         GLint uniform_materialDiffuse;
@@ -119,6 +122,7 @@ public:
         GLint uniform_sunDiffuse;
         GLint uniform_isDay;
 
+        GLint uniform_normalMap;
         GLint uniform_modelTexture;
         GLint uniform_shadowMap;
         GLint uniform_depthMVP;
