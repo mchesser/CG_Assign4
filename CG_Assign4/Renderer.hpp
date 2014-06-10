@@ -80,7 +80,7 @@ public:
     /// Renders the scene to the screen.
     /// </summary>
     void renderScene();
-    
+
     /// <summary>
     /// Clears the current scene in the renderer.
     /// </summary>
@@ -97,7 +97,7 @@ public:
     ///
     /// <param="skybox">The skybox to be rendered</param>
     void attachSkybox(Skybox* skybox);
-   
+
     struct ShaderInfo {
         GLint in_coord;
         GLint in_normal;
@@ -163,7 +163,7 @@ private:
     GLuint nightProgram;
     GLuint shadowMapProgram;
     GLuint skyboxProgram;
-    
+
     GLuint shadowMapFramebuffer;
     GLuint shadowMapTexture;
 

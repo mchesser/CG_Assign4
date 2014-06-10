@@ -53,10 +53,11 @@ RawModelData loadModelData(const std::string& filename, bool opposite_winding) {
             shape.vertices.push_back(b);
             shape.vertices.push_back(c);
 
-            glm::vec3 normal; 
+            glm::vec3 normal;
             if (!opposite_winding) {
                 normal = glm::normalize(glm::cross(b - a, c - a));
-            } else {
+            }
+            else {
                 normal = glm::normalize(glm::cross(c - a, b - a));
             }
             for (int n = 0; n < 3; ++n) {
@@ -104,7 +105,7 @@ RawModelData loadModelData(const std::string& filename, bool opposite_winding) {
 ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
     unsigned int totalAttributes = 0;
     unsigned int totalElements = 0;
-    
+
     std::vector<unsigned int> indices;
     for (size_t i = 0; i < data.shapes.size(); ++i) {
         // Recalculate indices based on the position in the buffer
@@ -118,7 +119,7 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    
+
     glGenBuffers(4, buffers);
 
     // Allocate memory for buffers
@@ -139,7 +140,7 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalElements * sizeof(unsigned int), dataPtr(indices), GL_STATIC_DRAW);
-    
+
     unsigned int attributeArrayOffset = 0;
     unsigned int elementArrayOffset = 0;
     for (size_t i = 0; i < data.shapes.size(); ++i) {

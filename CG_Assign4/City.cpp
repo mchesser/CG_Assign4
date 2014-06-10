@@ -34,12 +34,12 @@ float noise(int x, int y) {
 #define KEY_HEIGHT 6
 
 const static TileType TILE_KEY[KEY_HEIGHT][KEY_WIDTH] = {
-    { B, B, V, B, B },
-    { H, H, I, H, H },
-    { B, B, V, B, B },
-    { B, B, V, B, B },
-    { H, H, I, H, H },
-    { B, B, V, B, B },
+        { B, B, V, B, B },
+        { H, H, I, H, H },
+        { B, B, V, B, B },
+        { B, B, V, B, B },
+        { H, H, I, H, H },
+        { B, B, V, B, B },
 };
 
 TileType getTile(int x, int y) {
@@ -128,18 +128,18 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             case V: // Vertical road segment
             {
                 if (gridy % 2 == 0) {
-                    const glm::vec3 position = tileOffset + glm::vec3(-TILE_SIZE/2, 0.01, 0.0);
+                    const glm::vec3 position = tileOffset + glm::vec3(-TILE_SIZE / 2, 0.01, 0.0);
                     Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
-                    arrangement.rotate(glm::vec3(0.0, TAU/4, 0.0));
+                    arrangement.rotate(glm::vec3(0.0, TAU / 4, 0.0));
                     const glm::mat4 transform = arrangement.transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 
                     renderer->addLight(tileOffset + glm::vec3(-TILE_SIZE / STREETLIGHT_POS_DIV, STREETLIGHT_HEIGHT, 0));
                 }
                 else {
-                    const glm::vec3 position = tileOffset + glm::vec3(TILE_SIZE/2, 0.01, 0.0);
+                    const glm::vec3 position = tileOffset + glm::vec3(TILE_SIZE / 2, 0.01, 0.0);
                     Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
-                    arrangement.rotate(glm::vec3(0.0, TAU/-4, 0.0));
+                    arrangement.rotate(glm::vec3(0.0, TAU / -4, 0.0));
                     const glm::mat4 transform = arrangement.transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 
@@ -151,7 +151,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
             {
                 if (gridx % 2 == 0) {
                     const glm::vec3 position = tileOffset + glm::vec3(0.0, 0.01, -TILE_SIZE / 2);
-                    const glm::mat4 transform = Object(position, STREET_DIR, SKY_DIR, 
+                    const glm::mat4 transform = Object(position, STREET_DIR, SKY_DIR,
                         streetlight.scale).transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 
@@ -160,7 +160,7 @@ void City::draw(Renderer* renderer, glm::vec3 cameraPosition) const {
                 else {
                     const glm::vec3 position = tileOffset + glm::vec3(0.0, 0.01, TILE_SIZE / 2);
                     Object arrangement = Object(position, STREET_DIR, SKY_DIR, streetlight.scale);
-                    arrangement.rotate(glm::vec3(0.0, TAU/2, 0.0));
+                    arrangement.rotate(glm::vec3(0.0, TAU / 2, 0.0));
                     const glm::mat4 transform = arrangement.transformationMatrix();
                     renderer->drawModel(streetlight.model, transform);
 

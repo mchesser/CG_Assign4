@@ -90,7 +90,7 @@ void initResources() {
     std::vector<ModelData*> modelBuildings;
     std::vector<RawModelData> buildings;
     buildings = buildingFactory->genBuildings(NUMBER_OF_BUILDINGS);
-    for (int i=0; i<buildings.size(); i++) {
+    for (int i = 0; i < buildings.size(); i++) {
         ModelData *buildingModel = new ModelData(buildings[i], renderer);
         buildingModel->reduce();
         modelBuildings.push_back(buildingModel);
@@ -171,7 +171,7 @@ void onIdle() {
 
     if (keyState.up && !keyState.down) {
         relativeMovement.z += 0.2f;
-    } 
+    }
     if (keyState.down && !keyState.up) {
         relativeMovement.z -= 0.2f;
     }
@@ -250,20 +250,20 @@ void onReshape(GLsizei width, GLsizei height) {
 
 
 void setTimeMenu(int id) {
-    switch(id) {
-        case 1: sun->setVerticalAngle(3.14159); break;
-        case 2: sun->setVerticalAngle(0); break;
-        case 3: sun->setVerticalAngle(0.27); break;
-        case 4: sun->setVerticalAngle(2.89); break;
+    switch (id) {
+    case 1: sun->setVerticalAngle(3.14159); break;
+    case 2: sun->setVerticalAngle(0); break;
+    case 3: sun->setVerticalAngle(0.27); break;
+    case 4: sun->setVerticalAngle(2.89); break;
     }
 }
 
 void setSpeedMenu(int id) {
-    switch(id) {
-        case 1: sun->increaseSpeed(); break;
-        case 2: sun->decreaseSpeed(); break;
-        case 3: sun->togglePause(); break;
-        case 4: sun->resetSpeed(); break;
+    switch (id) {
+    case 1: sun->increaseSpeed(); break;
+    case 2: sun->decreaseSpeed(); break;
+    case 3: sun->togglePause(); break;
+    case 4: sun->resetSpeed(); break;
     }
 
 }
@@ -303,7 +303,7 @@ int main(int argc, char* argv[]) {
 #else
     glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #endif
-    
+
     glutInitWindowSize(800, 600);
     glutCreateWindow("Assignment 4");
 
@@ -329,7 +329,7 @@ int main(int argc, char* argv[]) {
     glutMouseFunc(onMouse);
     glutMotionFunc(onMotion);
     initGlutMenu();
-    
+
     initResources();
 
     glutMainLoop();

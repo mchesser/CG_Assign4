@@ -18,8 +18,6 @@
 
 
 Skybox::Skybox(const Renderer* renderer, std::vector<std::string> day_files, std::vector<std::string> night_files, std::vector<std::string> sunset_files) {
-
-
     //
     // Initialize wall vertices
     //
@@ -66,7 +64,6 @@ Skybox::Skybox(const Renderer* renderer, std::vector<std::string> day_files, std
     //
     // Initialize wall texcoords
     //
-
     GLfloat texcoords[] = {
         0, 1, 0, 0, 1, 0, 1, 1
     };
@@ -74,7 +71,6 @@ Skybox::Skybox(const Renderer* renderer, std::vector<std::string> day_files, std
     //
     // Initialize wall indices
     //
-
     unsigned int indices[] = {
         2, 1, 0, 0, 3, 2
     };

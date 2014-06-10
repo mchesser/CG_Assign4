@@ -37,10 +37,10 @@ void Terrain::draw(Renderer* renderer, City* city, glm::vec3 cameraPosition, int
     const float terrainSizeZ = terrainSizeX;
 
     // Find camera position square
-    glm::vec3 centerSquare = glm::vec3( 
-        terrainSizeX * 2 * (int)((cameraPosition.x + terrainSizeX * cameraPosition.x/(fabs(cameraPosition.x)))/(terrainSizeX * 2)),
-        0.0, 
-        terrainSizeZ * 2 * (int)((cameraPosition.z + terrainSizeZ * cameraPosition.z/(fabs(cameraPosition.z)))/(terrainSizeZ * 2))
+    glm::vec3 centerSquare = glm::vec3(
+        terrainSizeX * 2 * (int)((cameraPosition.x + terrainSizeX * cameraPosition.x / (fabs(cameraPosition.x))) / (terrainSizeX * 2)),
+        0.0,
+        terrainSizeZ * 2 * (int)((cameraPosition.z + terrainSizeZ * cameraPosition.z / (fabs(cameraPosition.z))) / (terrainSizeZ * 2))
         );
 
     // Handle division by 0
@@ -48,30 +48,30 @@ void Terrain::draw(Renderer* renderer, City* city, glm::vec3 cameraPosition, int
     if (cameraPosition.z == 0) centerSquare.z = 0.0;
 
     // Draw center square and surrounding squares
-    for (int i=-size; i<size+1; i++) { 
-        for (int j=-size; j<size+1; j++) {
+    for (int i = -size; i < size + 1; i++) {
+        for (int j = -size; j < size + 1; j++) {
             glm::vec3 square = centerSquare;
             square.x = centerSquare.x + terrainSizeX * 2 * j;
             square.z = centerSquare.z + terrainSizeZ * 2 * i;
             switch (city->tileForPosition(square)) {
             case B: // Building case
             {
-            	renderer->drawModel(building, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
+                renderer->drawModel(building, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
             }
                 break;
             case V: // Vertical road segment
-            { 
-            	renderer->drawModel(verticalRoad, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
+            {
+                renderer->drawModel(verticalRoad, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
             }
                 break;
             case H: // Horizontal road segment
             {
-            	renderer->drawModel(horizontalRoad, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
+                renderer->drawModel(horizontalRoad, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
             }
                 break;
             case I: // Intersection
             {
-            	renderer->drawModel(intersection, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
+                renderer->drawModel(intersection, square, glm::vec3(terrainSizeX, 1, terrainSizeZ));
             }
                 break;
             }

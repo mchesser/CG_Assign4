@@ -6,9 +6,9 @@
 #endif
 
 #ifndef __APPLE__
-  #include <GL/glew.h>
-  #include <GL/glut.h>
+#include <GL/glew.h>
+#include <GL/glut.h>
 #else
-  #include <OpenGL/gl3.h>
-  #include <GLUT/glut.h>
+#include <OpenGL/gl3.h>
+#include <GLUT/glut.h>
 #endif
