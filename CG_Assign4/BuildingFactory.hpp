@@ -10,32 +10,31 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
-class BuildingFactory
-{
+class BuildingFactory {
 public:
-	BuildingFactory(std::vector <std::string> windowTexturesName, std::string topTextureName);
+    BuildingFactory(std::vector <std::string> windowTexturesName, std::string topTextureName);
 
-	/// <summary>
+    /// <summary>
     /// Returns a block styled building
     /// </summary>
-	RawModelData genBlockBuilding();
+    RawModelData genBlockBuilding();
 
-	/// <summary>
+    /// <summary>
     /// Returns a classic styled building
     /// </summary>
-	RawModelData genClassicBuilding();    
+    RawModelData genClassicBuilding();
 
-	/// <summary>
+    /// <summary>
     /// Returns a number of random generated buildings
     /// </summary>
-	std::vector <RawModelData> genBuildings(int number);
+    std::vector <RawModelData> genBuildings(int number);
 private:
-	float buildingDimension;
-	float buildingHeight;
-	std::vector <std::string> windowTextures;
-	std::string topTexture;
+    float buildingDimension;
+    float buildingHeight;
+    std::vector <std::string> windowTextures;
+    std::string topTexture;
 
-	RawModelData genTrianglePrism(float width, float height, float depth, glm::vec3 center);
-	RawModelData genCube(std::string texture, float width, float height, float depth, glm::vec3 center);
+    RawModelData genTrianglePrism(float width, float height, float depth, glm::vec3 center);
+    RawModelData genCube(std::string texture, float width, float height, float depth, glm::vec3 center);
 
 };

@@ -42,12 +42,12 @@ struct Material {
 };
 uniform Material material;
 
-vec2 poissonDisk[4] = vec2[](
-    vec2(-0.94201624, -0.39906216),
-    vec2(0.94558609, -0.76890725),
-    vec2(-0.094184101, -0.92938870),
+vec2 poissonDisk[4] = vec2[] ( 
+    vec2(-0.94201624, -0.39906216), 
+    vec2(0.94558609, -0.76890725), 
+    vec2(-0.094184101, -0.92938870), 
     vec2(0.34495938, 0.29387760)
-    );
+);
 
 uniform float renderDistance;
 uniform vec4 fogColor;
@@ -55,68 +55,75 @@ float fogFade = 10.0;
 
 vec3 minAmbient = vec3(0.2, 0.2, 0.2);
 
-vec3 computeLighting(vec3 lightPosition, LightSource light) {
-    vec3 lightToPosition = position - lightPosition;
-    float distance = length(lightToPosition);
-    vec3 lightDir = lightToPosition / distance;
-
-    float theta = acos(dot(-lightDir, -light.direction));
-    if (theta > light.maxAngle) {
-        return vec3(0, 0, 0);
+vec3 computeDiffuse(vec4 lightVector, LightSource light) {
+    float distance;
+    vec3 lightDir;
+    if (lightVector.w != 0) {
+        vec3 lightToPosition = position - vec3(lightVector);
+        distance = length(lightToPosition);
+        lightDir = lightToPosition / distance;
+    }
+    else {
+        distance = 0.0;
+        lightDir = normalize(vec3(lightVector));
     }
 
-    vec3 ambient = light.ambient * material.ambient;
-    float cosTheta = clamp(dot(normal, lightDir), 0.0, 1.0);
+    float theta = 0.0;
+    if (light.direction != vec3(0, 0, 0)) {
+        theta = acos(dot(lightDir, light.direction));
+        if (theta > light.maxAngle) {
+            return vec3(0, 0, 0);
+        }
+    }
+
+    float cosTheta = 0.0;
+
+    // Bump map
+    if (bumpMapFlag) {
+        vec4 encodedNormal = texture(normalMap, texcoord);
+        vec3 localCoords = 2.0 * encodedNormal.rgb - vec3(1.0);
+        vec3 normalDirection = normalize(localSurface2World * localCoords);
+
+        cosTheta = max(0.0, dot(normalDirection, lightDir));
+    } 
+    else {
+        cosTheta = clamp(dot(normal, lightDir), 0.0, 1.0);
+    }
 
     vec3 diffuse = light.diffuse * material.diffuse * cosTheta * (1.0 - pow(theta / light.maxAngle, 2));
-
-    return (ambient + diffuse) / (1.0 + 0.1 * distance * distance);
+    return diffuse / (1.0 + 0.1 * distance * distance);
 }
 
 
 void main(void) {
     vec4 color;
-
+    // Day lighting
     if (isDay) { 
-        // Compute lighting
-        vec4 diffuse;
+        LightSource sunLightSource;
+        sunLightSource.direction = vec3(0, 0, 0);
+        sunLightSource.maxAngle = 0.0;
+        sunLightSource.ambient = sunAmbient;
+        sunLightSource.diffuse = sunDiffuse;
 
-        vec4 Ld = vec4(1.0, 1.0, 1.0, 1.0);
-        vec4 Kd = vec4(material.diffuse, 1.0);
-        float cosTheta = clamp(dot(normal, sunDir), 0.0, 1.0);
+        vec4 diffuse = vec4(computeDiffuse(vec4(sunDir, 0.0), sunLightSource), 1.0);
 
-        // Bump map
-        if (bumpMapFlag) {
-            vec4 encodedNormal = texture(normalMap, texcoord);
-            vec3 localCoords = 2.0 * encodedNormal.rgb - vec3(1.0);
-
-            vec3 normalDirection = normalize(localSurface2World * localCoords);
-            vec3 viewDirection = normalize(position - sun_position);
-
-            float attenuation = 1.0; // no attenuation
-            vec3 lightDirection = normalize(sunDir);
-
-            diffuse = attenuation * Ld * Kd * cosTheta * max(0.0, dot(normalDirection, lightDirection));
-        } else {
-            diffuse = Ld * Kd * cosTheta;
-        }
-
-        float bias = 0.005 * tan(acos(cosTheta));
+        // Shadows
+        float bias = 0.005;
         bias = clamp(bias, 0, 0.01);
-
-        // Compute visibility
         float visibility = 1.0;
-        for (int i = 0; i < 4; i++) {
-            visibility -= 0.2 * (1.0 - texture(shadowMap, vec3(shadowCoord.xy + poissonDisk[i]/3000.0, (shadowCoord.z-bias)/shadowCoord.w)));
-        }
+        for (int i = 0; i < 4; ++i) {
+            visibility -= 0.2 * (1.0 - texture(shadowMap, vec3(shadowCoord.xy + poissonDisk[i] / 8000.0,
+                (shadowCoord.z - bias) / shadowCoord.w)));
+         }
 
         color = visibility * diffuse * vec4(sunDiffuse, 1.0);
         color.a = 1.0;
     }
+    // Night lighting
     else {
         vec3 totalLight = vec3(0.0, 0.0, 0.0);
         for (int i = 0; i < numLights; ++i) {
-            totalLight += computeLighting(lightPositions[i], lampLight);
+            totalLight += computeDiffuse(vec4(lightPositions[i], 1.0), lampLight);
         }
 
         color = vec4(totalLight, 1.0);

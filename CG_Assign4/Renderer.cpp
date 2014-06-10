@@ -8,14 +8,16 @@
 #include <sstream>
 
 #define TAU (6.283185307179586f)
-#define FOV 45.0f
 #define DEG2RAD(x) ((x) / 360.0f * TAU)
 
+#define FOV 45.0f
+#define SHADOW_QUALITY 4
+
 Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistance, const Camera* camera, const Sun* sun,
-    GLuint modelProgram, GLuint shadowMapProgram, GLuint skyboxProgram) : screenWidth(screenWidth),  
-    screenHeight(screenHeight), renderDistance(renderDistance), activeCamera(camera), sun(sun), 
+    GLuint modelProgram, GLuint shadowMapProgram, GLuint skyboxProgram) : screenWidth(screenWidth),
+    screenHeight(screenHeight), renderDistance(renderDistance), activeCamera(camera), sun(sun),
     modelProgram(modelProgram), shadowMapProgram(shadowMapProgram), skyboxProgram(skyboxProgram) {
-    
+
     // Configure shaders
     shader.in_coord = glGetAttribLocation(modelProgram, "v_coord");
     shader.in_normal = glGetAttribLocation(modelProgram, "v_normal");
@@ -34,7 +36,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     shader.uniform_materialSpecular = glGetUniformLocation(modelProgram, "material.specular");
     shader.uniform_materialShine = glGetUniformLocation(modelProgram, "material.shine");
     shader.uniform_materialOpacity = glGetUniformLocation(modelProgram, "material.opacity");
-    
+
     shader.uniform_sunPos = glGetUniformLocation(modelProgram, "sunPos");
     shader.uniform_sunAmbient = glGetUniformLocation(modelProgram, "sunAmbient");
     shader.uniform_sunDiffuse = glGetUniformLocation(modelProgram, "sunDiffuse");
@@ -69,7 +71,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
         std::ostringstream light_ind;
         light_ind << i;
         const std::string shaderName = "lightPositions[" + light_ind.str() + "]";
-        shader.uniform_lightPositions[i]= glGetUniformLocation(modelProgram, (shaderName).c_str());
+        shader.uniform_lightPositions[i] = glGetUniformLocation(modelProgram, (shaderName).c_str());
     }
     lampLight.direction = glm::vec3(0, -1, 0);
     lampLight.maxAngle = 1.4f;
@@ -84,7 +86,7 @@ Renderer::Renderer(GLsizei screenWidth, GLsizei screenHeight, float renderDistan
     glGenTextures(1, &shadowMapTexture);
     glBindTexture(GL_TEXTURE_2D, shadowMapTexture);
     // Setup a 1024x1024 texture image with no data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 4 * 1024, 4 * 1024, 0, GL_DEPTH_COMPONENT,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, SHADOW_QUALITY * 1024, SHADOW_QUALITY * 1024, 0, GL_DEPTH_COMPONENT,
         GL_FLOAT, NULL);
 
     // Setup sampling settings
@@ -122,8 +124,8 @@ void Renderer::resize(GLsizei width, GLsizei height) {
 }
 
 void Renderer::drawModel(const ModelData* model, glm::mat4 transformation) {
-	RenderData data = { model, transformation };
-	renderData.push_back(data);
+    RenderData data = { model, transformation };
+    renderData.push_back(data);
 }
 
 void Renderer::drawModel(const ModelData* model, glm::vec3 position, glm::vec3 scale,
@@ -174,7 +176,7 @@ void Renderer::renderScene() {
         glUseProgram(shadowMapProgram);
         glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFramebuffer);
         glClear(GL_DEPTH_BUFFER_BIT);
-        glViewport(0, 0, 4 * 1024, 4 * 1024);
+        glViewport(0, 0, SHADOW_QUALITY * 1024, SHADOW_QUALITY * 1024);
         for (size_t i = 0; i < renderData.size(); ++i) {
             const glm::mat4 depthMVP = sunViewProj * renderData[i].transformation;
             glUniformMatrix4fv(shader.uniform_depthMVP, 1, GL_FALSE, glm::value_ptr(depthMVP));
@@ -186,7 +188,7 @@ void Renderer::renderScene() {
             }
         }
     }
-    
+
     //
     // Set background color and fog color
     //
@@ -203,7 +205,7 @@ void Renderer::renderScene() {
     if (sunPosition.y < 0) {
         fogColor = nighttime_fog;
         clearColor = night;
-    } 
+    }
     // Night -> Sunrise / sunset
     else if (sunPosition.y < 100) {
         float t = 1.0f - (sunPosition.y / 100.0f);
@@ -268,7 +270,7 @@ void Renderer::renderScene() {
 
             glBindTexture(GL_TEXTURE_2D, active_skybox->walls[i].sunset_textureId);
             glUniform1i(shader.uniform_sb_sunset_texture, 2);
-            
+
             glDrawElements(GL_TRIANGLES, active_skybox->walls[i].num_elements, GL_UNSIGNED_INT, NULL);
 
             glBindVertexArray(0);
@@ -276,7 +278,7 @@ void Renderer::renderScene() {
 
         glUseProgram(0);
     }
-    
+
     //
     // Render models
     //
@@ -307,8 +309,8 @@ void Renderer::renderScene() {
     glUniform3fv(shader.uniform_lampLight.ambient, 1, glm::value_ptr(lampLight.ambient));
     glUniform3fv(shader.uniform_lampLight.diffuse, 1, glm::value_ptr(lampLight.diffuse));
 
-    int shader_i = 0;
-    int light_i = 0;
+    size_t shader_i = 0;
+    size_t light_i = 0;
     while (shader_i < MAX_LIGHTS) {
         while (light_i < lights.size() && !inFOV(lights[light_i], activeCamera->getPosition(), activeCamera->getDirection())) {
             light_i += 1;
@@ -334,11 +336,11 @@ void Renderer::renderScene() {
             0.0, 0.5, 0.0, 0.0,
             0.0, 0.0, 0.5, 0.0,
             0.5, 0.5, 0.5, 1.0
-         );
+            );
         const glm::mat4 depthMVP = sunViewProj * renderData[i].transformation;
         const glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
         glUniformMatrix4fv(shader.uniform_depthBiasMVP, 1, GL_FALSE, glm::value_ptr(depthBiasMVP));
-        
+
         // Calculate model transformations
         const glm::mat4 m = renderData[i].transformation;
         glUniformMatrix4fv(shader.uniform_m, 1, GL_FALSE, glm::value_ptr(m));
@@ -376,25 +378,25 @@ void Renderer::renderScene() {
     }
 }
 
-bool Renderer::checkCollision(glm::vec3 position) { 
+bool Renderer::checkCollision(glm::vec3 position) {
     for (size_t i = 0; i < renderData.size(); i++) {
         // Position of object
         const glm::mat4 m = renderData[i].transformation;
 
         // put bounding box in position
         glm::vec4 boundingBoxMax = m * glm::vec4(renderData[i].model->boundingBox.maxVertex, 1);
-        glm::vec4 boundingBoxMin = m * glm::vec4(renderData[i].model->boundingBox.minVertex, 1); 
+        glm::vec4 boundingBoxMin = m * glm::vec4(renderData[i].model->boundingBox.minVertex, 1);
 
         float boundingOffset = 0.3f;
         //Check if within box
-        if (boundingBoxMax.x + boundingOffset > position.x 
+        if (boundingBoxMax.x + boundingOffset > position.x
             && boundingBoxMin.x - boundingOffset < position.x
             && boundingBoxMax.y + boundingOffset > position.y
             && boundingBoxMin.y - boundingOffset < position.y
             && boundingBoxMax.z + boundingOffset > position.z
             && boundingBoxMin.z - boundingOffset < position.z) {
             return true;
-        } 
+        }
         else if (position.y < 0.0 + boundingOffset) { // Special case for the ground
             return true;
         }

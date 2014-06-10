@@ -33,9 +33,9 @@ namespace shapes {
         shape.indices.push_back(3);
 
         // Compute Tangents
-        shape.tangents.resize(shape.vertices.size(), glm::vec3(0.0,0.0,0.0));
+        shape.tangents.resize(shape.vertices.size(), glm::vec3(0.0f, 0.0f, 0.0f));
 
-        for (int i = 0; i < shape.indices.size(); i+=3) {
+        for (size_t i = 0; i < shape.indices.size(); i += 3) {
             int i1 = shape.indices.at(i);
             int i2 = shape.indices.at(i+1);
             int i3 = shape.indices.at(i+2);
@@ -53,7 +53,7 @@ namespace shapes {
 
             float c = uv1uv2.s * uv1uv3.t - uv1uv3.s * uv1uv2.t;
             if (c != 0) {
-                float mul = 1.0 / c;
+                float mul = 1.0f / c;
                 glm::vec3 tangent = (p1p2 * uv1uv3.t - p1p3 * uv1uv2.t) * mul;
                 shape.tangents.at(i1) = glm::normalize(tangent);
                 shape.tangents.at(i2) = glm::normalize(tangent);

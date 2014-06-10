@@ -10,15 +10,15 @@
 
 glm::vec3 linear_color_gradient(const glm::vec3 colors[], size_t numColors, float x) {
     // Handle the the cases where there is only one color to sample
-    if (x <= 0.0) {
+    if (x <= 0.0f) {
         return colors[0];
     }
-    else if (x >= 1.0) {
-        return colors[numColors-1];
+    else if (x >= 1.0f) {
+        return colors[numColors - 1];
     }
 
-    const float band_width = numColors - 1.0;
-    const int left_color = x * band_width;
+    const float band_width = numColors - 1.0f;
+    const int left_color = static_cast<int>(x * band_width);
     const int right_color = left_color + 1;
     const float x_new = x * band_width - left_color;
 
@@ -26,10 +26,10 @@ glm::vec3 linear_color_gradient(const glm::vec3 colors[], size_t numColors, floa
     return colors[left_color] + x_new * (colors[right_color] - colors[left_color]);
 }
 
-Sun::Sun(float verticalAngle, float horizontalAngle) 
-    : verticalAngle(verticalAngle), horizontalAngle(horizontalAngle), 
-      rotate_speed(DEFAULT_ROTATE_SPEED), paused(false) {
-    
+Sun::Sun(float verticalAngle, float horizontalAngle)
+    : verticalAngle(verticalAngle), horizontalAngle(horizontalAngle),
+    rotate_speed(DEFAULT_ROTATE_SPEED), paused(false) {
+
     distance = 700;
     projection = glm::ortho<float>(-50, 50, -50, 50, distance - 50, distance + 50);
 }
@@ -48,7 +48,7 @@ glm::vec3 Sun::position() const {
         glm::cos(verticalAngle) * glm::cos(horizontalAngle),
         glm::sin(verticalAngle),
         glm::cos(verticalAngle) * glm::sin(horizontalAngle)
-    ));
+        ));
 }
 
 glm::mat4 Sun::viewProjection(glm::vec3 position) const {
@@ -94,7 +94,7 @@ void Sun::setHorizontalAngle(float angle) {
     }
 }
 
-glm::vec3 Sun::diffuse() const { 
+glm::vec3 Sun::diffuse() const {
     static const glm::vec3 colors[3] = {
         glm::vec3(1), // Day
         glm::vec3(1.0f, 0.6f, 0.4f), // Sunset
@@ -109,7 +109,7 @@ glm::vec3 Sun::diffuse() const {
     }
     else if (sun_position.y < 200.0f) {
         float x = sun_position.y / 200.0f;
-        return linear_color_gradient(colors, 3, 1.0 - x);
+        return linear_color_gradient(colors, 3, 1.0f - x);
     }
     return colors[0];
 }

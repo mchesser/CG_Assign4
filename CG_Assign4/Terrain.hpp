@@ -10,22 +10,21 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
-class Terrain
-{
+class Terrain {
 public:
-	/// <summary>
+    /// <summary>
     /// Creates all tile models
     /// </summary>
-	Terrain(Renderer* renderer);
+    Terrain(Renderer* renderer);
 
-	/// <summary>
+    /// <summary>
     /// Draws a grid of terrain models corresponding to the city grid
     /// </summary>
-	void draw(Renderer* renderer, City* city, glm::vec3 cameraPosition, int size) const;
+    void draw(Renderer* renderer, City* city, glm::vec3 cameraPosition, int size) const;
 private:
-	ModelData* horizontalRoad;
-	ModelData* verticalRoad;
-	ModelData* intersection;
-	ModelData* building;
+    ModelData* horizontalRoad;
+    ModelData* verticalRoad;
+    ModelData* intersection;
+    ModelData* building;
 
 };

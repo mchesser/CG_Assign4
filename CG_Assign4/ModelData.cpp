@@ -53,10 +53,11 @@ RawModelData loadModelData(const std::string& filename, bool opposite_winding) {
             shape.vertices.push_back(b);
             shape.vertices.push_back(c);
 
-            glm::vec3 normal; 
+            glm::vec3 normal;
             if (!opposite_winding) {
                 normal = glm::normalize(glm::cross(b - a, c - a));
-            } else {
+            }
+            else {
                 normal = glm::normalize(glm::cross(c - a, b - a));
             }
             for (int n = 0; n < 3; ++n) {
@@ -104,7 +105,7 @@ RawModelData loadModelData(const std::string& filename, bool opposite_winding) {
 ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
     unsigned int totalAttributes = 0;
     unsigned int totalElements = 0;
-    
+
     std::vector<unsigned int> indices;
     for (size_t i = 0; i < data.shapes.size(); ++i) {
         // Recalculate indices based on the position in the buffer
@@ -118,7 +119,7 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    
+
     glGenBuffers(5, buffers);
 
     // Allocate memory for buffers
@@ -144,7 +145,7 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
     glBufferData(GL_ARRAY_BUFFER, totalAttributes * sizeof(glm::vec3), NULL, GL_STATIC_DRAW);
     glEnableVertexAttribArray(renderer->shader.in_tangent);
     glVertexAttribPointer(renderer->shader.in_tangent, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    
+
     unsigned int attributeArrayOffset = 0;
     unsigned int elementArrayOffset = 0;
     for (size_t i = 0; i < data.shapes.size(); ++i) {
@@ -178,16 +179,17 @@ ModelData::ModelData(const RawModelData& data, const Renderer* renderer) {
         // Load the normal map texture using SOIL
         if (!data.shapes[i].normalMap.empty()) {
             shape.normalMapId = AssetManager::loadTexture(data.shapes[i].normalMap);
-        } else {
+        }
+        else {
             shape.normalMapId = -1;
         }
 
-         // Load tangents into the buffer
+        // Load tangents into the buffer
         if (data.shapes[i].tangents.size() > 0) {
             glBindBuffer(GL_ARRAY_BUFFER, buffers[4]);
             glBufferSubData(GL_ARRAY_BUFFER, attributeArrayOffset * sizeof(glm::vec3),
                 attributeArraySize * sizeof(glm::vec3), dataPtr(data.shapes[i].tangents));
-        }  
+        }
 
         shape.elementOffset = elementArrayOffset * sizeof(unsigned int);
         shape.numElements = data.shapes[i].indices.size();
