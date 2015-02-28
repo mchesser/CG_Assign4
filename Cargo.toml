@@ -1,0 +1,22 @@
+[package]
+name = "CG_Assign4"
+version = "0.0.0"
+authors = ["Michael Chesser"]
+
+[[bin]]
+name = "CG_Assign4"
+
+[dependencies.glutin]
+git = "https://github.com/tomaka/glutin"
+
+[dependencies.glium]
+git = "https://github.com/tomaka/glium"
+
+[dependencies.glium_macros]
+git = "https://github.com/tomaka/glium"
+
+[dependencies.nalgebra]
+git = "https://github.com/sebcrozet/nalgebra"
+
+[dependencies]
+clock_ticks = "*"

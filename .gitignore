@@ -1,26 +1,22 @@
-# Compiled Object files
-*.slo
-*.lo
+# Object files
 *.o
+*.ko
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
+# Libraries
 *.lib
+*.a
+*.rlib
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
 
 # Executables
 *.exe
 *.out
 *.app
-/CG_Assign4/CG_Assign4.vcxproj.filters
-/CG_Assign4/CG_Assign4.opensdf
-/CG_Assign4/CG_Assign4.sdf
-/CG_Assign4/CG_Assign4.sln
-/CG_Assign4/CG_Assign4.v12.suo
-/CG_Assign4/CG_Assign4.vcxproj
+
+# Cargo
+/target
